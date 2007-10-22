@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+use dbQC;
+use intodb;
+
+my $path= get_obs_pgm_path();
+
+
+all_intodb( $path,"obs_pgm","obs_pgm.out",'|');

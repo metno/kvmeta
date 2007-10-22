@@ -1,0 +1,67 @@
+#! /bin/sh
+
+DESTINATION=bin
+STKV=
+STKVSRC=$METADIR/src/stinfosys2kvalobs
+
+#Do the install
+
+HELP=
+DEST=
+UNKNOWN=
+
+# FUNCTIONS: ====================================================
+
+
+
+# PARSE THE COMMANDLINE =========================================
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case $1 in
+    -help    ) HELP=TRUE;;
+    -h       ) HELP=TRUE;;
+    -dest    ) DEST=$2
+                shift;;
+    -d       ) DEST=$2
+                shift;;
+    *        ) UNKNOWN=$1
+    esac
+    shift
+done
+
+
+if [ $UNKNOWN ]; then
+    echo $BOLD    echo "UNKNOWN OPTION: $UNKNOWN"
+    echo "skipping INSTALL at $PWD"
+    echo $PLAIN
+    exit;
+fi
+
+
+if [ $DEST ]; then
+    mkdir -p $DEST/$DESTINATION
+    STKV=$DEST/$DESTINATION
+else
+    echo $BOLD
+    echo "NO INSTALL DESTINATION DEFINED..... skipping $PWD"
+    echo $PLAIN
+    exit;
+fi
+
+
+
+mkdir -p $STKV/stkv_cron
+
+# cp -upv $STKVSRC/stinfosys2kvalobs.pl       $STKV/stkv_cron
+cp -upv $STKVSRC/station2kvalobs.pl         $STKV/stkv_cron
+cp -upv $STKVSRC/param2kvalobs.pl           $STKV/stkv_cron
+cp -upv $STKVSRC/obs_pgm2kvalobs.pl         $STKV/stkv_cron
+cp -upv $STKVSRC/message_format_stdump.pl   $STKV/stkv_cron
+
+
+# cp -upv $STKVSRC/run_stinfosys2kvalobs          $STKV/
+cp -upv $STKVSRC/run_stinfosys2kvalobs_new       $STKV/
+# cp -upv $STKVSRC/run_stinfosys2kvalobs_station  $STKV/
+cp -upv $STKVSRC/run_stinfosys2hist_kvalobs_new  $STKV/
+
+cp -upfv  *.pm "$DEST/lib/perl" 

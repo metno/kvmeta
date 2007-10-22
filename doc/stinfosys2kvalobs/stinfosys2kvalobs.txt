@@ -1,0 +1,142 @@
+Alle tabellene som kvalobs får i fra stinfosys får de i fra databasen stinfosys
+på warm. Konfigurasjonsfilen som scriptene bruker heter stinfosys.conf og ligger under ~/etc katalogen
+Cronjobscriptet på overcast heter run_stinfosys2kvalobs_new,
+det bruker perlscriptene 
+- station2kvalobs.pl
+- obs_pgm2kvalobs.pl
+- param2kvalobs.pl
+- message_format_stdump.pl
+
+Cronjobscriptet run_stinfosys2kvalobs_new kan kalles opp med et argument, vanligvis latin1, 
+da vil det skrive ut *.out filene på latin1 formatet. 
+Uten noe argument vil det skrive ut *.out filene på utf-8  formatet.
+
+all kode referert til over finnes under: 
+kvalobs_metadata/src/stinfosys2kvalobs
+
+
+perlscriptet station2kvalobs.pl bruker modulen wmonr_stinfosys2kvalobs.pm.
+Denne modulen kan editeres for å stanse wmonr til stasjoner en ikke ønsker skal ha det.
+I dag ser denne koden slik ut:
+our %wmono_filter;
+$wmono_filter{99700}=1;
+$wmono_filter{71530}=1;
+$wmono_filter{99940}=1;
+$wmono_filter{44550}=1;
+
+Det er bare å legge til å fjerne etter behov eller ønsker. Denne
+modulen er felles for både vanlig kvalobs og hist_kvalobs.
+
+Eneste forkjellen på vanlig kvalobs og hist_kvalobs er:
+ run_stinfosys2hist_kvalobs_new
+Dette scriptet bruker de samme perscriptene som
+ run_stinfosys2kvalobs_new, men med andre opsjoner:
+ -1 i stedet for 365 for  station2kvalobs.pl og obs_pgm2kvalobs.pl
+
+Argumentet til station2kvalobs.pl og  obs_pgm2kvalobs.pl betyr:
+-1 alle tidspunkt
+-2 totime er null, det vil si det som gjelder akkurat nå
+'positivt tall' er antall dager tilbake, eks. 365
+
+
+Driftsdokumentasjon TODO ved feilmelding:
+- sjekk at en eller flere av de tabellen(e) som vises under i dette dokumentet
+ikke er tomme på stinfosys@warm.
+psql -h warm -p 5435 -U pstinfosys -d stinfosys
+Password: info12
+- sjekk at tabellstrukturen ikke er endret i forhold til det som vises
+under i dette dokumentet. Det skal riktignok ikke skje av seg selv, men mennesker gjør feil.
+- meld ifra til Gabriel og Øystein
+
+Følgende tabeller i stinfosys brukes,
+strukturen som beskrives under er tabellene slik de sees ut i drift nå:
+
+tabellen network_station bruker bare 
+stationid og networkid.
+
+
+CREATE TABLE obs_pgm  (
+        stationid INTEGER NOT NULL,
+        paramid   INTEGER NOT NULL,
+        hlevel    INTEGER NOT NULL,
+        nsensor   INTEGER DEFAULT 1,
+	priority_messageid INTEGER NOT NULL,
+        anytime BOOLEAN DEFAULT FALSE,
+        hour    BOOLEAN[24] DEFAULT '{FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE}',
+	totime    TIMESTAMP DEFAULT NULL,
+        fromtime  TIMESTAMP NOT NULL,
+	edited_by  INTEGER NOT NULL,
+        edited_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY ( stationid, paramid, hlevel, fromtime ),
+	FOREIGN KEY ( stationid ) REFERENCES stationid_list,
+        FOREIGN KEY ( paramid )   REFERENCES param,
+	FOREIGN KEY ( priority_messageid )  REFERENCES message_format ( message_formatid )
+);
+
+CREATE TABLE station (
+        stationid INTEGER NOT NULL,
+        lat FLOAT DEFAULT NULL,
+        lon FLOAT DEFAULT NULL,
+        countryid   INTEGER NOT NULL,
+        municipid   INTEGER DEFAULT NULL,
+        Hs     INTEGER DEFAULT NULL,
+        Hv     INTEGER DEFAULT NULL,
+        Hp     FLOAT DEFAULT NULL, -- tilsvarer Ha for flyplasser
+        -- Hb     FLOAT DEFAULT NULL, regnes ut i fra hbe=Hb-Hp
+        maxspeed FLOAT DEFAULT NULL,
+        name                TEXT DEFAULT NULL,
+        -- international_name  TEXT DEFAULT NULL, name i tabellen wmostation
+        -- airport_name        TEXT DEFAULT NULL, name i tabellen airport
+        short_name       VARCHAR ( 16 ) DEFAULT NULL,
+        wmono      INTEGER DEFAULT NULL,
+        icaocode   CHAR ( 4 ) DEFAULT NULL,
+        call_sign  VARCHAR ( 7 ) DEFAULT NULL,
+        environmentid INTEGER NOT NULL,
+        ontologyid    INTEGER NOT NULL,
+        fromtime   TIMESTAMP NOT NULL,
+        totime     TIMESTAMP DEFAULT NULL,
+        edited_by   INTEGER NOT NULL,
+        edited_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY ( stationid, fromtime ),
+        FOREIGN KEY ( stationid )            REFERENCES stationid_list,
+        FOREIGN KEY ( countryid )            REFERENCES country,
+        FOREIGN KEY ( municipid )            REFERENCES municip,
+        FOREIGN KEY ( wmono )                REFERENCES wmostation,
+        FOREIGN KEY ( icaocode )             REFERENCES airport,
+        FOREIGN KEY ( environmentid )        REFERENCES environment,
+        FOREIGN KEY ( ontologyid )           REFERENCES ontology
+);
+
+
+CREATE TABLE param (
+        paramid INTEGER NOT NULL,
+        name    TEXT DEFAULT NULL,
+        description TEXT DEFAULT NULL,
+        weather_element TEXT DEFAULT NULL,
+        unit    TEXT DEFAULT NULL,
+        hlevel_scale INTEGER DEFAULT 0,
+        standard_hlevel INTEGER DEFAULT NULL,
+        standard_physical_height TEXT DEFAULT NULL,
+        comment TEXT DEFAULT NULL,
+        scalar  BOOLEAN DEFAULT TRUE,
+        edited_by     INTEGER NOT NULL,
+        edited_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY ( paramid )
+);
+
+
+CREATE TABLE message_format (
+        message_formatid INTEGER NOT NULL,
+        name     TEXT DEFAULT NULL,
+        earlyobs INTEGER DEFAULT NULL,
+        lateobs  INTEGER DEFAULT NULL,
+        read        TEXT DEFAULT NULL,
+        frequency   TEXT DEFAULT NULL,
+        description TEXT DEFAULT NULL,
+        edited_by           INTEGER NOT NULL,
+        edited_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY ( message_formatid )
+);
+
+
+

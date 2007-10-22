@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Cwd;
+
+
+my $bin_path= get_bin_path();
+#$bin_path = $bin_path . "/dbscript";
+my $lib_path= get_lib_path();
+
+print "bin_path= $bin_path \n";
+print "lib_path= $lib_path \n";
+
+
+
+while(<*.pl>){
+    my $f=$_;
+    chop;chop;chop;
+    print; 
+    my $min = -M $f;
+    my $tt= " days since last changed: " . $min;
+    my $binfile = "$bin_path/$_";
+    #print $binfile;
+
+    if( -e $binfile ){
+	if( -M $f <= -M $binfile){
+	    print "$tt TO bin ";
+	    system("cp $f $binfile");
+	    system("chmod a+rx $binfile");
+	}
+    }else{
+	print "$tt new TO bin ";
+	system("cp $f $binfile");
+	system("chmod a+rx $binfile");
+    }
+ 
+   #my $dir = cwd();
+    print "\n";
+}
+
+
+while(<run*>){
+    my $f=$_;
+    print; 
+    my $min = -M $f;
+    my $tt= " days since last changed: " . $min;
+    my $binfile = "$bin_path/$_";
+
+    if( -e $binfile ){
+	if( -M $f <= -M  $binfile ){
+	    print "$tt TO bin ";
+	    system("cp $f  $binfile");
+	    system("chmod a+rx  $binfile");
+	}
+    }else{
+	print "$tt new TO bin ";
+	system("cp $f  $binfile");
+	system("chmod a+rx  $binfile");
+    }
+ 
+   #my $dir = cwd();
+   print "\n";
+}
+  
+
+while(<*.pm>){
+    my $f=$_;
+    print; 
+    my $min = -M $f;
+    my $tt= " days since last changed: " . $min;
+    my $libfile = "$lib_path/$f";
+
+    if( -e $libfile ){
+	if( -M $f <= -M  $libfile ){
+	    print "$tt TO lib/perl ";
+	    system("cp $f  $libfile");
+	}
+    }else{
+	print "$tt new TO  lib/perl";
+	system("cp $f $libfile");
+    }
+ 
+   #my $dir = cwd();
+   print "\n";
+}
+
+
+
+  
+sub get_lib_path{
+    my $lib_path=$ENV{"PERL5LIB"};
+    return $lib_path;
+}
+
+
+sub get_bin_path{
+    my $bin_path;
+    if( defined( $bin_path=$ENV{"PATH"}) ){     
+	my $bin_path=trim($bin_path);
+	print "bin_path=  $bin_path\n";
+        if( length($bin_path)>0 ){
+            my @sline=split /:/,$bin_path;
+            my $len=@sline;
+            if($len>1){
+		if( defined($sline[0]) ){
+		    return trim($sline[0]);
+		}
+	    }else{
+		 return $bin_path;
+	    }
+	}
+    }
+    return "";
+}
+
+
+sub trim{
+    my  $line = shift;
+    if(defined($line)){
+        $line =~ s/^\s*//; #Her utfores en ltrim
+        $line =~ s/\s*$//; #Her utfores en rtrim
+        return $line;
+    }
+    return "";
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,3 @@
+checkname      : eq_between 
+qcx            : QC1-2-154
+checksignature : obs;CC1,CH;;|meta;CC1_C,CH_LO,CH_HI;;

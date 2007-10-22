@@ -1,0 +1,7 @@
+run_QC1-1 all
+run_QC1-3 all
+run_QC1-4 all
+run_QC2d-4 all
+run_algorithm_all
+run_checks_all
+run_station_param_all

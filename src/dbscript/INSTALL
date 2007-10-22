@@ -1,0 +1,61 @@
+#! /bin/sh
+
+DESTINATION=
+DIRECTORIES="bin lib/perl bin/dbscript"
+FILES=
+
+
+#Prepare the install
+
+MYLIBPERL="lib/perl"
+DBSCRIPT="bin/dbscript"
+MYBIN="bin"
+
+mkdir -p "$MYLIBPERL"
+mkdir -p "$DBSCRIPT"
+mkdir -p "$MYBIN"
+
+if ! [ -d $MYLIBPERL ]; then
+   echo "Cant create directory `pwd`/lib/perl"
+   exit 1
+fi
+
+if ! [ -d "$DBSCRIPT" ]; then
+   echo "Cant create directory `pwd`/$DBSCRIPT"
+   exit 1
+fi
+
+if ! [ -d "$MYBIN" ]; then
+   echo "Cant create directory `pwd`/$MYBIN"
+   exit 1
+fi
+
+cp -upfv kvinitdb "$MYBIN"
+cp -upfv  *.pm "$MYLIBPERL"	
+
+#Remove the '.pl' ending
+for FILE in `ls -1 *.pl` ; do
+  BASE=`echo $FILE | sed -e 's/\.pl//'`
+  cp -ufpv "$FILE" "$DBSCRIPT/$BASE"
+done
+
+#Remove the '.sh' ending
+for FILE in `ls -1 *.sh` ; do
+  BASE=`echo $FILE | sed -e 's/\.sh//'`
+  cp -ufpv "$FILE" "$DBSCRIPT/$BASE"
+done
+
+
+for FILE in `ls -1 run*` ; do 
+  #Dont install backup files
+  if [ -z $(echo $FILE | grep '~') ]; then
+     cp -ufpv "$FILE" "$DBSCRIPT/$FILE"
+  fi
+done
+
+chmod -Rf +x $DBSCRIPT
+chmod -Rf +x $MYBIN
+
+
+#Do the install
+. $KVDIR/conf/INSTALL.conf

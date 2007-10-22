@@ -1,0 +1,34 @@
+#! /bin/sh
+
+PSQL=psql
+
+if ! [ KVALOBS ]; then
+   KVALOBS="."
+fi
+
+MYPATH="$KVALOBS/bin/dbscript"
+
+if ! [ -f "$MYPATH/script.create" ]; then
+    echo "Missing: $MYPATH/script.create"
+    exit 1;
+fi
+
+PATH="$MYPATH:$PATH"
+export PATH
+
+if [ -z "$PGHOST" ]; then
+    PGHOST=localhost
+fi
+
+export PGHOST
+
+PGPASSWORD=`grep dbpass $KVALOBS/.kvpasswd | sed -e 's/ *dbpass *//'`
+
+export PGPASSWORD
+
+dropdb -U kvalobs kvalobs
+createdb -E SQL_ASCII -U kvalobs --owner kvalobs kvalobs
+
+psql -U kvalobs kvalobs < "$MYPATH/script.create"
+
+run_metadata
