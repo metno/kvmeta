@@ -22,7 +22,7 @@ my $path= get_algorithms_path();
 #$ENV{"PATH"}="$scriptpath:$ENV{\"PATH\"}";
 #printf("PATH: %s\n", $ENV{"PATH"});
 #printf("system(algorithm_all ins $path)\n");
-
-system("algorithm_all ins $path");
+my $expath=getenv('LIBEXECDIR');
+system("$expath/algorithm_all ins $path");
 
 

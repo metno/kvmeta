@@ -62,10 +62,10 @@ sub get_bin_path{
 
 
 sub get_passwd{
-    my $kvalobs;
-    if( defined( $kvalobs=$ENV{"KVALOBS"}) ){
-        my $kvalobs=trim($kvalobs);
-	my $kvpasswd= $kvalobs . "/.kvpasswd";
+    my $home;
+    if( defined( $home=$ENV{"HOME"}) ){
+        my $home=trim($home);
+	my $kvpasswd= $home . "/.kvpasswd";
 	open(MYFILE,$kvpasswd ) or die "Can't open $kvpasswd: $!\n";
 	my $line;
 	while( defined($line=<MYFILE>) ){

@@ -1,11 +1,4 @@
 #! /bin/sh
 
-if ! [ KVALOBS ]; then
-   MYPATH="."
-else
-   MYPATH="$KVALOBS/bin/dbscript"
-fi
-
-
-$MYPATH/dbQC1-4_cat
-$MYPATH/dbQC1-4 ${1} QC1-4meta QC1-4
+$LIBEXECDIR/dbQC1-4_cat
+$LIBEXECDIR/dbQC1-4 ${1} QC1-4meta QC1-4
