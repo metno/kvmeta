@@ -16,8 +16,8 @@ fi
 KVCONFIG=__KVCONFIG__
 PKGLIBDIR=`$KVCONFIG --libdir`/kvalobs
 LIBEXECDIR=`$KVCONFIG --libexecdir`/kvalobs
-METADATADIR=`$KVCONFIG --datadir`/kvalobs/metadata
-
+METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
+KVALOBS=`$KVCONFIG --prefix`
 
 ## ** Global variables **
 #MYPATH=$LIBEXECDIR
