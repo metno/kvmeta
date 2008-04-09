@@ -54,11 +54,11 @@ if( $len == 0 ){
     #print "$year,$month,$day\n";
 
 
-    my $stname=  st_name();
-    my $sthost=  st_host();
-    my $stport=  st_port();
-    my $stuser=  st_user();
-    my $stpasswd=st_passwd();
+    my $stname= "stinfosys"; # st_name();
+    my $sthost= "warm";      # st_host();
+    my $stport= "5435";      # st_port();
+    my $stuser= "pstinfosys"; # st_user();
+    my $stpasswd="info12";   # st_passwd();
 
 # print " $dbname,$host,$dbuser,$passwd\n";
 # exit 0;
@@ -98,7 +98,7 @@ while (my @row = $sth->fetchrow()) {
 
     #if($row[5] eq "t" or $row[5] eq "T" or $row[5]  eq = "1"
 
-    $time_hash{"$row[0]|$row[1]|$row[2]|$row[8]$totime"}=1;
+    $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"}=1;
     print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$outhour|$week|$row[8]|$totime\n";
 }
 
@@ -116,7 +116,7 @@ if( $days_back > -2 ){
      }
 
 
-     if( ! exists  $time_hash{"$row[0]|$row[1]|$row[2]|$row[7]$totime"} ){
+     if( ! exists  $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"} ){
 	     print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|f|$outhour|$week|$row[8]|$totime\n";	 
      }
   }
