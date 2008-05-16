@@ -20,7 +20,7 @@ mkdir -p  $DUMPDIR
 
 ## PRODUCTION
 $KVALOBS/bin/stkv_cron/station2kvalobs.pl 365 > $DUMPDIR/station.utf-8
-$KVALOBS/bin/stkv_cron/obs_pgm2kvalobs.pl 365 > $DUMPDIR/obs_pgm.out
+$KVALOBS/bin/stkv_cron/obs_pgm2kvalobs_new.pl 365 > $DUMPDIR/obs_pgm.out
 $KVALOBS/bin/stkv_cron/param2kvalobs.pl       > $DUMPDIR/param.utf-8
 $KVALOBS/bin/stkv_cron/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 
