@@ -71,18 +71,18 @@ my %time_hash;
 
 if( $days_back == -1 ){# fullstendig historisk med alle data 
    $sth=$dbh->prepare("select * from obs_pgm") or die "Can't prep\n";
-   $sth2=$dbh->prepare("select * from obs_pgm where totime is not NULL") or die "Can't prep\n";
-}elsif( $days_back == -2 ){# bare nÃ¥tid
+   # $sth2=$dbh->prepare("select * from obs_pgm where totime is not NULL") or die "Can't prep\n";
+}elsif( $days_back == -2 ){# bare nåtid
    $sth=$dbh->prepare("select * from obs_pgm where totime is NULL") or die "Can't prep\n";
 }else{# fullstendig historisk $days_back dager bakover
    $sth=$dbh->prepare("select * from obs_pgm where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
-   $sth2=$dbh->prepare("select * from obs_pgm where totime>=( now() - '$days_back days'::INTERVAL )") or die "Can't prep\n";
+   # $sth2=$dbh->prepare("select * from obs_pgm where totime>=( now() - '$days_back days'::INTERVAL )") or die "Can't prep\n";
 }
 
 
 $sth->execute;
 
- my $week="t|t|t|t|t|t|t";
+my $week="t|t|t|t|t|t|t";
 while (my @row = $sth->fetchrow()) {
     my $hour=$row[6];
     $hour =~ s/[\s{}]//g;
@@ -98,29 +98,29 @@ while (my @row = $sth->fetchrow()) {
 
     #if($row[5] eq "t" or $row[5] eq "T" or $row[5]  eq = "1"
 
-    $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"}=1;
+    ## $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"}=1;
     print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$outhour|$week|$row[8]|$totime\n";
 }
 
 $sth->finish;
 
-if( $days_back > -2 ){
-  $sth2->execute;
-  while (my @row = $sth2->fetchrow()) {
-     my $outhour="f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f";
-     my $totime=$row[7];
-	
-     if( ! defined $totime ){
-	#print "Totime IKKE DEFINERT \n";
-	$totime="\\N";
-     }
-
-
-     if( ! exists  $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"} ){
-	     print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|f|$outhour|$week|$row[8]|$totime\n";	 
-     }
-  }
-  $sth2->finish;
-}
+#if( $days_back > -2 ){
+#  $sth2->execute;
+#  while (my @row = $sth2->fetchrow()) {
+#     my $outhour="f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f|f";
+#     my $totime=$row[7];
+#	
+#     if( ! defined $totime ){
+#	#print "Totime IKKE DEFINERT \n";
+#	$totime="\\N";
+#     }
+#
+#
+#     if( ! exists  $time_hash{"$row[0]|$row[1]|$row[2]|$row[4]|$row[8]|$totime"} ){
+#	     print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|f|$outhour|$week|$row[8]|$totime\n";	 
+#     }
+#  }
+#  $sth2->finish;
+# }
 
 $dbh->disconnect;
