@@ -18,24 +18,21 @@ my $dev="";
 
 my $temp;
 
-  $hk=$ENV{"KVALOBS"};
+my $kvconfig=`which kvconfig`;
 
-  if( substr($hk,-1,1) eq '/' ){
-      chop($hk);
-  }
 
-  $metadata=$hk . "/share/kvalobs/metadata";
+$metadata=`$kvconfig --localstetedir` . "/kvalobs/metadata";
 
-  if( defined($dev=$ENV{"METADIR"})){
-      if( substr($dev,-1,1) eq '/' ){
-           chop($dev);
-       }
-      $cvs_metadata=$dev . "/share/metadata";
-  }
+if( defined($dev=$ENV{"METADIR"})){
+   if( substr($dev,-1,1) eq '/' ){
+       chop($dev);
+   }
+   $cvs_metadata=$dev . "/share/metadata";
+}
 
 
 sub get_script_path{
-    return "$hk/src/script";
+    return `$kvconfig --localstetedir` . "/kvalobs/bin";
 }
 
 
@@ -90,7 +87,8 @@ sub get_passwd{
 
 sub get_lib_path{
     my $lib_path=$ENV{"PERL5LIB"};
-    return $lib_path;
+    my $libdir=`$kvconfig --libdir`;
+    return $lib_path . ":$libdir/kvalobs/lib/perl";
 }
 
 sub get_checks_path{

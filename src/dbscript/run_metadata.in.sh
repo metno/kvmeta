@@ -8,29 +8,43 @@ set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
 
-if ! [ $PGHOST ]; then
-    echo "PGHOST er ikke satt! Avslutter..."
-    exit 1
-fi
+#if ! [ $PGHOST ]; then
+#    echo "PGHOST er ikke satt! Avslutter..."
+#    exit 1
+#fi
 
 KVCONFIG=__KVCONFIG__
 PKGLIBDIR=`$KVCONFIG --libdir`/kvalobs
-LIBEXECDIR=`$KVCONFIG --libexecdir`/kvalobs
+LIBEXECDIR=`$KVCONFIG --libexecdir`/kvalobs/lib/perl
 METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
-KVALOBS=`$KVCONFIG --prefix`
+#KVALOBS=`$KVCONFIG --prefix`
 
 ## ** Global variables **
 #MYPATH=$LIBEXECDIR
 
-PERL5LIB=$LIBEXECDIR
+PERL5LIB=$PKGLIBDIR/lib/perl
 
-if [ -z "$PGPASSWORD" ]; then
-    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`
-fi
+#if [ -z "$PGPASSWORD" ]; then
+#    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`
+#fi
 
 PGNAME=kvalobs
 PGUSER=kvalobs
-PGTARGET="-h $PGHOST -d $PGNAME -U $PGUSER"
+PGTARGET=
+
+if [ "z$PGHOST" != "z" ]; then
+	PGTARGER="$PGTARGET -h $PGHOST"
+fi
+
+if [ "z$PGNAME" != "z" ]; then
+	PGTARGER="$PGTARGET -d $PGNAME"
+fi
+
+if [ "z$PGUSER" != "z" ]; then
+	PGTARGER="$PGTARGET -U $PGUSER"
+fi
+
+
 
 DUMPDIR="/tmp/$USER/kvalobs/var/log/tabledump"
 rm -rf $DUMPDIR

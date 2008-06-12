@@ -5,24 +5,32 @@ set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
 
-export KVALOBS=$HOME
-export PERL5LIB=$HOME/lib/perl
+kvconfig = $(which kvconfig 2> /dev/null )
+
+if [ "z$kvconfig" = "z" ]; then
+	echo "Cant find 'kvconfig' on the PATH."
+	exit 1
+fi
+
+
+export PERL5LIB=`$kvconfig --libdir`/kvalobs/lib/perl
 export METADIR=$HOME/src/kvalobs_metadata
 
+BINDIR = `$kvconfig --libdir`/kvalobs/bin
 
 
 #echo "KVALOBS=$KVALOBS"
 #echo "METADIR=$METADIR"
 
 
-DUMPDIR=$KVALOBS/var/log/stkv_tabledump
+DUMPDIR=`$kvconfig --localstatedir`/kvalobs/log/stkv_tabledump
 mkdir -p  $DUMPDIR
 
 ## PRODUCTION
-$KVALOBS/bin/stkv_cron/station2kvalobs.pl 365 > $DUMPDIR/station.utf-8
-$KVALOBS/bin/stkv_cron/obs_pgm2kvalobs_new.pl 365 > $DUMPDIR/obs_pgm.out
-$KVALOBS/bin/stkv_cron/param2kvalobs.pl       > $DUMPDIR/param.utf-8
-$KVALOBS/bin/stkv_cron/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
+$BINDIR/station2kvalobs.pl 365 > $DUMPDIR/station.utf-8
+$BINDIR/stkv_cron/obs_pgm2kvalobs_new.pl 365 > $DUMPDIR/obs_pgm.out
+$BINDIR/stkv_cron/param2kvalobs.pl       > $DUMPDIR/param.utf-8
+$BINDIR/stkv_cron/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 
 for TABLE in param station message_format
 do

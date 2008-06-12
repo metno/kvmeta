@@ -9,6 +9,7 @@ AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	src/dbscript/Makefile
+	src/stinfosys2kvalobs/Makefile
 ])
 
 
