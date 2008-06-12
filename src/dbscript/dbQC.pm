@@ -13,7 +13,7 @@ use trim;
 
 my $metadata;
 my $cvs_metadata="";
-my $hk;
+#my $hk;
 my $dev="";
 
 my $temp;
@@ -32,7 +32,7 @@ if( defined($dev=$ENV{"METADIR"})){
 
 
 sub get_script_path{
-    return `$kvconfig --localstetedir` . "/kvalobs/bin";
+    return `$kvconfig --libdir` . "/kvalobs/bin";
 }
 
 
@@ -63,7 +63,7 @@ sub get_passwd{
     if( defined( $home=$ENV{"HOME"}) ){
         my $home=trim($home);
 	my $kvpasswd= $home . "/.kvpasswd";
-	open(MYFILE,$kvpasswd ) or die "Can't open $kvpasswd: $!\n";
+	open(MYFILE,$kvpasswd ) or return "";
 	my $line;
 	while( defined($line=<MYFILE>) ){
             $line= trim($line);
@@ -87,8 +87,7 @@ sub get_passwd{
 
 sub get_lib_path{
     my $lib_path=$ENV{"PERL5LIB"};
-    my $libdir=`$kvconfig --libdir`;
-    return $lib_path . ":$libdir/kvalobs/lib/perl";
+    return $lib_path;
 }
 
 sub get_checks_path{

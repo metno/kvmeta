@@ -1,5 +1,12 @@
 #! /bin/sh
 
+kvconfig=`which kvconfig 2>/dev/null`
+
+if [ "z$kvconfig" == "z" ]; then
+    echo "Cant find 'kvconfig'!"
+    exit 1
+fi
+
 if ! [ KVALOBS ]; then
    MYPATH="."
 else
@@ -7,4 +14,4 @@ else
 fi
 
 
-$MYPATH/dbQC2d-4 ${1} 262 QC2d-4-262metadata QC2d-4-262
+`$kvconfig --libdir`/kvalobs/dbQC2d-4 ${1} 262 QC2d-4-262metadata QC2d-4-262

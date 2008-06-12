@@ -1,5 +1,8 @@
-pkglibdir = `$(KVCONFIG) --pkglibdir`
+kvlibdir = `$(KVCONFIG) --libdir`
+pkglibdir=$kvlibdir/kvalobs
+
 bindir =$(pkglibdir)/bin
+
 bin_SCRIPTS = \
 	run_metadata \
 	run_station \
@@ -22,7 +25,7 @@ bin_SCRIPTS = \
 	algorithm_all \
 	station_param_all \
 	checks_all 
-	
+
 
 run_metadata:	run_metadata.in.sh
 	sed s,__KVCONFIG__,$(KVCONFIG), $< > $@
@@ -36,4 +39,3 @@ pkglibexec_SCRIPTS = \
 	trim.pm \
 	logdbQC.pm \
 	station_param.pm
-	

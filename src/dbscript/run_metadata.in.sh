@@ -15,13 +15,8 @@ set -e  # Exit if a simple shell command fails
 
 KVCONFIG=__KVCONFIG__
 PKGLIBDIR=`$KVCONFIG --libdir`/kvalobs
-LIBEXECDIR=`$KVCONFIG --libexecdir`/kvalobs/lib/perl
+LIBEXECDIR=$PKGLIBDIR/bin
 METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
-#KVALOBS=`$KVCONFIG --prefix`
-
-## ** Global variables **
-#MYPATH=$LIBEXECDIR
-
 PERL5LIB=$PKGLIBDIR/lib/perl
 
 #if [ -z "$PGPASSWORD" ]; then
@@ -33,15 +28,15 @@ PGUSER=kvalobs
 PGTARGET=
 
 if [ "z$PGHOST" != "z" ]; then
-	PGTARGER="$PGTARGET -h $PGHOST"
+	PGTARGET="$PGTARGET -h $PGHOST"
 fi
 
 if [ "z$PGNAME" != "z" ]; then
-	PGTARGER="$PGTARGET -d $PGNAME"
+	PGTARGET="$PGTARGET -d $PGNAME"
 fi
 
 if [ "z$PGUSER" != "z" ]; then
-	PGTARGER="$PGTARGET -U $PGUSER"
+	PGTARGET="$PGTARGET -U $PGUSER"
 fi
 
 
