@@ -1,9 +1,9 @@
-kvlibdir = `$(KVCONFIG) --libdir`
-pkglibdir=$kvlibdir/kvalobs
-
 bindir =$(pkglibdir)/bin
 
-bin_SCRIPTS = \
+nodist_bin_SCRIPTS =\
+	run_QC1-1 
+	
+dist_bin_SCRIPTS = \
 	run_metadata \
 	run_station \
 	run_types \
@@ -11,7 +11,6 @@ bin_SCRIPTS = \
 	run_obs_pgm \
 	run_model \
 	run_qcx_info \
-	run_QC1-1 \
 	run_QC1-3 \
 	run_QC1-4 \
 	checks_auto \
@@ -26,16 +25,19 @@ bin_SCRIPTS = \
 	station_param_all \
 	checks_all 
 
-
 run_metadata:	run_metadata.in.sh
 	sed s,__KVCONFIG__,$(KVCONFIG), $< > $@
 
 #pkglibexecdir=$(libexecdir)/kvalobs
 pkglibexecdir=$(pkglibdir)/lib/perl
 
-pkglibexec_SCRIPTS = \
+dist_pkglibexec_SCRIPTS = \
 	intodb.pm \
 	dbQC.pm \
 	trim.pm \
 	logdbQC.pm \
 	station_param.pm
+
+EXTRA_DIST = run_metadata.in.sh 	run_QC1-1 
+
+CLEANFILES=run_metadata 	run_QC1-1

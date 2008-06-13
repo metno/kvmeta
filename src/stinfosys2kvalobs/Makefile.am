@@ -3,7 +3,7 @@ pkglibdir=$kvlibdir/kvalobs
 
 bindir =$(pkglibdir)/bin
 
-bin_SCRIPTS = run_stinfosys2hist_kvalobs_new \
+dist_bin_SCRIPTS = run_stinfosys2hist_kvalobs_new \
               run_stinfosys2kvalobs_new \
               station2kvalobs.pl \
               obs_pgm2kvalobs_new.pl \
@@ -13,13 +13,10 @@ bin_SCRIPTS = run_stinfosys2hist_kvalobs_new \
               obs_pgm2kvalobs.pl \
               test_wmonr_stinfosys2kvalobs.pl 
 
-run_metadata:	run_metadata.in.sh
-	sed s,__KVCONFIG__,$(KVCONFIG), $< > $@
-
 #pkglibexecdir=$(libexecdir)/kvalobs
 pkglibexecdir=$(pkglibdir)/lib/perl
 
-pkglibexec_SCRIPTS = \
+dist_pkglibexec_SCRIPTS = \
    stinfosysdb.pm \
    stinfosys.pm \
    wmonr_stinfosys2kvalobs.pm \
