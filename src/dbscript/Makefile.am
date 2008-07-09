@@ -26,9 +26,7 @@ dist_bin_SCRIPTS = \
 	station_param_all \
 	checks_all 
 
-nondist_pkglibexecdir = $(pkglibexecdir)
-
-nondist_pkglibexec_SCRIPTS = \
+nodist_pkglibexec_SCRIPTS = \
 	dbQC.pm 
     
 dist_pkglibexec_SCRIPTS = \
@@ -67,4 +65,4 @@ run_checks_all: run_checks_all.in
 EXTRA_DIST = run_metadata.in.sh 	run_QC1-1.in run_QC1-3.in run_QC1-4.in dbQC.pm.in \
  	run_station_param_all.in run_algorithm_all.in run_checks_all.in 
 
-CLEANFILES= $(nodist_bin_SCRIPTS) $(nondist_pkglibexec_SCRIPTS)
+CLEANFILES= $(nodist_bin_SCRIPTS) $(nodist_pkglibexec_SCRIPTS)

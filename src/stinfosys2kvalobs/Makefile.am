@@ -1,7 +1,7 @@
 bindir =$(pkglibdir)/bin
 pkglibexecdir=$(pkglibdir)/lib/perl
 
-nondist_bin_SCRIPTS = \
+nodist_bin_SCRIPTS = \
 	run_stinfosys2hist_kvalobs_new \
 	run_stinfosys2kvalobs_new
 
