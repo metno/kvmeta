@@ -11,9 +11,9 @@ my $path= get_checks_manual_path();
 my @subd = qw( QC1-2 QC1-6  QC1_rest QC2d );
 
 chdir($path);
-my $expath=getenv('LIBEXECDIR');
+#my $expath=getenv('LIBEXECDIR');
 foreach my $sub (@subd){
-  system("$expath/checks_all ins $sub");
+  system("__PKGLIBBINDIR__/checks_all ins $sub");
   chdir($path);
 }
 

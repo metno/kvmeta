@@ -2,24 +2,23 @@ AC_PREREQ([2.59])
 AC_INIT([kvalobs_metadata], [2.0.0], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_MACRO_DIR([m4])
+#AC_CONFIG_MACRO_DIR([m4])
 
 
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	src/dbscript/Makefile
-	src/dbscript/run_QC1-1
 	src/stinfosys2kvalobs/Makefile
 ])
 
 
 #KV_KVALOBS # doesn't work
 AC_ARG_WITH( 
-	[kvalobs],
-	[AS_HELP_STRING([--with-kvalobs=KVALOBS_EXEC_PREFIX],[Kvalobs exec prefix. Defaults to $prefix])],
+	[kvconfig-path],
+	[AS_HELP_STRING([--with-kvconfig-path=KVALOBS_EXEC_PREFIX/bin],[Where is kvconfig. Default search the path on configure time.])],
 	[
-		KVCONFIG=${withval}/bin/kvconfig
+		KVCONFIG=${withval}/kvconfig
 	],
 	[
 		KVCONFIG=`which kvconfig`
@@ -28,7 +27,7 @@ AC_ARG_WITH(
 
 AC_ARG_ENABLE( 
 	[kvconfig-check],
-	[AS_HELP_STRING([--disable-kvconfig-check],[Disable the existence check for kvconfig, assume it will be available at runtime. It is proably wise to use --with-kvalobs to specify where kvconfig is to be found. Default is enabled.])],
+	[AS_HELP_STRING([--disable-kvconfig-check],[Disable the existence check for kvconfig, assume it will be available at runtime. It is proably wise to use --with-kvconfig-path to specify where kvconfig is to be found. Default is enabled.])],
 	[
 		disable_kvconfig_check=${withval}
 	],

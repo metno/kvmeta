@@ -1,0 +1,4 @@
+#! /bin/sh
+
+__PKGLIBBINDIR__/dbQC1-4_cat
+__PKGLIBBINDIR__/dbQC1-4 ${1} QC1-4meta QC1-4

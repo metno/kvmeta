@@ -7,7 +7,7 @@ use dbQC;
 
 my $path= get_algorithms_path();
 
-my $expath=getenv('LIBEXECDIR');
-system("$expath/algorithm_all ins $path");
+##my $expath=getenv('LIBEXECDIR');
+system("__PKGLIBBINDIR__/algorithm_all ins $path");
 
 

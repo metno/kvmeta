@@ -1,5 +1,0 @@
-#! /bin/sh
-
-
-$LIBEXECDIR/dbQC1-3 ${1} QC1-3a max
-$LIBEXECDIR/dbQC1-3 ${1} QC1-3b no

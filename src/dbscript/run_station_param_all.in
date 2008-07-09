@@ -8,9 +8,9 @@ my $path= get_station_param_manual_path();
 my @subd = qw( QC1-2 QC1-6  QC1_rest  QC2d );
 
 chdir($path);
-my $expath=getenv('LIBEXECDIR');
+#my $expath=getenv('LIBEXECDIR');
 foreach my $sub (@subd){
-  system("$expath/station_param_all ins  $sub");
+  system("__PKGLIBBINDIR__/station_param_all ins  $sub");
   chdir($path);
 }
 

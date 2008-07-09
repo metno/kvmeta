@@ -32,7 +32,7 @@ if( defined($dev=$ENV{"METADIR"})){
 
 
 sub get_script_path{
-    return `$kvconfig --libdir` . "/kvalobs/bin";
+    return "__PKGLIBBINDIR__";
 }
 
 

@@ -14,10 +14,9 @@ set -e  # Exit if a simple shell command fails
 #fi
 
 KVCONFIG=__KVCONFIG__
-PKGLIBDIR=`$KVCONFIG --libdir`/kvalobs
-LIBEXECDIR=$PKGLIBDIR/bin
+LIBEXECDIR=__PKGLIBBINDIR__
+PERL5LIB=__PERL5LIB__
 METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
-PERL5LIB=$PKGLIBDIR/lib/perl
 
 #if [ -z "$PGPASSWORD" ]; then
 #    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`

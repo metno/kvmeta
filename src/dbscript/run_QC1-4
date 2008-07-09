@@ -1,4 +1,0 @@
-#! /bin/sh
-
-$LIBEXECDIR/dbQC1-4_cat
-$LIBEXECDIR/dbQC1-4 ${1} QC1-4meta QC1-4
