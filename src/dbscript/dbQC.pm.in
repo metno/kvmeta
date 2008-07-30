@@ -21,7 +21,7 @@ my $temp;
 #my $kvconfig=`which kvconfig`;
 
 
-$metadata=`kvconfig --metadir`; 
+$metadata=`kvconfig --datadir`; 
 $metadata = trim( $metadata )  . "/kvalobs/metadata";
 
 if( defined($dev=$ENV{"METADIR"})){
