@@ -18,10 +18,11 @@ my $dev="";
 
 my $temp;
 
-my $kvconfig=`which kvconfig`;
+#my $kvconfig=`which kvconfig`;
 
 
-$metadata=`$kvconfig --localstatedir` . "/kvalobs/metadata";
+$metadata=`kvconfig --metadir`; 
+$metadata = trim( $metadata )  . "/kvalobs/metadata";
 
 if( defined($dev=$ENV{"METADIR"})){
    if( substr($dev,-1,1) eq '/' ){

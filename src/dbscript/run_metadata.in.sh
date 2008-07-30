@@ -8,8 +8,9 @@ set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
 
+
 #if ! [ $PGHOST ]; then
-#    echo "PGHOST er ikke satt! Avslutter..."
+#    echo "Environment variable PGHOST er ikke satt! Avslutter..."
 #    exit 1
 #fi
 
@@ -22,23 +23,13 @@ METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
 #    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`
 #fi
 
-PGNAME=kvalobs
+PGDATABASE=kvalobs
 PGUSER=kvalobs
-PGTARGET=
+
 
 if [ "z$PGHOST" != "z" ]; then
-	PGTARGET="$PGTARGET -h $PGHOST"
+	PGHOST=localhost
 fi
-
-if [ "z$PGNAME" != "z" ]; then
-	PGTARGET="$PGTARGET -d $PGNAME"
-fi
-
-if [ "z$PGUSER" != "z" ]; then
-	PGTARGET="$PGTARGET -U $PGUSER"
-fi
-
-
 
 DUMPDIR="/tmp/$USER/kvalobs/var/log/tabledump"
 rm -rf $DUMPDIR
@@ -49,14 +40,14 @@ LOGFILE="$DUMPDIR/table_update.log"
 
 ## ** Subroutines **
 assert_table_not_empty() {
-	NUM_ROWS=`psql $PGTARGET -t -c "select count(*) from $1"`
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
 	if [ $NUM_ROWS -eq 0 ]; then
 		echo "ERROR: tabellen $1 er tom."
 		exit 1
 	fi
 }
 
-PSQL="psql $PGTARGET"
+PSQL=psql 
 
 ## ** MAIN **
 
@@ -65,7 +56,7 @@ for TABLE in station types param obs_pgm model qcx_info
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
        
-    if ! diff -q  $DUMPDIR/$TABLE.out $METADATADIR/$TABLE/$TABLE.out; then
+    if ! diff -q  $DUMPDIR/$TABLE.out $METADIR/$TABLE/$TABLE.out; then
 		$LIBEXECDIR/run_$TABLE
 		echo -e `date` "\t$TABLE updated" >> $LOGFILE
 		assert_table_not_empty $TABLE

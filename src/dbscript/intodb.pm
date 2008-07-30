@@ -91,10 +91,10 @@ sub todb{
        $path_outfilename=$outfilename
    }
 
-    my $hostname= $ENV{"HOSTNAME"};
+    #my $hostname= $ENV{"HOSTNAME"};
     my $pghost=   $ENV{"PGHOST"};
 
-    print "hostname= $hostname \n";
+    #print "hostname= $hostname \n";
     print "pghost= $pghost \n";
 
     $ENV{"PGPASSWORD"}=get_passwd();
