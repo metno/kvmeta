@@ -155,7 +155,7 @@ sub algorithm {
 	# $line =~ s/\\n/\\\\n/g;
 	# $line =~ s/\\t/\\\\t/g;
 	$line =~ s/\\/\\\\/g;
-	$algstr .= $line . "\\" . "\n";
+	$algstr .= $line . "\n";
     }
 
     close(MYFILE);
@@ -201,10 +201,8 @@ sub insert_DB{
   #my @driver_names = DBI->available_drivers;
   #print @driver_names;
 
-  my $sth = $dbh->prepare("select language from algorithms where checkname='$checkname'");
-  $sth->execute;
-
-  #my $sth = $dbh->do("select language from algorithms where checkname='$checkname'");
+  my $sth = $dbh->prepare("select language from algorithms where checkname=?");
+  $sth->execute($checkname);
 
     my @row=();
   my @language_already=();
@@ -221,23 +219,23 @@ sub insert_DB{
 	  if($_ eq $language){ 
 	      if( $control eq "ins" || $control eq 'R' ){
 		  print " $checkname: Denne algoritmen blir naa replaced";
-		  my $sth = $dbh->prepare("UPDATE algorithms \
-                                           SET  signature = '$signature', script = '$script' \
-                                           WHERE language='$language' AND checkname='$checkname'");
-                  $sth->execute;
+                  my $sth = $dbh->prepare("UPDATE algorithms \
+                                           SET  signature = ?, script = ? \
+                                           WHERE language=? AND checkname=?");
+                  $sth->execute($signature,$script,$language,$checkname);
                   $sth->finish;
                   return;
 		}
               else{
 	        print " $checkname: Dette spraaket er $_ og finnes i fra for; ingen oppdateringer \n";
-	        exit 0;
+	        return;
 	      }
 	  }
           else{
 	      print " $checkname finnes ogsaa for spraak $_ \n";
 	  }
       }
-      }
+  }
 
   ########################
 
@@ -251,8 +249,8 @@ sub insert_DB{
 
 
 
-  $sth = $dbh->prepare("INSERT INTO algorithms VALUES('$language', '$checkname', '$signature', '$script')");
-  $sth->execute;
+  $sth = $dbh->prepare("INSERT INTO algorithms VALUES(?,?,?,?)");
+  $sth->execute($language,$checkname,$signature,$script);
   
   $sth->finish;
 
