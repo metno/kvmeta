@@ -41,7 +41,7 @@ sub readstfile {
     my $hour    = -1;
     my $qcx;
     my $metadata;
-    my $desc_metadata = "\\N";
+    my $desc_metadata = "";
     my $fromtime      = get_fromtime();
 
     my $is_metadata = 0;
@@ -152,7 +152,7 @@ sub readstfile {
                 }
                 elsif ( $r eq "" ) {
                     if ( $is_metadata == 1 ) {
-                        $metadata .= "\\n" . trim( $words[1] );
+                        $metadata .= "\n" . trim( $words[1] );###
                         print "metadata=$metadata  counter= $counter";
                         print "\n";
                     }
@@ -167,7 +167,7 @@ sub readstfile {
                 }
                 if ( $len == 1 ) {
                     if ( $is_metadata == 1 ) {
-                        $metadata .= "\\n" . trim( $words[0] );
+                        $metadata .= "\n" . trim( $words[0] );###
                         print "metadata=$metadata  counter= $counter";
                         print "\n";
                     }
@@ -385,12 +385,12 @@ sub insert_update_DB {
     eval {
         $sth = $dbh->prepare(
             "SELECT sensor FROM station_param \
-                           WHERE  stationid=$stationid AND paramid=$paramid AND level=$level AND \
-                                  fromday=$fromday AND today=$today AND hour=$hour AND \
-                                  qcx = '$qcx' AND fromtime = '$fromtime'"
+                           WHERE  stationid=? AND paramid=? AND level=? AND \
+                                  fromday=? AND today=? AND hour=? AND \
+                                  qcx=? AND fromtime=?"
         );
 
-        $sth->execute;
+        $sth->execute($stationid,$paramid,$level,$fromday,$today,$hour,$qcx,$fromtime);
 
         my @row = ();
 
@@ -428,12 +428,12 @@ sub insert_update_DB {
 "1: $stationid, $paramid, $qcx, $metadata: Denne raden i station_param tabellen blir naa replaced \n";
                         $sth = $dbh->prepare(
                             "UPDATE station_param \
-                                  SET   metadata = '$metadata', desc_metadata = '$desc_metadata' \
-                                  WHERE stationid=$stationid AND paramid=$paramid AND level=$level AND \
-                                        fromday=$fromday AND today=$today AND hour=$hour AND \
-                                        qcx = '$qcx' AND fromtime = '$fromtime'"
+                                  SET   metadata = ?, desc_metadata = ? \
+                                  WHERE stationid=? AND paramid=? AND level=? AND \
+                                        fromday=? AND today=? AND hour=? AND \
+                                        qcx = ? AND fromtime = ?"
                         );
-                        $sth->execute;
+                        $sth->execute($metadata,$desc_metadata,$stationid,$paramid,$level,$fromday,$today,$hour,$qcx,$fromtime);
                         $sth->finish;
                     };
                     if ($@) { print "tt=$@"; return 0; }
@@ -445,13 +445,13 @@ sub insert_update_DB {
 "2: $stationid, $paramid, $qcx, $metadata: Denne raden i station_param tabellen blir naa replaced \n";
                         $sth = $dbh->prepare(
                             "UPDATE station_param \
-                                  SET   sensor = '$sensor', \
-                                        metadata = '$metadata', desc_metadata = '$desc_metadata' \
-                                  WHERE stationid=$stationid AND paramid=$paramid AND level=$level AND \
-                                        fromday=$fromday AND today=$today AND hour=$hour AND \
-                                        qcx = '$qcx' AND fromtime = '$fromtime'"
+                                  SET   sensor = ?, \
+                                        metadata = ?, desc_metadata = ? \
+                                  WHERE stationid=? AND paramid=? AND level=? AND \
+                                        fromday=? AND today=? AND hour=? AND \
+                                        qcx = ? AND fromtime = ?"
                         );
-                        $sth->execute;
+                        $sth->execute($sensor,$metadata,$desc_metadata,$stationid,$paramid,$level,$fromday,$today,$hour,$qcx,$fromtime);
                         $sth->finish;
                     };
                     if ($@) { print "tt=$@"; return 0; }
@@ -473,10 +473,9 @@ sub insert_update_DB {
 "3: $stationid, $paramid, $qcx, $metadata: denne raden blir naa lagt til \n";
     eval {
         $sth = $dbh->prepare(
-"INSERT INTO station_param VALUES('$stationid','$paramid','$level','$sensor','$fromday','$today',\
-                                                  '$hour','$qcx','$metadata','$desc_metadata','$fromtime')"
+"INSERT INTO station_param VALUES(?,?,?,?,?,?,?,?,?,?,?)"
         );
-        $sth->execute;
+        $sth->execute($stationid,$paramid,$level,$sensor,$fromday,$today,$hour,$qcx,$metadata,$desc_metadata,$fromtime);
         $sth->finish;
     };
     if ($@) { print "tt=$@"; return 0; }
