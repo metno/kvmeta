@@ -1,0 +1,132 @@
+#! /bin/sh
+
+KV_METADIR=/usr/share/kvalobs/metadata
+
+
+if [ "z$METADIR" = "z" ]; then
+   echo "The environment variable METADIR must be set "
+   echo "and point to the kvalobs CVS metadata. "
+   exit 1
+fi
+
+if ! cd $KV_METADIR; then
+    echo "Can not change directory to $KV_METADIR."
+    exit 1
+fi
+
+#
+# Creating backup of the metadata directory to kvalobs
+# $V_METADIR
+#
+
+backup=$HOME/metadat-$(date +%Y%m%d).tar
+metadirs=""
+dirlist=`ls -1`
+
+for file in $dirlist; do
+  if [ -d "$file"  ]; then
+     metadirs="$metadirs $file"
+  fi
+done 
+
+if [ "$metadirs" ]; then
+   echo "Creating backup of currently installed metadata to $backup.bz2" 
+   tar cpf $backup $metadirs
+
+   bzip2 -f $backup
+
+   rm -rf $metadirs
+fi
+
+#
+# Create a temporary directory to hold the new kvalobs metadata
+# that is to be copied to $KV_METADIR
+#
+# The temporary directory is named $HOME/tmp/metadata. 
+#
+
+tmp_metadir="$HOME/tmp/metadata"
+
+if [ -d "$tmp_metadir" ]; then
+  rm -rf $tmp_metadir
+  
+  if [ "$?" != "0" ]; then
+     echo "Can not remove old temporary directory $tmp_metadir."
+     exit 1
+  fi
+fi
+
+  mkdir -p "$tmp_metadir"
+
+  if [ "$?" != "0" ]; then
+     echo "Can not create temporary directory $tmp_metadir."
+     exit 1
+  fi
+  
+  echo "Create temporary directory $tmp_metadir."
+
+
+#
+# Change directory to the METADIR.
+# This directory hold the new metadata
+# checked out from CVS and stinfosys.
+#
+
+if ! cd $METADIR ; then
+   echo "Can not change directory to $METADIR."
+   exit 1
+fi
+
+dirlist=`ls -1`
+metadirs=""
+
+for file in $dirlist; do
+  if [ -d "$file" -a "$file" != "CVS" ]; then
+     metadirs="$metadirs $file"
+  fi
+done 
+
+#echo "metadirs: $metadirs"
+
+tar cpf - $metadirs | (cd $tmp_metadir; tar xpf - )
+
+if [ "$?" != "0" ]; then
+   echo "Failed to copy metadata from $METADIR to $tmp_metadir."
+   exit 1
+fi
+
+if ! cd $tmp_metadir ; then
+   echo "Can not change directory to temporary dir $tmp_metadir."
+   exit 1
+fi
+
+find . -name CVS -type d -exec rm -rf {} \; > /dev/null 2>&1
+
+tar cpf - $metadirs | (cd $KV_METADIR; tar xpf - )
+
+if [ "$?" != "0" ]; then
+    echo "Failed to update kvalobs metadata in directory $KV_METADIR"
+    echo "To restore the old metedata copy the file $backup.bz2"
+    echo "to $KV_METADIR and unpack it."
+    echo
+    echo "   bunzip2 $backup.bz2"
+    echo
+
+    exit 1
+fi
+
+echo
+echo
+echo "The kvalobs metadata is updated in directory $KV_METADIR."
+echo "To update kvalobs:"
+echo
+echo "Stop kvalobs with kvstop."
+echo 
+echo "Update metadata in the database with:"
+echo 
+echo "/usr/lib/kvalobs_metadata/bin/run_metadata"
+echo
+echo "Start kvalobs again with kvstart"
+echo
+
+exit 0
