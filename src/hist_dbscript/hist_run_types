@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+use dbQC;
+use intodb;
+
+my $hk=$ENV{"KVALOBS"};
+my $metadata=$hk . "/share/kvalobs/metadata";
+
+my $path= "$metadata/hist_types";
+
+
+all_intodb( $path,"types","types.out",'|');
