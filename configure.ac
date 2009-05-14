@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs_metadata], [2.0.0], [kvoss@met.no])
+AC_INIT([kvalobs_metadata], [2.0.1], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 
 #AC_CONFIG_MACRO_DIR([m4])
@@ -10,6 +10,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	src/dbscript/Makefile
 	src/stinfosys2kvalobs/Makefile
+	src/hist_dbscript/Makefile
 ])
 
 

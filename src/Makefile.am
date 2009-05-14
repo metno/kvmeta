@@ -1,1 +1,1 @@
-SUBDIRS=dbscript stinfosys2kvalobs
+SUBDIRS=dbscript hist_dbscript stinfosys2kvalobs
