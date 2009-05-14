@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+# use dbQC;
+use trim;
+use intodb;
+
+my $metadata=`kvconfig --datadir`; 
+$metadata = trim( $metadata )  . "/kvalobs/metadata";
+
+# my $path= get_types_path();
+
+my $path= "$metadata/hist_types";
+
+
+
+all_intodb( $path,"types","types.out",'|');
