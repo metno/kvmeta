@@ -14,6 +14,7 @@ dist_bin_SCRIPTS = \
 	run_station \
 	run_types \
 	run_param \
+	run_operator \
 	run_obs_pgm \
 	run_model \
 	run_qcx_info \
