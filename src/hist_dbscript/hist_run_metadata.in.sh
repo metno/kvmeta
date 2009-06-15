@@ -51,8 +51,8 @@ PSQL=psql
 
 ## ** MAIN **
 
-echo "Oppdaterer tabellene param model qcx_info"
-for TABLE in param model qcx_info
+echo "Oppdaterer tabellene param model qcx_info operator"
+for TABLE in param model qcx_info operator
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
        
