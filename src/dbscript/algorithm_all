@@ -68,10 +68,10 @@ foreach my $file (<*.pl>){
     print $file; print "\n";
     eval { algorithm($file, $control) };
     if ( $@ ) {                    # EVAL_ERROR
-	print "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
-	warn "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
+		print "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
+		warn "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
     } else {
-	print "algorithm($file, $control) er OK\n\n";
+		print "algorithm($file, $control) er OK\n\n";
     }
     print "*********************************";print "\n";
 }
