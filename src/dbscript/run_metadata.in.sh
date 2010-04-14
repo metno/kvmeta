@@ -52,7 +52,7 @@ PSQL=psql
 ## ** MAIN **
 
 echo "Oppdaterer tabellene station types param obs_pgm model qcx_info operator"
-for TABLE in station types param obs_pgm model qcx_info operator
+for TABLE in station types param obs_pgm station_metadata model qcx_info operator
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
        

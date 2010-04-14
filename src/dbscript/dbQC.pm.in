@@ -1,7 +1,7 @@
 package dbQC;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw( fhfromday fhtoday  fill_station fill_station_environment fill_param fill_obs_pgm get_fromtime get_checks_path get_checks_manual_path get_cvs_checks_manual_path get_station_param_path get_station_param_manual_path get_cvs_station_param_manual_path station_param_name get_algorithms_path get_cvs_algorithms_path get_station_path  get_param_path  get_qcx_info_path get_obs_pgm_path  get_operator_path get_types_path get_model_path get_script_path get_bin_path get_lib_path get_passwd trim default_trim default_trim_lzero trim_lzero );
+@EXPORT = qw( fhfromday fhtoday  fill_station fill_station_environment fill_param fill_obs_pgm get_fromtime get_checks_path get_checks_manual_path get_cvs_checks_manual_path get_station_param_path get_station_param_manual_path get_cvs_station_param_manual_path station_param_name get_algorithms_path get_cvs_algorithms_path get_station_path  get_param_path  get_qcx_info_path get_obs_pgm_path get_station_metadata_path get_operator_path get_types_path get_model_path get_script_path get_bin_path get_lib_path get_passwd trim default_trim default_trim_lzero trim_lzero );
 
 
 use POSIX;
@@ -147,6 +147,11 @@ sub get_qcx_info_path{
 
 sub get_obs_pgm_path{  
     return "$metadata/obs_pgm";
+}
+
+
+sub get_station_metadata_path{  
+    return "$metadata/station_metadata";
 }
 
 
