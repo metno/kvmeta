@@ -5,17 +5,18 @@ nodist_bin_SCRIPTS =\
 	run_checks_all \
 	run_station_param_all \
 	run_algorithm_all \
-   run_metadata \
+	run_metadata \
 	run_QC1-4 \
-   run_QC1-3 \
-	run_QC1-1 
-	
+	run_QC1-3 \
+	run_QC1-1
+
 dist_bin_SCRIPTS = \
 	run_station \
 	run_types \
 	run_param \
 	run_operator \
 	run_obs_pgm \
+	run_station_metadata \
 	run_model \
 	run_qcx_info \
 	checks_auto \
@@ -42,7 +43,7 @@ run_metadata:	run_metadata.in.sh
    | sed s,__PKGLIBBINDIR__,$(bindir),  > $@
 
 run_QC1-1: run_QC1-1.in
-	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@ 	
+	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
 	
 run_QC1-3: run_QC1-3.in
 	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@ 	
