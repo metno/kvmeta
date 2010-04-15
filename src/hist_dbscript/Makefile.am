@@ -7,7 +7,8 @@ nodist_bin_SCRIPTS =\
 dist_bin_SCRIPTS = \
 	hist_run_station \
 	hist_run_types \
-	hist_run_obs_pgm  
+	hist_run_obs_pgm \
+	hist_run_station_metadata 
 
 hist_run_metadata:	hist_run_metadata.in.sh
 	sed s,__KVCONFIG__,$(KVCONFIG), $< \
