@@ -50,6 +50,9 @@ assert_table_not_empty() {
 PSQL=psql 
 
 ## ** MAIN **
+echo "Sletter tabellene metadatatype og station_metadata"
+$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+$PSQL -a -c "\copy metadatatype from '$METADIR/metadatatype/metadatatype.out' DELIMITER '|'"
 
 echo "Oppdaterer tabellene param model qcx_info operator"
 for TABLE in param model qcx_info operator
@@ -64,8 +67,8 @@ do
 done
 
 
-echo "HISTORISK oppdaterer tabellene obs_pgm station types"
-for TABLE in obs_pgm station types
+echo "HISTORISK oppdaterer tabellene obs_pgm station_metadata station types"
+for TABLE in obs_pgm station_metadata station types
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
        
