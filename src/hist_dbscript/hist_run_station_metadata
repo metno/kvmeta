@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+use dbQC;
+use intodb;
+
+my $metadata=`kvconfig --datadir`; 
+$metadata = trim( $metadata )  . "/kvalobs/metadata";
+my $path= "$metadata/hist_station_metadata";
+
+
+all_intodb( $path,"station_metadata","station_metadata.out",'|');
