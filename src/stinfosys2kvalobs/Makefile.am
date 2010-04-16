@@ -12,13 +12,16 @@ dist_bin_SCRIPTS =  \
    message_format_stdump.pl \
    intodb_stinfosys2kvalobs.pl \
    obs_pgm2kvalobs.pl \
-   test_wmonr_stinfosys2kvalobs.pl 
+   test_wmonr_stinfosys2kvalobs.pl \
+   hp.pl \
+   station_info_avg2kvalobs.pl 
 
 dist_pkglibexec_SCRIPTS = \
    stinfosysdb.pm \
    stinfosys.pm \
    wmonr_stinfosys2kvalobs.pm \
-   conf.pm
+   conf.pm \
+   st_time.pm
 
 EXTRA_DIST = run_stinfosys2hist_kvalobs_new.in run_stinfosys2kvalobs_new.in
 
