@@ -96,7 +96,3 @@ for TABLE in algorithms checks station_param
 do
     assert_table_not_empty $TABLE
 done
-
-
-## midlertidige saker er her nederst
-$PSQL -c "update station set wmonr=89504 where stationid=99990"
