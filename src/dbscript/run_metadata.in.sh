@@ -90,9 +90,20 @@ do
     $LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out
 done  
 
-
-echo "Sjekker antall linjer i tabellene algorithms checks station_param"
-for TABLE in algorithms checks station_param
+METADIST=`$KVCONFIG --datadir`/kvalobs/metadist
+mkdir -p -m700 "$METADIST/kvmeta"
+echo "Sjekker antall linjer i tabellene og dumper tabellene"
+for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
 do
     assert_table_not_empty $TABLE
+    $PSQL -c "\copy $TABLE to $METADIST/kvmeta/$TABLE.out DELIMITER '|'"
 done
+
+
+cd $METADIST
+kvmetadist=kvmeta-$(date +%Y%m%d).tar.bz2
+tar cpjf  $kvmetadist kvmeta
+cp -pv  kvmeta-$(date +%Y%m%d).tar.bz2  kvmeta.tar.bz2
+rm -rf   $METADIST/kvmeta
+
+
