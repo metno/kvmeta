@@ -29,7 +29,7 @@ fi
 #echo "METADIR=$METADIR"
 
 
-DUMPDIR=`$KVCONFIG --localstatedir`/kvalobs/log/stkv_tabledump
+DUMPDIR=`$KVCONFIG --logdir`/stkv_tabledump
 mkdir -p  $DUMPDIR
 
 ## PRODUCTION
