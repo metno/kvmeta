@@ -41,7 +41,7 @@ $BINDIR/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 $BINDIR/station_info_avg2kvalobs.pl > $DUMPDIR/station_info_avg2kvalobs.out
 $BINDIR/hp.pl 365 > $DUMPDIR/hp.out
 
-cp -pv $METADIR/station_metadata/T_KC.out $DUMPDIR/T_KC.out
+cp -p $METADIR/station_metadata/T_KC.out $DUMPDIR/T_KC.out
 cat $DUMPDIR/station_info_avg2kvalobs.out $DUMPDIR/hp.out $DUMPDIR/T_KC.out > $DUMPDIR/station_metadata.out
 
 for TABLE in param station message_format
