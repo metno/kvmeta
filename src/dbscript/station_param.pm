@@ -1,7 +1,7 @@
 package station_param;
 require Exporter;
 @ISA    = qw(Exporter);
-@EXPORT = qw( readstfile );
+@EXPORT = qw( readstfile execute_program );
 
 use POSIX;
 use strict;
