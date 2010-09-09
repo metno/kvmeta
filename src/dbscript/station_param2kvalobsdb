@@ -38,8 +38,8 @@ use station_param;
 
 my $narg=@ARGV;
 if( $narg == 0 ){
-   print "This script station_param2kvalobsdb demands one argument";
-   return 0;
+   print "This script station_param2kvalobsdb demands one argument \n";
+   exit 0;
 }
 
 my $kvpasswd=get_passwd();
