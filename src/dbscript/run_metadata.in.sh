@@ -74,21 +74,33 @@ do
     $PSQL -a -c "truncate table $TABLE"
 done
 
-# Tables  algorithms, checks and station_param need several scripts
-# for updating
+
+# Table station_param need several scripts for updating
 for COMMAND in "run_QC1-1 all"  "run_QC1-3 all" \
-    "run_QC1-4 all"  "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
-    "checks_auto  QC1-3b_checks" "checks_auto  QC1-4_checks"
+    "run_QC1-4 all"
 do
     $LIBEXECDIR/$COMMAND
 done 
 
 
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+
+
+# Table checks need several scripts for updating
+for COMMAND in "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
+    "checks_auto  QC1-3b_checks" "checks_auto  QC1-4_checks"
+do
+    $LIBEXECDIR/$COMMAND
+done
+
+
 for COMMAND in run_algorithm_all run_station_param_all  run_checks_all
 do
-    echo "$LIBEXECDIR/$COMMAND" > $DUMPDIR/$COMMAND.out
+    echo "$LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out"
     $LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out
 done  
+
 
 METADIST=`$KVCONFIG --datadir`/kvalobs/metadist
 mkdir -p -m700 "$METADIST/kvmeta"
@@ -105,5 +117,3 @@ kvmetadist=kvmeta-$(date +%Y%m%d).tar.bz2
 tar cpjf  $kvmetadist kvmeta
 cp -pv  kvmeta-$(date +%Y%m%d).tar.bz2  kvmeta.tar.bz2
 rm -rf   $METADIST/kvmeta
-
-
