@@ -117,8 +117,8 @@ if ( $narg > 1 ){
 		my $calc_lowest = trim($sline[11]);            
 
                 print_station_param($stationid,$MONTH,$paramid,$level,
-                                    $highest,$high,$low,$lowest,
-                                    $calc_highest,$calc_high,$calc_low,$calc_lowest);
+                                    $highest,$high,$low,$lowest );
+                                    # $calc_highest,$calc_high,$calc_low,$calc_lowest);
 	    }
         }
     }
@@ -127,7 +127,7 @@ if ( $narg > 1 ){
 
 
 sub print_station_param{
-   my ( $stationid,$MONTH,$paramid,$level,$highest,$high,$low,$lowest,$calc_highest,$calc_high,$calc_low,$calc_lowest ) = @_;
+   my ( $stationid,$MONTH,$paramid,$level,$highest,$high,$low,$lowest ) = @_;
 
    my $sensor = '0';
    my $QCX = "QC1-1";
@@ -145,29 +145,29 @@ sub print_station_param{
 
    my ($min,$max) = @{$metafile{"$paramid,$level"}};
 
-   if( defined $highest  && defined $calc_highest && $highest ne "" && $calc_highest ne "" ){ 
-       if ( $calc_highest > $highest ){
-	    $highest=$calc_highest;
-       }
-   }
+   #if( defined $highest  && defined $calc_highest && $highest ne "" && $calc_highest ne "" ){ 
+   #    if ( $calc_highest > $highest ){
+   #	    $highest=$calc_highest;
+   #    }
+   #}
 
-   if( defined $high  && defined $calc_high && $high ne "" && $calc_high ne "" ){ 
-       if ( $calc_high > $high ){
-	    $high=$calc_high;
-       }
-   }
+   #if( defined $high  && defined $calc_high && $high ne "" && $calc_high ne "" ){ 
+   #    if ( $calc_high > $high ){
+   #	    $high=$calc_high;
+   #    }
+   #}
 
-   if( defined $lowest  && defined $calc_lowest && $lowest ne "" && $calc_lowest ne "" ){ 
-       if ( $calc_lowest < $lowest ){
-	    $lowest=$calc_lowest;
-       }
-   }
+   #if( defined $lowest  && defined $calc_lowest && $lowest ne "" && $calc_lowest ne "" ){ 
+   #    if ( $calc_lowest < $lowest ){
+   #	    $lowest=$calc_lowest;
+   #    }
+   #}
 
-   if( defined $low  && defined $calc_low && $low ne "" && $calc_low ne "" ){ 
-       if ( $calc_low < $low ){
-	    $low=$calc_low;
-       }
-   }
+   #if( defined $low  && defined $calc_low && $low ne "" && $calc_low ne "" ){ 
+   #    if ( $calc_low < $low ){
+   #	    $low=$calc_low;
+   #    }
+   #}
 
    my $tt=0;
    if( defined $highest && defined $high && defined $lowest && defined $low && $highest ne "" && $high ne "" && $lowest ne "" && $low ne "" ){
