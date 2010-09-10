@@ -85,10 +85,21 @@ do
     $PSQL -a -c "truncate table $TABLE"
 done
 
-# Tables  algorithms, checks and station_param need several scripts
-# for updating
+
+# Table station_param need several scripts for updating
 for COMMAND in "run_QC1-1 all"  "run_QC1-3 all" \
-    "run_QC1-4 all"  "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
+    "run_QC1-4 all"
+do
+    $LIBEXECDIR/$COMMAND
+done
+
+
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+
+
+# Table checks need several scripts for updating
+for COMMAND in "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
     "checks_auto  QC1-3b_checks" "checks_auto  QC1-4_checks"
 do
     $LIBEXECDIR/$COMMAND
