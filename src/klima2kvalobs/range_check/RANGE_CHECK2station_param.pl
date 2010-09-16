@@ -65,15 +65,36 @@ $sth->finish;
 ###########################
 my $narg=@ARGV;
 my %metafile;
+my %param_group;
 
 if ( $narg > 1 ){
    my $fromfile=$ARGV[0];
    my $fromfile_param=station_param_name($ARGV[1]);
-
-   # exit 0;
-   my $line;
-
    
+   if ( $narg > 2 ){  
+       my $fromfile_param_group=$ARGV[2];
+       open(PGROUP,$fromfile_param_group) or die "Can't open $fromfile_param_group: $!\n";
+       my $splitter_param=",";
+       while( defined(my $line=<PGROUP>) ){
+          $line=trim($line);
+          if( length($line)>0 ){
+             my @sline=split /$splitter_param/,$line;
+             my $paramid = trim($sline[0]);
+             my $group = trim($sline[1]);
+             # print "par   $group :: $paramid \n";
+             $param_group{$group}{$paramid}=1;      
+          }
+       }
+       close( PGROUP );
+       #foreach my $group ( keys %param_group ){
+       #    foreach my $paramid ( keys %{$param_group{$group}} ){
+       #        print "param   $group :: $paramid \n";
+       #    }
+       #}
+   }
+
+
+   my $line;
    open(MYFILEP,$fromfile_param) or die "Can't open $fromfile_param: $!\n";
    
    my $splitter_param=";";
@@ -182,8 +203,11 @@ sub print_station_param{
    my $fromday=$hfromday{$MONTH};
    my $today=$htoday{$MONTH};
    
-   if( $tt ){               
-   print OUT "$stationid|$paramid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
+   if( $tt ){
+       my $group=$paramid;
+       foreach my $lparamid ( keys %{$param_group{$group}} ){              
+           print OUT "$stationid|$lparamid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
+       }
    }
 
    return;
