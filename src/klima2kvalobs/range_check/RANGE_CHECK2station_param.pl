@@ -206,7 +206,7 @@ sub print_station_param{
    if( $tt ){
        my $group=$paramid;
        foreach my $lparamid ( keys %{$param_group{$group}} ){              
-           print OUT "$stationid|$lparamid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
+           print OUT "$stationid|$lparamid|$level|$sensor|$fromday|$today|$QCX-$lparamid|$metadata|$desc_metadata|$fromtime\n";
        }
    }
 
