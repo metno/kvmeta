@@ -11,6 +11,7 @@ AC_CONFIG_FILES([
 	src/dbscript/Makefile
 	src/stinfosys2kvalobs/Makefile
 	src/hist_dbscript/Makefile
+	src/klima2kvalobs/Makefile
 ])
 
 
