@@ -1,0 +1,62 @@
+#! /bin/sh
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+
+PERL5LIB=__PERL5LIB__
+BINDIR=__PKGLIBBINDIR__
+KVCONFIG=__KVCONFIG__
+
+if [ "z$KVCONFIG" = "z" ]; then
+	echo "Cant find '$KVCONFIG'."
+	exit 1
+fi
+
+##export METADIR=$HOME/src/kvalobs_metadata
+##METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
+
+if [ "z$METADIR" = "z" ]; then
+	echo "The environment variable METADIR must be set."
+	echo "METADIR is set to where the archived (CVS/svn) "
+	echo "metadata is located."
+	exit 1
+fi
+
+
+#echo "KVALOBS=$KVALOBS"
+#echo "METADIR=$METADIR"
+
+
+DUMPDIR=`$KVCONFIG --logdir`/klkv_tabledump
+mkdir -p  $DUMPDIR
+
+
+DVH=$HOME
+
+if [ -f  $DVH/etc/klima.conf ]; then
+   . $HOME/etc/klima.conf
+else
+   echo "Missing file:  $DVH/etc/klima.conf"
+   exit 1
+fi
+
+cd $DUMPDIR
+sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_CHECK.sql
+sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_PARAM_GROUPS.sql
+$BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.lst QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
+
+
+## COPY TO station_param   
+for FILE in station_param_QC1-1.out
+do       
+    if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/$FILE
+    then
+        if [ -s $DUMPDIR/$FILE ]; then
+            cp -upv $DUMPDIR/$FILE $METADIR/station_param/$FILE
+        else
+            echo "Empty file:  $DUMPDIR/$FILE"
+        fi
+    fi
+done
