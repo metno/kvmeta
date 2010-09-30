@@ -112,6 +112,10 @@ do
 done
 
 
+assert_table_not_empty station
+$PSQL -c "\copy ( select * from station  where static='t' ) to $METADIST/kvmeta/station.out DELIMITER '|'"
+
+
 cd $METADIST
 kvmetadist=kvmeta-$(date +%Y%m%d).tar.bz2
 tar cpjf  $kvmetadist kvmeta
