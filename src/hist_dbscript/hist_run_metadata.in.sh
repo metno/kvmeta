@@ -54,7 +54,7 @@ echo "Sletter tabellene metadatatype og station_metadata"
 $PSQL -a -c "TRUNCATE metadatatype CASCADE"
 $PSQL -a -c "\copy metadatatype from '$METADIR/metadatatype/metadatatype.out' DELIMITER '|'"
 
-echo "Oppdaterer tabellene station param obs_pgm model qcx_info operator"
+echo "Oppdaterer tabellene station param obs_pgm station_metadata model qcx_info operator"
 for TABLE in station param obs_pgm model qcx_info operator
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
@@ -67,8 +67,8 @@ do
 done
 
 
-echo "HISTORISK oppdaterer tabellene station_metadata types"
-for TABLE in station_metadata types
+echo "HISTORISK oppdaterer tabellen types"
+for TABLE in types
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
        
