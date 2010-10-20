@@ -38,6 +38,9 @@ $BINDIR/obs_pgm2kvalobs_new.pl -1 > $DUMPDIR/obs_pgm.out
 $BINDIR/param2kvalobs.pl       > $DUMPDIR/param.utf-8
 $BINDIR/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 
+$BINDIR/sensor_info2kvalobs.pl $DUMPDIR > $DUMPDIR/station_param_QCX.out
+$BINDIR/sensor_info_bucket2kvalobs.pl $DUMPDIR >> $DUMPDIR/station_param_QCX.out
+
 $BINDIR/station_info_avg2kvalobs.pl > $DUMPDIR/station_info_avg2kvalobs.out
 $BINDIR/hp.pl -1 > $DUMPDIR/hp.out
 
@@ -68,6 +71,17 @@ do
         fi
     fi
 done
+
+
+if ! diff -q  $DUMPDIR/station_param_QCX.out  $METADIR/station_param/station_param_auto/station_param_QCX.out
+then
+    if [ -s $DUMPDIR/station_param_QCX.out ]; then
+	cp -upv $DUMPDIR/station_param_QCX.out $METADIR/station_param/station_param_auto/station_param_QCX.out
+    else
+        echo "Empty file:  $DUMPDIR/station_param_QCX.out"
+    fi
+fi
+
 
 
 if ! diff -q $DUMPDIR/message_format.out $METADIR/types/types.out
