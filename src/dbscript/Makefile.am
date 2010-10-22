@@ -27,7 +27,8 @@ dist_bin_SCRIPTS = \
 	algorithm_all \
 	station_param_all \
 	checks_all \
-	station_param2kvalobsdb 
+	station_param2kvalobsdb \
+	checks2kvalobsdb 
 
 nodist_pkglibexec_SCRIPTS = \
 	dbQC.pm 
