@@ -86,6 +86,9 @@ done
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
 
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log
+
 
 # Table checks need several scripts for updating
 for COMMAND in "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
@@ -93,6 +96,10 @@ for COMMAND in "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
 do
     $LIBEXECDIR/$COMMAND
 done
+
+
+echo "$LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log"
+$LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log
 
 
 for COMMAND in run_algorithm_all run_station_param_all  run_checks_all
