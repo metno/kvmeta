@@ -14,7 +14,9 @@ dist_bin_SCRIPTS =  \
    obs_pgm2kvalobs.pl \
    test_wmonr_stinfosys2kvalobs.pl \
    hp.pl \
-   station_info_avg2kvalobs.pl 
+   station_info_avg2kvalobs.pl \
+   sensor_info_bucket2kvalobs.pl \
+   sensor_info2kvalobs.pl 
 
 dist_pkglibexec_SCRIPTS = \
    stinfosysdb.pm \
