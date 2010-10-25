@@ -98,7 +98,7 @@ sub print_checks{
 
    my $QCX = "QC1-0";
    my $qcx="QC1-0-autosnow";
-   print CHECKS "0~$qcx~$QCX~1~summer-snow~obs;SA;;|meta;SA_R1;;~* * * * *~1500-01-01\n";
+   print CHECKS "0~$qcx~$QCX~1~summer_snow~obs;SA;;|meta;SA_R1;;~* * * * *~1500-01-01\n";
  
    $QCX = "QC1-1";
    print CHECKS "0~$QCX-$paramid~$QCX~1~RANGE_CHECK~obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;~* * * * *~1500-01-01\n";
