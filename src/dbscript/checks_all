@@ -168,6 +168,10 @@ sub checks {
 		    $qcx=trim($words[1]);
 		    $counter++;
 		    print "qcx=$qcx  counter= $counter";  print "\n";
+		}elsif( $r eq "fromtime"){
+		    $fromtime=trim($words[1]);
+		    $counter++;
+		    print "fromtime=$fromtime  counter= $counter";  print "\n";
 		}
 		
 	    }  
