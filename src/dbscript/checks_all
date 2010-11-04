@@ -133,6 +133,9 @@ sub checks {
             #print "len= $len \n";
 	    if(($len>1) && (length(trim($words[1]))>0) ){
 		my $r=trim($words[0]);
+                my $x= shift  @words;
+                my $l=join(':', @words );
+                $l=trim($l);
 		#print $r; print "\n";
 		#my $ll=trim($words[1]);
 		#my $tt=length($ll);
@@ -141,35 +144,35 @@ sub checks {
 		
 		if( ($r eq "Stationid") || ($r eq "stationid") ){
 		    # print "HEI!!";
-		    $stationid = trim($words[1]);
+		    $stationid = $l;
 		    $counter++;
 		    print "stationid=$stationid  counter= $counter";  print "\n";
 		}
 		if( $r eq "language" ){
-		    $language=trim($words[1]);
+		    $language=$l;
 		    $counter++;
 		    print "language=$language  counter= $counter";  print "\n";
 		}elsif( $r eq "checkname"){
-		    $checkname=trim($words[1]);
+		    $checkname=$l;
 		    $counter++;
 		    print "checkname=$checkname  counter= $counter";  print "\n";
 		}elsif( $r eq "checksignature"){
-		    $checksignature = trim($words[1]);
+		    $checksignature = $l;
 		    my $checksignature_ = $checksignature;
 		    my $x=chop($checksignature_);
 		    if( $x eq '|' ){ $checksignature=$checksignature_;}
 		    $counter++;
 		    print "checksignature=$checksignature  counter= $counter";  print "\n";
 		}elsif( $r eq "active"){
-		    $active = trim($words[1]);
+		    $active = $l;
 		    $counter++;
 		    print "active=$active  counter= $counter";  print "\n";
 		}elsif( $r eq "qcx"){
-		    $qcx=trim($words[1]);
+		    $qcx = $l;
 		    $counter++;
 		    print "qcx=$qcx  counter= $counter";  print "\n";
 		}elsif( $r eq "fromtime"){
-		    $fromtime=trim($words[1]);
+		    $fromtime = $l;
 		    $counter++;
 		    print "fromtime=$fromtime  counter= $counter";  print "\n";
 		}
