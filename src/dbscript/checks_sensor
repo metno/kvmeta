@@ -1,0 +1,443 @@
+#!/usr/bin/perl -w
+# Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
+#
+# $Id: checks_sensor.pl 2011-02-10 terjeer $
+#
+# Copyright (C) 2007 met.no
+#
+# Contact information:
+# Norwegian Meteorological Institute
+# Box 43 Blindern
+# 0313 OSLO
+# NORWAY
+# email: kvalobs-dev@met.no
+#
+# This file is part of KVALOBS_METADATA
+# 
+# KVALOBS_METADATA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#
+# KVALOBS_METADATA is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc., 
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+
+use strict;
+
+use POSIX;
+use File::Copy;
+use DBI;
+use Cwd qw(cwd);
+
+use dbQC;
+
+
+my $control = "";
+
+my $argn = @ARGV;
+
+if( $argn > 0 ){
+    $control = $ARGV[0];
+    if( $control eq "-" ){
+	$control = "";
+    }
+}
+
+if( $argn > 1 ){
+    my $filedir= $ARGV[1];
+    chdir($filedir);
+}
+
+print "START \n";
+
+my $kvpasswd=get_passwd();
+our $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+    die "Connect failed: $DBI::errstr";
+
+
+my %get_paramid;
+my $sth = $dbh->prepare("select paramid, name from param");
+   $sth->execute();
+   
+   while( my @row = $sth->fetchrow_array ){
+          my $paramid=$row[0];
+          my $name=$row[1];
+          $get_paramid{$name}=$paramid;
+   }
+#print "START 2  \n";
+
+foreach my $file (<*checks*>){
+    print $file; print "\n";
+    if( substr($file,-1,1 ) ne '~' ){
+        eval { checks($file, $control) };
+        if ( $@ ) {                    # EVAL_ERROR
+	    print "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n $@" ;
+	    warn "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n" ;
+        } else {
+	    print "checks $file er OK\n\n";
+        }
+        print "*********************************";print "\n";
+    }
+}
+
+$dbh->disconnect;
+
+print "END \n";
+
+
+sub checks {
+    my ($fromfile, $control) = @_;
+
+    my ( $qcx_basis, $medium_qcx, $language, $checkname, $checksignature_basis, $active, $fromtime )=read_checks($fromfile, $control);
+
+    # returnerer liste av ($stationid, $level, $sensor_param1,  $sensor_param2 ... )            
+    my @st_list=make_st_level_sensor_list( $checksignature_basis, $control );
+
+    foreach my $st ( @st_list ){
+        my ($stationid, $typeid, $level, $href )=@{$st};
+
+        # returnerer liste av ( $qcx, $checksignature ) for en spesifikk stasjon, level, sensor kombinasjon
+        my @qcx_checksignature_list=make_qcx_checksignature( $stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis );
+        foreach my $q_ch ( @qcx_checksignature_list ){
+           my ( $qcx, $checksignature )=@{$q_ch};
+           # print "$stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime \n";
+           insert_DB( $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime );
+        }
+    }
+}
+
+
+sub  make_st_level_sensor_list{
+   my ($checksignature, $control )=@_;
+
+   my @paramlist=simple_parse_checksignature($checksignature);
+
+   my $sth = $dbh->prepare("select stationid, typeid, level, paramid, nr_sensor from obs_pgm where totime is null and paramid in ( select paramid from param where name in ( " . join( ",", map { "?" } @paramlist ) . " ) )");
+   $sth->execute( @paramlist );
+
+   
+   my %stl;
+   # the point here is that the list of paramid,nsensor for a certain $stationid, $typeid, $level combination is made
+   # using a reference to a hash 
+   # IMPORTANT: This datastructure is necessary
+   while( my @row = $sth->fetchrow_array ){
+          my $stationid=$row[0];
+          my $typeid=$row[1];
+          my $level=$row[2];
+ 	  my $paramid=$row[3];
+          my $nsensor=$row[4];
+ 	  my $href={};
+          if( defined $stl{$stationid}{$typeid}{$level} ){
+           	$href=$stl{$stationid}{$typeid}{$level};
+ 	  }
+          # print "$stationid,$typeid,$level,$paramid,$nsensor \n";
+          $href->{$paramid}=$nsensor;
+ 	  $stl{$stationid}{$typeid}{$level}=$href;
+      }
+
+    my $lp=@paramlist;
+    my @astl=();
+    foreach  my $stationid ( keys %stl ) {
+       foreach my $typeid ( keys %{$stl{$stationid}} ) {
+ 	 foreach  my $level ( keys %{$stl{$stationid}{$typeid}} ) {
+	     my @k=keys %{$stl{$stationid}{$typeid}{$level}};
+             my $lk=@k;
+	     if ( $lk == $lp ){
+                  # print "astl $stationid, $typeid, $level \n";
+                  my $href=$stl{$stationid}{$typeid}{$level};
+                  # foreach my $paramid ( keys %{$href} ){
+		  #    my $nsensor=$href->{$paramid};
+                  #    print "$paramid :: $nsensor \n";
+	          # }   
+                  my @arr=( $stationid, $typeid, $level, $href );
+                  push( @astl, \@arr);
+             }else{
+                # print "lk=$lk \n";
+ 	     }	 
+          }
+      }
+   }
+  
+   my $len_astl= @astl;
+   # print "len_astl=$len_astl \n";
+
+ return @astl;
+}
+
+
+sub simple_parse_checksignature{
+    my $checksignature=shift;
+
+    # print "checksignature=$checksignature \n";
+    my ($first,@rsplit)=split('\|',$checksignature);
+    # print "first=$first \n";
+    my @par=split(';',$first);
+    # print "p=" . $par[1] . "\n";
+    my @paramlist=split(',',$par[1]);
+    return @paramlist;
+}
+
+
+sub make_qcx_checksignature{
+    my ($stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis )=@_;
+    #print "mqc1 $stationid, $typeid, $level, $qcx_basis, $checksignature_basis \n";
+
+    my ($first,@rsplit)=split('\|',$checksignature_basis);
+    my @par_split=split(';',$first);
+    my @paramlist=split(',',$par_split[1]);
+
+    my $start=$par_split[0];
+    
+    my $len_paramlist=@paramlist;
+    #print "len_paramlist=$len_paramlist \n";
+    # here we make the $sensor on list form
+    my %param_sensorlist=();
+    foreach my $param ( @paramlist ){
+        my $paramid= $get_paramid{ $param };
+        my $nsensor=$href->{$paramid};
+	my @sensorlist=();
+        # print "$stationid,$typeid,$level,$paramid,$nsensor \n";
+        for( my $sensor=0; $sensor < $nsensor; $sensor ++ ){ # $t="$param&$level&$sensor&$typeid";
+              push(@sensorlist,$sensor);  
+        }
+	$param_sensorlist{$param}=\@sensorlist;
+   }
+ 
+   
+   ###
+   my $param_0=$paramlist[0];
+   # my $len_paramlist=@paramlist;
+
+   my @all; #initialisation of all
+   foreach my $sensor ( @{$param_sensorlist{$param_0}} ){
+        my @par_slist;
+        my @ps=($param_0,$sensor); # create a param.name/sensor pair.
+        push( @par_slist, \@ps  ); #This is a list of par/sensor pairs for the first param
+        push( @all, \@par_slist );
+   }
+ 
+   my $len_all= @all;
+   # print "len_all=  $len_all \n";
+
+   for ( my $i=1; $i < $len_paramlist; $i++ ){
+       # print "$i :: $len_paramlist \n";
+       my @new_all;
+       foreach my $sensor ( @{$param_sensorlist{$paramlist[$i]}} ){
+	   # print "sensor=$sensor \n";
+           my @ps=($paramlist[$i],$sensor);
+           # print "$i :: $paramlist[$i] \n";
+           foreach my $par_slist_ref ( @all ){
+	        my @par_slist=@{ $par_slist_ref};
+                my $len_par_slist=@par_slist;
+                # print "len_par_slist= $len_par_slist \n";
+	        push( @par_slist, \@ps ); 
+                push( @new_all, \@par_slist );
+    	   }
+       }
+       @all=@new_all;
+   }
+
+   
+   my @qcx_checksignature_list;
+   foreach my $par_slist_ref ( @all ){
+	my @par_slist=@{$par_slist_ref};
+        my $checksignature= $start . ';';
+	my $qcx= $qcx_basis . '_L' . $level . '_T' . $typeid . '_';
+        foreach my $par_ref ( @par_slist ){
+	   my @ps= @{$par_ref};
+           my ($param, $sensor)=@ps;
+           # print "$param :: $sensor \n";
+	   $checksignature .= "$param&$level&$sensor&$typeid" . ',';
+           $qcx .= $param . ":" . $sensor . "_";
+	}
+        chop $checksignature;
+        chop $qcx;
+        # print "qcx=$qcx \n";
+        my @ch=($checksignature,@rsplit);
+        $checksignature=join('|',@ch);
+        my @a=( $qcx, $checksignature );
+        my $tt=\@a;
+        push(@qcx_checksignature_list,$tt);
+   }
+   return @qcx_checksignature_list;
+}
+
+   
+# Example of some rows in table checks:
+# qcx            : QC1-2-101
+# language       : 1
+# checkname      : mediumsight_drizzlesnowthunder
+# checksignature : obs;VV,WW;;|meta;VV_R1,WW_R2,WW_R3;;|
+
+sub read_checks {
+    my ($fromfile, $control) = @_;
+
+    my $splitter= ":";
+
+    my $remove_from_fromname=4;
+
+    my $tofile = $fromfile;
+    for( my $i = $remove_from_fromname; $i>0; $i-- ){
+	chop($tofile);
+    }
+#$tofile=$tofile."_";
+
+    open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
+
+    my $line;
+    my $counter=0;
+
+    my $qcx;
+    my $medium_qcx;
+    my $language = 1;
+    my $checkname;
+    my $checksignature;
+    my $active= "* * * * *";
+    my $fromtime= get_fromtime();
+
+
+    while( defined($line=<MYFILE>) ){
+	$line = trim($line);
+	#last unless $line;
+
+	if( $counter >= 15)
+	{ last;}
+	
+	if( (length($line) > 0) && ($counter<15) ){
+	    #my $x = substr($line,0,1);
+	    #if($x eq "#"){
+	    #	my $t= substr( $line, 1, length($line) );
+            #    $t=trim($t);
+	    my $t=trim($line);
+	    my @words = split /$splitter/,$t;
+	    my $len = @words;
+            #print "len= $len \n";
+	    if(($len>1) && (length(trim($words[1]))>0) ){
+		my $r=trim($words[0]);
+                my $x= shift  @words;
+                my $l=join(':', @words );
+                $l=trim($l);
+		#print $r; print "\n";
+		#my $ll=trim($words[1]);
+		#my $tt=length($ll);
+		#print "tt=$tt\n";
+		#if(length(trim($words[1]))>0){
+		
+		if( $r eq "language" ){
+		    $language=$l;
+		    $counter++;
+		    print "language=$language  counter= $counter";  print "\n";
+		}elsif( $r eq "checkname"){
+		    $checkname=$l;
+		    $counter++;
+		    print "checkname=$checkname  counter= $counter";  print "\n";
+		}elsif( $r eq "checksignature"){
+		    $checksignature = $l;
+		    my $checksignature_ = $checksignature;
+		    my $x=chop($checksignature_);
+		    if( $x eq '|' ){ $checksignature=$checksignature_;}
+		    $counter++;
+		    print "checksignature=$checksignature  counter= $counter";  print "\n";
+		}elsif( $r eq "active"){
+		    $active = $l;
+		    $counter++;
+		    print "active=$active  counter= $counter";  print "\n";
+		}elsif( $r eq "qcx"){
+		    $qcx = $l;
+		    $counter++;
+		    print "qcx=$qcx  counter= $counter";  print "\n";
+		}elsif( $r eq "fromtime"){
+		    $fromtime = $l;
+		    $counter++;
+		    print "fromtime=$fromtime  counter= $counter";  print "\n";
+		}
+		
+	    }  
+	}
+    }
+
+    close(MYFILE);
+
+    my @med = split /-/,$qcx;
+    $medium_qcx= $med[0] . "-" . $med[1];
+    print "med[0] = $med[0] \n";
+    print "medium_qcx= $medium_qcx \n";
+
+    return ( $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime );
+}
+
+
+
+sub insert_DB{
+  my ( $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime ) = @_;
+
+  my $sth = $dbh->prepare("SELECT language FROM checks \ 
+                           WHERE stationid=$stationid AND qcx='$qcx' AND fromtime='$fromtime'");
+  $sth->execute;
+
+  my @row=();
+  my @language_already=();
+
+  while (@row = $sth->fetchrow_array) {
+    push(@language_already,$row[0]);
+  }
+  $sth->finish;
+
+  my $len_language=@language_already;
+  print "length of language is $len_language\n";
+  print "qcx=$qcx og fromtime=$fromtime\n";
+
+  if( $len_language > 0 ){
+      print "length of language is $len_language\n";
+      foreach(@language_already){
+	  if($_ eq $language){ 
+	      if(  $control eq "ins" || $control eq 'R' ){
+		  print " $qcx: Denne checken blir naa replaced";
+		  my $sth = $dbh->prepare("UPDATE checks \
+                                  SET  checkname = '$checkname',\
+                                  checksignature = '$checksignature',\
+                                  active         = '$active'\
+                                  WHERE qcx='$qcx' AND fromtime='$fromtime'");
+                  $sth->execute;
+                  $sth->finish;
+                  return;
+	      }
+              else{
+	        print " $checkname: Dette spraaket er $_ og finnes i fra for; ingen oppdateringer \n";
+	        exit 0;
+	      }
+	  }
+          else{
+	      print " $checkname finnes ogsaa for spraak $_ \n";
+	  }
+      }
+  }
+
+  ########################
+
+    #print " $checkname: Denne algoritmen blir naa replaced";
+    #my $sth = $dbh->prepare("UPDATE algorithms \
+    #                        SET  signature = '$signature', script = '$script' \
+    #                        WHERE language like '$language' AND checkname like '$checkname'");
+    #$sth->execute;
+    #$sth->finish;
+
+
+
+
+  $sth = $dbh->prepare("INSERT INTO checks VALUES($stationid,'$qcx','$medium_qcx',$language, \
+                        '$checkname', '$checksignature', '$active','$fromtime')");
+  $sth->execute;
+  
+  $sth->finish;
+
+  return;
+}

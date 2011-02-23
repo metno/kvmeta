@@ -8,7 +8,8 @@ nodist_bin_SCRIPTS =\
 	run_metadata \
 	run_QC1-4 \
 	run_QC1-3 \
-	run_QC1-1
+	run_QC1-1 \
+	run_checks_sensor
 
 dist_bin_SCRIPTS = \
 	run_station \
@@ -28,7 +29,8 @@ dist_bin_SCRIPTS = \
 	station_param_all \
 	checks_all \
 	station_param2kvalobsdb \
-	checks2kvalobsdb 
+	checks2kvalobsdb \
+	checks_sensor 
 
 nodist_pkglibexec_SCRIPTS = \
 	dbQC.pm 
@@ -65,8 +67,11 @@ run_station_param_all: run_station_param_all.in
 run_checks_all: run_checks_all.in 
 	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
 
+run_checks_sensor: run_checks_sensor.in 
+	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
+
 
 EXTRA_DIST = run_metadata.in.sh 	run_QC1-1.in run_QC1-3.in run_QC1-4.in dbQC.pm.in \
-	run_station_param_all.in run_algorithm_all.in run_checks_all.in 
+	run_station_param_all.in run_algorithm_all.in run_checks_all.in run_checks_sensor.in
 
 CLEANFILES= $(nodist_bin_SCRIPTS) $(nodist_pkglibexec_SCRIPTS)
