@@ -72,16 +72,34 @@ while (my @row = $sth->fetchrow()) {
     my $hlevel=$row[1];
     my $sensor=$row[2];
     my $fromtime=$row[3];
-    my $description=$row[4];
-    # print "$description\n";
+    my $description=trim($row[4]);
     
-    if( $description =~ /^\d+/ ){ 
-         my $V = $description;
-         $V =~ s/^(\d+)(.*)/$1/;
-         # print "V=$V\n";
-         # print "$description\n";
+    if( defined $description and $description ne "" ){
+        #print "$description\n";
+        if( $description =~ /\|/ ){
+            #my $V = $description;
+            #$V =~ s/(.*)\|(\s*)threshold(\s*)=(\s*)(\d+)(\s*)\|(.*)/$5/;
+            # print "V=$V\n";
+            # print "$description\n";
+            my @adesc=split /\|/,$description;
+            foreach my $atom (@adesc){
+	       my ($key,$value)=split(/=/, $atom);
+               $key=trim($key);
+               if( $key eq "threshold" ){
+                  my $V=trim($value);
+                  if( $V =~ /\d+/ ){
+		      print_station_param($stationid,$paramid,$hlevel,$sensor,$V,$fromtime );   
+                  }   
+               }
+           }
+        }elsif( $description =~ /^\d+/ ){ 
+           my $V = $description;
+           $V =~ s/^(\d+)(.*)/$1/;
+           #print "V=$V\n";
+           # print "$description\n";
     	 	
-         print_station_param($stationid,$paramid,$hlevel,$sensor,$V,$fromtime );
+           print_station_param($stationid,$paramid,$hlevel,$sensor,$V,$fromtime );
+       }
     }
 }
 $sth->finish;
