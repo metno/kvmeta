@@ -28,14 +28,31 @@
 # with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc.,
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
+####
+# Description:  This script prints station_param format files based on information from stinfosys. The select returns equipmentmodel.description joined with metadata from sensor_info, equipment_model where measurement_methodid=217502 and paramid=104.
+# For further information of measurement_methodid and paramid contact stinfosys.
+#
+# Usage: ./sensor_info_bucket2kvalobs.pl
+#
+# Arguments: none
+#
+# Example:
+# $BINDIR/sensor_info_bucket2kvalobs.pl >> $DUMPDIR/station_param_QCX.out
+
 use strict;
 use DBI;
 use stinfosys;
 use trim;
-use dbQC;
+# use dbQC;
 
-my %hfromday = fhfromday();
-my %htoday   = fhtoday();
+# CONST
+my $paramid = 104; #
+my $measurement_methodid =217502; #
+# END CONST
+
+# my %hfromday = fhfromday(); # from dbQC.pm
+# my %htoday   = fhtoday();   # from dbQC.pm
 
 my $len = @ARGV;
 
@@ -45,17 +62,9 @@ my $stport   = st_port();
 my $stuser   = st_user();
 my $stpasswd = st_passwd();
 
-# print " $dbname,$host,$dbuser,$passwd\n";
-# exit 0;
 
-#my $checks_path=get_checks_path();
-my $DUMPDIR = ".";
-if ( scalar(@ARGV) > 0 ) {
-    $DUMPDIR = $ARGV[0];
-}
-
-my $outfile = ">checks_QCX_bucket.out";
-open( CHECKS, $outfile ) or die "Can't open $outfile: $!\n";
+# my $outfile = ">checks_QCX_bucket.out";
+# open( CHECKS, $outfile ) or die "Can't open $outfile: $!\n";
 
 my $dbh = DBI->connect( "dbi:Pg:dbname=$stname;host=$sthost;port=$stport",
     "$stuser", "$stpasswd", { RaiseError => 1 } )
@@ -64,11 +73,11 @@ my $sth;
 
 $sth =
   $dbh->prepare(
-"select stationid, hlevel, sensor, sensor_info.fromtime, equipmentmodel.description from sensor_info, equipment, equipmentmodel where measurement_methodid=217502 and sensor_info.paramid=104 and sensor_info.equipmentid=equipment.equipmentid and equipment.modelname=equipmentmodel.modelname"
+"select stationid, hlevel, sensor, sensor_info.fromtime, equipmentmodel.description from sensor_info, equipment, equipmentmodel where measurement_methodid=$measurement_methodid and sensor_info.paramid=$paramid and sensor_info.equipmentid=equipment.equipmentid and equipment.modelname=equipmentmodel.modelname"
   ) or die "Can't prep\n";
 $sth->execute;
 
-my $paramid = 104;
+
 while ( my @row = $sth->fetchrow() ) {
     my $stationid   = $row[0];
     my $hlevel      = $row[1];
@@ -113,24 +122,28 @@ while ( my @row = $sth->fetchrow() ) {
 $sth->finish;
 $dbh->disconnect;
 
-print_checks($paramid);
+# print_checks($paramid);
+# sub print_checks {
+#    my ($paramid) = @_;
+#
+#    my $QCX = "QC1-1";
+#    print CHECKS
+#"0~$QCX-$paramid~$QCX~1~RANGE_CHECK~obs;RA;;|meta;RA_max,RA_highest,RA_high,RA_low,RA_lowest,RA_min;;~* * * * *~1500-01-01\n";
+#}
 
-sub print_checks {
-    my ($paramid) = @_;
-
-    my $QCX = "QC1-1";
-    print CHECKS
-"0~$QCX-$paramid~$QCX~1~RANGE_CHECK~obs;RA;;|meta;RA_max,RA_highest,RA_high,RA_low,RA_lowest,RA_min;;~* * * * *~1500-01-01\n";
-}
 
 sub print_station_param {
     my ( $stationid, $paramid, $level, $sensor, $V, $fromtime ) = @_;
+
+    # INPUT: threshold for an equipmentmodel with metadata.
+    # SIDE_EFFECT: Print one line formatted as the station_param format for the check QC1-1-104.
+    # RETURN VALUE: none
 
     my $desc_metadata = "\\N";
     my $fromday       = 1;
     my $today         = 365;
 
-    my $qcx  = "QC1-1-104";
+    # my $qcx  = "QC1-1-104";
     my $maxV = $V + 115;
     my $metadata =
       "max;highest;high;low;lowest;min\\n$maxV;$V;$V;50.0;0.0;-3.0";
@@ -138,4 +151,3 @@ sub print_station_param {
     print
 "$stationid|$paramid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
 }
-
