@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
 #
-# $Id: intodb_stinfosys2kvalobs.pl 27 2007-10-22 16:21:15Z paule $
+# $Id: checks2kvalobsdb 27 2007-10-22 16:21:15Z paule $
 #
 # Copyright (C) 2007 met.no
 #
