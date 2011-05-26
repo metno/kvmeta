@@ -12,6 +12,7 @@ AC_CONFIG_FILES([
 	src/stinfosys2kvalobs/Makefile
 	src/hist_dbscript/Makefile
 	src/klima2kvalobs/Makefile
+	src/stinfosys2kvalobs/stinfosys2station_param/Makefile
 ])
 
 
