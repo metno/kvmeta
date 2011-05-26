@@ -1,1 +1,1 @@
-SUBDIRS=dbscript hist_dbscript stinfosys2kvalobs klima2kvalobs
+SUBDIRS=dbscript hist_dbscript stinfosys2kvalobs klima2kvalobs stinfosys2kvalobs/stinfosys2station_param
