@@ -1,0 +1,5 @@
+#! /bin/sh
+
+/usr/bin/kvstop
+/usr/lib/kvalobs_metadata/bin/kvget_metadata
+/usr/bin/kvstart
