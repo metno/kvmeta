@@ -10,11 +10,12 @@ dist_bin_SCRIPTS =  \
    obs_pgm2kvalobs_new.pl \
    param2kvalobs.pl \
    message_format_stdump.pl \
-   intodb_stinfosys2kvalobs.pl \
    obs_pgm2kvalobs.pl \
    test_wmonr_stinfosys2kvalobs.pl \
    hp.pl \
-   station_info_avg2kvalobs.pl 
+   station_info_avg2kvalobs.pl
+   
+#   intodb_stinfosys2kvalobs.pl 
 
 dist_pkglibexec_SCRIPTS = \
    stinfosysdb.pm \

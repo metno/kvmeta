@@ -1,0 +1,9 @@
+#! /bin/sh
+
+KVCONFIG=__KVCONFIG__
+METABINDIR=__PKGLIBBINDIR__
+KVBINDIR=`$KVCONFIG --bindir`
+
+$KVBINDIR/kvstop
+$METABINDIR/kvget_metadata
+$KVBINDIR/kvstart

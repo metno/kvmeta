@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+use dbQC;
+use File::Find;
+
+my $path= get_checks_semi_auto_path();
+print "path=$path \n";
+
+#my @subd = qw( QC1-2 QC1-6  QC1_rest QC2d );
+my %subd;
+
+find(\&Wanted, $path);
+
+sub Wanted
+{    
+#   /^QC/ or return;	
+#   print $_ . "\n"; 
+# print $File::Find::dir . "\n";
+
+   if(  $File::Find::dir ne $path ){
+       # print $File::Find::dir . "\n";
+       $subd{$File::Find::dir}=1;
+   }       
+}
+
+
+chdir($path);
+foreach my $sub ( keys %subd){
+   print "sub=$sub \n";
+   system("__PKGLIBBINDIR__/checks_sensor ins $sub");
+   chdir($path);
+}
+
