@@ -70,6 +70,8 @@ done
 ## COPY TO METADIR    
 for TABLE in param obs_pgm station station_metadata
 do  
+	mkdir -p $METADIR/$TABLE
+	
    	if ! diff -qN  $DUMPDIR/$TABLE.out  $METADIR/$TABLE/$TABLE.out
     then
 		if [ -s $DUMPDIR/$TABLE.out ]; then
@@ -84,8 +86,9 @@ done
 
 if ! diff -qN  $DUMPDIR/station_param_QCX.out  $METADIR/station_param/station_param_auto/station_param_QCX.out
 then
-    if [ -s $DUMPDIR/station_param_QCX.out ]; then
-	cp -upv $DUMPDIR/station_param_QCX.out $METADIR/station_param/station_param_auto/station_param_QCX.out
+	if [ -s $DUMPDIR/station_param_QCX.out ]; then
+		mkdir -p $METADIR/station_param/station_param_auto
+		cp -upv $DUMPDIR/station_param_QCX.out $METADIR/station_param/station_param_auto/station_param_QCX.out
     else
         echo "Empty file:  $DUMPDIR/station_param_QCX.out"
     fi
@@ -95,5 +98,6 @@ fi
 
 if ! diff -qN $DUMPDIR/message_format.out $METADIR/types/types.out
 then
+	mkdir -p $METADIR/types
     cp -upv $DUMPDIR/message_format.out $METADIR/types/types.out
 fi
