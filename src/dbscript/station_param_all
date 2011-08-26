@@ -71,13 +71,15 @@ my $file;
     foreach $file (<*station_param*>){
 	print $file; print "\n";
 	#system("$prog $file $control");
-        eval{
-	  if( ! readstfile($dbh,$file,$control) ){
-	    print "ERROR: station_param::readstfile $file har feilet\n" ;
-	  }
-        };
-        if( $@ ){ print "TT=$@"; }
-	print "*********************************";print "\n";
+        if( substr($file,-1,1 ) ne '~' ){
+            eval{
+	      if( ! readstfile($dbh,$file,$control) ){
+	        print "ERROR: station_param::readstfile $file har feilet\n" ;
+	      }
+            };
+            if( $@ ){ print "TT=$@"; }
+	    print "*********************************";print "\n";
+        }
     }
 #$d=`date`;
 print "END $d \n";

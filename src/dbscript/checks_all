@@ -65,14 +65,16 @@ our $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError 
 
 foreach my $file (<*checks*>){
     print $file; print "\n";
-    eval { checks($file, $control) };
-    if ( $@ ) {                    # EVAL_ERROR
-	print "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n" ;
-	warn "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n" ;
-    } else {
-	print "checks $file er OK\n\n";
+    if( substr($file,-1,1 ) ne '~' ){
+        eval { checks($file, $control) };
+        if ( $@ ) {                    # EVAL_ERROR
+	    print "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n" ;
+	    warn "\nERROR!!\nERROR:checks $file har feilet\n\nERROR!!\n" ;
+        } else {
+	    print "checks $file er OK\n\n";
+        }
+        print "*********************************";print "\n";
     }
-    print "*********************************";print "\n";
 }
 
 $dbh->disconnect;
