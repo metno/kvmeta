@@ -1,0 +1,13 @@
+Package: kvalobs-metadata
+Version: 2.7.2-1
+Section: main
+Priority: extra
+Architecture: all
+Depends: libdbd-pg-perl, libdbi-perl, libperl5.10 (>= 5.8.8), libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3), cvs, less, bzip2
+Installed-Size: 328
+Maintainer: Terje Reite <terje.reite@met.no>
+Description: Metadata to kvalobs
+ The package contains scripts to read metadata from stinfosys.
+ The package contains scripts to upload the data to a kvalobs database
+ from various sources and to generate a data package from the content in
+ the database.
