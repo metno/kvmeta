@@ -11,3 +11,15 @@ Description: Metadata to kvalobs
  The package contains scripts to upload the data to a kvalobs database
  from various sources and to generate a data package from the content in
  the database.
+
+
+Package: kvget-metadata
+Version: 2.1.1-2
+Section: main
+Priority: extra
+Architecture: all
+Depends:  postgresql (>= 8.3), bzip2
+Installed-Size: 100
+Maintainer: Terje Reite <terje.reite@met.no>
+Description: Metadata to kvalobs
+ The package contains a script to get metadata to kvalobs from the repository.
