@@ -1,7 +1,0 @@
-#! /bin/sh
-
-/usr/bin/kvstop
-/usr/lib/kvalobs_metadata/bin/kvget_metadata
-echo "Oppdaterer QC1-0:"
-psql -f $HOME/insert_qc1_0.sql
-/usr/bin/kvstart

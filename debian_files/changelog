@@ -1,3 +1,10 @@
+kvalobs-metadata (2.7.3~rc1-1) unstable; urgency=low
+
+  * Make aostop more flexible.
+ 
+ -- Terje Reite <terje.reite@met.no>  Fri, 23 Sep 2011 09:45:00 +0100
+
+
 kvalobs-metadata (2.0.0-1) : Initial release.
 
  -- Børge Moe <borge.moe@met.no>  Wed,  9 Jul 2008 17:39:03 +0200

@@ -4,7 +4,9 @@ SUBDIRS=dbscript \
         klima2kvalobs \
         stinfosys2kvalobs/stinfosys2station_param
 
-bindir =$(pkglibdir)/bin
+#bindir =$(pkglibdir)/bin
+
+EXTRA_DIST=kvget_metadata_cron.in
 
 dist_bin_SCRIPTS = kvget_metadata_cron \
                    kvget_metadata

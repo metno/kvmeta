@@ -22,7 +22,7 @@ assert_table_not_empty() {
 	fi
 }
 
-METAGET=/usr/share/kvalobs/metaget
+METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
 if [ -n "$1" ]; then
    METAGET=$PWD
