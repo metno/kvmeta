@@ -70,13 +70,13 @@ my $sth2;
 my %time_hash;
 
 if( $days_back == -1 ){# fullstendig historisk med alle data 
-   $sth=$dbh->prepare("select * from obs_pgm") or die "Can't prep\n";
-   $sth2=$dbh->prepare("select * from obs_pgm where totime is not NULL") or die "Can't prep\n";
-}elsif( $days_back == -2 ){# bare nåtid
-   $sth=$dbh->prepare("select * from obs_pgm where totime is NULL") or die "Can't prep\n";
+   $sth=$dbh->prepare("select stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm") or die "Can't prep\n";
+   $sth2=$dbh->prepare("select stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm where totime is not NULL") or die "Can't prep\n";
+}elsif( $days_back == -2 ){# just now
+   $sth=$dbh->prepare("select  stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_atfrom obs_pgm where totime is NULL") or die "Can't prep\n";
 }else{# fullstendig historisk $days_back dager bakover
-   $sth=$dbh->prepare("select * from obs_pgm where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
-   $sth2=$dbh->prepare("select * from obs_pgm where totime>=( now() - '$days_back days'::INTERVAL )") or die "Can't prep\n";
+   $sth=$dbh->prepare("select  stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_atfrom obs_pgm where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
+   $sth2=$dbh->prepare("select  stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm where totime>=( now() - '$days_back days'::INTERVAL )") or die "Can't prep\n";
 }
 
 
@@ -85,11 +85,11 @@ $sth->execute;
  my $week="t|t|t|t|t|t|t";
 while (my @row = $sth->fetchrow()) {
     my $hour=$row[6];
-    $hour =~ s/[\s{}]//g;
+    #$hour =~ s/[\s{}]//g;
     #print "hour=$hour\n";
-    my  @ahour=split /,/,$hour;
-    my $outhour=join("|",@ahour);
-
+    #my  @ahour=split /,/,$hour;
+    #my $outhour=join("|",@ahour);
+    my $outhour=$hour;
     #if($row[5] eq "t" or $row[5] eq "T" or $row[5]  eq = "1"
 
     $time_hash{"$row[0]|$row[1]|$row[2]|$row[8]"}=1;
