@@ -64,12 +64,14 @@ while (my @row = $sth->fetchrow()) {
 
         my $Tm;
         my $Um;        
+        my $exist_key=0;
 
 	if ( $description =~ /^\s*Tm/ ){
                if( $description =~ /^\s*Tm\s*=\s*(.*)Um\s*=\s*(.*)/ ){
 	           # print "not exist alias2:: $stationid :: $year :: $1 :: $2 \n";
                    $Tm=$1;
                    $Um=$2;
+                   $exist_key=1;
                }
         }
 
@@ -78,9 +80,12 @@ while (my @row = $sth->fetchrow()) {
 	           # print "not exist alias2:: $stationid :: $year :: $1 :: $2 \n";
 	           $Um=$1;
                    $Tm=$2;
+		   $exist_key=1;
 		}
         }
-	
+
+        if( ! $exist_key ){ next; }
+	    
         if( $Tm =~ /^\s*(-?\d*[\.,]?\d*).*$/ ){
            $Tm=$1;
            $Tm =~ s/,/\./g;
