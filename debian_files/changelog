@@ -1,3 +1,15 @@
+kvalobs-metadata (2.7.3~rc4-1) unstable; urgency=low
+
+  *  Bugfix kvget-metadata-cron.in 
+ 
+ -- Terje Reite <terje.reite@met.no>  Thu, 31 Nov 2011 16:42:00 +0100
+
+kvalobs-metadata (2.7.3~rc3-1) unstable; urgency=low
+
+  * Namechange kvget_metadata --> kvget-metadata 
+ 
+ -- Terje Reite <terje.reite@met.no>  Wed, 30 Nov 2011 17:26:00 +0100
+
 kvalobs-metadata (2.7.3~rc2-1) unstable; urgency=low
 
   * Bugfix.
