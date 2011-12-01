@@ -6,11 +6,11 @@ SUBDIRS=dbscript \
 
 #bindir =$(pkglibdir)/bin
 
-EXTRA_DIST=kvget_metadata_cron.in
+EXTRA_DIST=kvget-metadata-cron.in
 
-dist_bin_SCRIPTS = kvget_metadata_cron \
-                   kvget_metadata
+dist_bin_SCRIPTS = kvget-metadata-cron \
+                   kvget-metadata
                    
-kvget_metadata_cron:	kvget_metadata_cron.in
+kvget-metadata-cron:	kvget-metadata-cron.in
 	sed s,__KVCONFIG__,$(KVCONFIG), $< \
     | sed s,__PKGLIBBINDIR__,$(bindir),  > $@
