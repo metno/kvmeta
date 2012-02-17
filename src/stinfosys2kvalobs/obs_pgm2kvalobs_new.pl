@@ -67,12 +67,14 @@ my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stus
 my $sth;
 my $sth2;
 
+my $base_sql="select stationid,paramid,hlevel,nsensor,message_formatid,priority_message,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obspgm_h";
+
 if( $days_back == -1 ){# fullstendig historisk med alle data 
-   $sth=$dbh->prepare("select stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm") or die "Can't prep\n";
+   $sth=$dbh->prepare("$base_sql") or die "Can't prep\n";
 }elsif( $days_back == -2 ){# bare nåtid
-   $sth=$dbh->prepare("select stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm where totime is NULL") or die "Can't prep\n";
+   $sth=$dbh->prepare("$base_sql where totime is NULL") or die "Can't prep\n";
 }else{# fullstendig historisk $days_back dager bakover
-   $sth=$dbh->prepare("select stationid,paramid,hlevel,nsensor,priority_messageid,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obs_pgm where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
+   $sth=$dbh->prepare("$base_sql where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
 }
 
 
@@ -80,23 +82,21 @@ $sth->execute;
 
 my $week="t|t|t|t|t|t|t";
 while (my @row = $sth->fetchrow()) {
-    my $hour=$row[6];
+    my $hour=$row[7];
     $hour =~ s/[\s{}]//g;
     #print "hour=$hour\n";
     my  @ahour=split /,/,$hour;
     my $outhour=join("|",@ahour);
-    my $totime=$row[7];
+    my $totime=$row[8];
 
     if( ! defined $totime ){
 	#print "Totime IKKE DEFINERT \n";
 	$totime="\\N";
     }
 
-    print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$outhour|$week|$row[8]|$totime\n";
+    print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
 }
 
+
 $sth->finish;
-
-
-
 $dbh->disconnect;
