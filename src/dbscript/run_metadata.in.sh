@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 ## Script to update metadata tables in Kvalobs.
 
@@ -125,6 +125,26 @@ $PSQL -c "\copy ( select * from station  where static='t' ) to $METADIST/kvmeta/
 
 cd $METADIST
 kvmetadist=kvmeta-$(date +%Y%m%d).tar.bz2
-tar cpjf  $kvmetadist kvmeta
-cp -pv  kvmeta-$(date +%Y%m%d).tar.bz2  kvmeta.tar.bz2
-rm -rf   $METADIST/kvmeta
+
+CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
+SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
+echo "CLIENT_ENCODING=${CLIENT_ENCODING}"
+echo "SERVER_ENCODING=${SERVER_ENCODING}"
+
+## CHARSET CONVERSION FOR UTF8
+if [ $CLIENT_ENCODING = UTF8 ] && [ $SERVER_ENCODING = UTF8 ]; then
+  mkdir -p -m700 "$METADIST/kvmeta_UTF8"
+  for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
+  do
+     iconv -f utf-8 -t latin1  $METADIST/kvmeta/$TABLE.out >  $METADIST/kvmeta/$TABLE.latin1
+     mv $METADIST/kvmeta/$TABLE.out    $METADIST/kvmeta_UTF8/$TABLE.utf8
+     mv $METADIST/kvmeta/$TABLE.latin1 $METADIST/kvmeta/$TABLE.out
+  done
+fi
+
+
+if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) || ( $CLIENT_ENCODING = UTF8 && $SERVER_ENCODING = UTF8 ) ]] ; then
+   tar cpjf  $kvmetadist kvmeta
+   cp -pv  kvmeta-$(date +%Y%m%d).tar.bz2  kvmeta.tar.bz2
+   rm -rf   $METADIST/kvmeta
+fi
