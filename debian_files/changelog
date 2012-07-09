@@ -1,3 +1,23 @@
+kvalobs-metadata (2.7.4~rc1-1) unstable; urgency=low
+
+  *  Changed run_metadata, run_metadata can be installed on both latin1 and UTF8 databases and generate latin1. 
+ 
+ -- Terje Reite <terje.reite@met.no>  Thu, 9 Jul 2012 17:03:00 +0100
+
+	
+kvalobs-metadata (2.7.3~rc5-2) unstable; urgency=low
+
+  *  Section unknown --> main
+ 
+ -- Terje Reite <terje.reite@met.no>  Fri, 17 Feb 2012 15:27:00 +0100
+
+kvalobs-metadata (2.7.3~rc5-1) unstable; urgency=low
+
+  *  Changed obs_pgm2kvalobs_new.pl
+ 
+ -- Terje Reite <terje.reite@met.no>  Fri, 10 Feb 2012 12:28:00 +0100
+
+
 kvalobs-metadata (2.7.3~rc4-1) unstable; urgency=low
 
   *  Bugfix kvget-metadata-cron.in 
