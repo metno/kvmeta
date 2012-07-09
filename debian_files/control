@@ -1,5 +1,5 @@
 Source: kvalobs-metadata
-Section: unknown
+Section: main
 Priority: extra
 Maintainer: Terje Reite <terje.reite@met.no>
 Build-Depends: debhelper, autotools-dev, debconf,
