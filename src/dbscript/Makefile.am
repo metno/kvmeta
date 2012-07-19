@@ -9,6 +9,7 @@ nodist_bin_SCRIPTS =\
 	run_QC1-4 \
 	run_QC1-3 \
 	run_QC1-1 \
+	run_QC1-1_all \
 	run_checks_sensor
 
 dist_bin_SCRIPTS = \
@@ -34,7 +35,7 @@ dist_bin_SCRIPTS = \
 
 nodist_pkglibexec_SCRIPTS = \
 	dbQC.pm 
-    
+
 dist_pkglibexec_SCRIPTS = \
 	intodb.pm \
 	trim.pm \
@@ -42,6 +43,11 @@ dist_pkglibexec_SCRIPTS = \
 	station_param.pm
 
 run_metadata:	run_metadata.in.sh
+	sed s,__KVCONFIG__,$(KVCONFIG), $< \
+   | sed s,__PERL5LIB__,$(pkglibexecdir), \
+   | sed s,__PKGLIBBINDIR__,$(bindir),  > $@
+
+run_QC1-1_all:	run_QC1-1_all.in.sh
 	sed s,__KVCONFIG__,$(KVCONFIG), $< \
    | sed s,__PERL5LIB__,$(pkglibexecdir), \
    | sed s,__PKGLIBBINDIR__,$(bindir),  > $@
@@ -71,7 +77,7 @@ run_checks_sensor: run_checks_sensor.in
 	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
 
 
-EXTRA_DIST = run_metadata.in.sh 	run_QC1-1.in run_QC1-3.in run_QC1-4.in dbQC.pm.in \
+EXTRA_DIST = run_metadata.in.sh run_QC1-1_all.in.sh run_QC1-1.in run_QC1-3.in run_QC1-4.in dbQC.pm.in \
 	run_station_param_all.in run_algorithm_all.in run_checks_all.in run_checks_sensor.in
 
 CLEANFILES= $(nodist_bin_SCRIPTS) $(nodist_pkglibexec_SCRIPTS)
