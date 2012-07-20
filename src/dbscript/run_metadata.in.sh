@@ -75,16 +75,24 @@ do
 done
 
 
+## Table station_param need several scripts for updating
+#for COMMAND in "run_QC1-1 all"  "run_QC1-3 all" \
+#    "run_QC1-4 all"
+#do
+#    $LIBEXECDIR/$COMMAND
+#done 
+#
+#
+#echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
+#$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+
+$PSQL -a -c "\copy station_param from '$METADIR/station_param/station_param_auto/QC1-1_all.out' DELIMITER '|'" 
+
 # Table station_param need several scripts for updating
-for COMMAND in "run_QC1-1 all"  "run_QC1-3 all" \
-    "run_QC1-4 all"
+for COMMAND in  "run_QC1-3 all" "run_QC1-4 all"
 do
     $LIBEXECDIR/$COMMAND
-done 
-
-
-echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
-$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+done
 
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log
