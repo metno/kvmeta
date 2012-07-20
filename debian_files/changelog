@@ -1,10 +1,20 @@
+kvalobs-metadata (2.7.4~rc2-1) unstable; urgency=low
+
+  * Changed run_metadata, uses QC1-1_all.out
+  * Added   run_QC1-1_all to generate QC1-1_all.out
+  * Added   run_metadata_mini to be used in development of algorithms/checks
+  * Added   kvinstall_metadata
+
+ -- Terje Reite <terje.reite@met.no>  Fri, 20 Jul  2012 13:51:00 +0200
+
+
 kvalobs-metadata (2.7.4~rc1-1) unstable; urgency=low
 
   *  Changed run_metadata, run_metadata can be installed on both latin1 and UTF8 databases and generate latin1. 
  
- -- Terje Reite <terje.reite@met.no>  Thu, 9 Jul 2012 17:03:00 +0100
+ -- Terje Reite <terje.reite@met.no>  Thu, 9 Jul 2012 17:03:00 +0200
 
-	
+
 kvalobs-metadata (2.7.3~rc5-2) unstable; urgency=low
 
   *  Section unknown --> main
