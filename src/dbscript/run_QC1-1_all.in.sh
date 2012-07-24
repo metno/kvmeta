@@ -64,3 +64,5 @@ done
 
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+
+$PSQL -a -c "\copy station_param to QC1-1_all.out"
