@@ -1,3 +1,10 @@
+kvalobs-metadata (2.7.4~rc3-1) unstable; urgency=low
+
+  * Delimiter '|' for the file QC1-1_all.out
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 30 Jul  2012 23:10:00 +0200
+
+
 kvalobs-metadata (2.7.4~rc2-1) unstable; urgency=low
 
   * Changed run_metadata, uses QC1-1_all.out
