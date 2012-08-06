@@ -1,4 +1,0 @@
-qcx		: QC1-2-72.c4
-checkname	: geok04_card_snowsymbol_without_snowdepth
-checksignature	: obs;RR_24&&&402,SA&&&402,V4&&&402,V5&&&402,V6&&&402;;0,-1501|meta;RR_24_R1;;
-active		: 0 6,7 * * *

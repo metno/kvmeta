@@ -1,5 +1,0 @@
-fromtime=2002-01-01 00:00:00+00
-QCX=QC1-1
-time=count
-splitter=\s+
-$stationid $paramid max highest high low lowest min

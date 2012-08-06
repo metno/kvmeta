@@ -1,4 +1,0 @@
-checkname	: windmaxmean3h
-qcx		: QC1-2-45b
-checksignature	: obs;FX,FF;;0,-180|meta;FX_C;;
-active		: 0 3,9,15,21 * * *

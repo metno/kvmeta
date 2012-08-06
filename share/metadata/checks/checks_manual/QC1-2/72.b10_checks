@@ -1,4 +1,0 @@
-qcx		: QC1-2-72.b10
-checkname	: geok10_sms_snowdepth_decreasing_to_0
-checksignature	: obs;RR_24&&&302,SA&&&302,V4&&&302,V5&&&302,V6&&&302;;0,-1501
-active		: 0 6 * * *
