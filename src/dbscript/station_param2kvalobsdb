@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+# Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
+#
+# $Id: station_param2kvalobsdb 27 2007-10-22 16:21:15Z paule $
+#
+# Copyright (C) 2007 met.no
+#
+# Contact information:
+# Norwegian Meteorological Institute
+# Box 43 Blindern
+# 0313 OSLO
+# NORWAY
+# email: kvalobs-dev@met.no
+#
+# This file is part of KVALOBS_METADATA
+# 
+# KVALOBS_METADATA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#
+# KVALOBS_METADATA is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc., 
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+use strict;
+use DBI;
+use trim;
+use Date::Calc qw( check_date check_time Delta_Days Today );
+use dbQC;
+use station_param;
+
+my $narg=@ARGV;
+if( $narg == 0 ){
+   print "This script station_param2kvalobsdb demands one argument \n";
+   exit 0;
+}
+
+my $kvpasswd=get_passwd();
+my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+        die "Connect failed: $DBI::errstr";
+
+my $control="ins";
+my $hour=-1;
+
+if ( $narg > 0 ){
+    my $fromfile=station_param_name($ARGV[0]);
+
+    my $splitter='\|';
+    open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
+    while( defined(my $line=<MYFILE>) ){
+        $line=trim($line);
+
+        if( length($line) > 0 ){
+            my @sline=split /$splitter/,$line;
+            my $len=@sline;
+            #print "$sline[0] =  $len \n";
+            if( $len > 1 ){
+	       my $stationid=trim trim($sline[0]);
+               my $paramid=trim($sline[1]);
+               my $level=trim($sline[2]);
+               my $sensor=trim($sline[3]);
+               my $fromday=trim($sline[4]);
+               my $today=trim($sline[5]);
+               my $qcx=trim($sline[6]);
+               my $metadata=trim($sline[7]);
+               my $desc_metadata=trim($sline[8]);
+               if ( $desc_metadata eq '\N' ){
+                  $desc_metadata="";
+	       }
+               my $fromtime=trim($sline[9]);
+	       
+	       # print "HELLO 0 $stationid,$paramid,$level,$fromday \n";
+
+               eval{
+                   if ( !execute_program(
+                                $dbh,           $fromfile, $control,
+                                $stationid,     $paramid,  $level,
+                                $sensor,        $fromday,  $today,
+                                $hour,          $qcx,      $metadata,
+                                $desc_metadata, $fromtime
+                          )
+                       ){
+                            print "ERROR: station_param2kvalobsdb::execute_program har feilet\n" ;
+                        }
+               }   
+           }
+        } 
+    }  
+}

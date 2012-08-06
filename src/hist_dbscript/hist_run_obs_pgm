@@ -2,13 +2,12 @@
 
 use POSIX;
 use strict;
-use dbQC;
+#use dbQC;
+use trim;
 use intodb;
 
-my $hk=$ENV{"KVALOBS"};
-my $metadata=$hk . "/share/kvalobs/metadata";
-
+my $metadata=`kvconfig --datadir`; 
+$metadata = trim( $metadata )  . "/kvalobs/metadata";
 my $path= "$metadata/hist_obs_pgm";
-
 
 all_intodb( $path,"obs_pgm","obs_pgm.out",'|');

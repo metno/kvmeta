@@ -33,7 +33,7 @@ my $stname=  st_name();
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Vi får ikke forbindelse med databasen";
 
-my $sth=$dbh->prepare("select * from station") or die "Can't prep\n";
+my $sth=$dbh->prepare("select stationid,wmono,fromtime,totime from station") or die "Can't prep\n";
 $sth->execute;
 
 my %many_wmo;
@@ -44,9 +44,9 @@ while (my @row = $sth->fetchrow()) {
 		next;
 	      }
 	      my $stationid=$row[0];
-	      my $wmonr=$row[11];
-	      my $fromtime=$row[16];
-              my $totime=$row[17];
+	      my $wmonr=$row[1];
+	      my $fromtime=$row[2];
+              my $totime=$row[3];
 	      if( ! defined $totime ){
 		#print "IKKE DEFINERT \n";
 		$totime="\\N";

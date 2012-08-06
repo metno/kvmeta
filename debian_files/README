@@ -1,0 +1,9 @@
+Note that 
+Kvutil.pm and kvget_metadata have their own packages.
+
+Copy from this catalogue to the right directories in the debian package:
+cp -pv control   $Packageroot/DEBIAN
+cp -pv copyright $Packageroot/usr/share/doc/kvalobs-metadata
+cp -pv changelog $Packageroot/usr/share/doc/kvalobs-metadata/changelog
+
+After that "gzip --best" the changelog file 

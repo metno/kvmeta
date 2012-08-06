@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+
+use POSIX;
+use strict;
+use dbQC;
+use intodb;
+
+my $path= get_station_metadata_path();
+
+
+all_intodb( $path,"station_metadata","station_metadata.out",'|');

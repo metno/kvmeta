@@ -1,4 +1,0 @@
-qcx		: QC1-2-72.c6
-checkname	: geok06_card_snowdepth_increase_no_snowsymbol
-checksignature	: obs;RR_24&&&402,SA&&&402,V4&&&402,V5&&&402,V6&&&402;;0,-1501
-active		: 0 6,7 * * *

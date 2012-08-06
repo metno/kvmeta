@@ -91,17 +91,17 @@ sub todb{
        $path_outfilename=$outfilename
    }
 
-    my $hostname= $ENV{"HOSTNAME"};
+    #my $hostname= $ENV{"HOSTNAME"};
     my $pghost=   $ENV{"PGHOST"};
 
-    print "hostname= $hostname \n";
+    #print "hostname= $hostname \n";
     print "pghost= $pghost \n";
 
     $ENV{"PGPASSWORD"}=get_passwd();
     print "path_outfilename=  $path_outfilename\n";
     system("cp  $path_outfilename /tmp/$outfilename");
-    print "psql -a -d kvalobs -U kvalobs -c \"\\copy $tablename from \'/tmp/$outfilename\' USING DELIMITERS \'$del\'\" \n";
-    system("psql -a -d kvalobs -U kvalobs -c \"\\copy $tablename from \'/tmp/$outfilename\' USING DELIMITERS \'$del\'\"");
+    print "psql -a -d kvalobs -U kvalobs -c \"\\copy $tablename from \'/tmp/$outfilename\' DELIMITER \'$del\'\" \n";
+    system("psql -a -d kvalobs -U kvalobs -c \"\\copy $tablename from \'/tmp/$outfilename\' DELIMITER \'$del\'\"");
 
     # system("./run_copy '$del' $outfilename $tablename");
     delete $ENV{"PGPASSWORD"};

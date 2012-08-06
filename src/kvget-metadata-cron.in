@@ -1,0 +1,9 @@
+#! /bin/sh
+
+KVCONFIG=__KVCONFIG__
+KVBINDIR=`$KVCONFIG --bindir`
+$KVBINDIR/kvstop
+$KVBINDIR/kvget-metadata
+echo "Oppdaterer QC1-0:"
+psql -f $HOME/insert_qc1_0.sql
+$KVBINDIR/kvstart

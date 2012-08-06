@@ -1,7 +1,0 @@
-stationid:      
-qcx:            QC1-7-110
-medium_qcx:     QC1-7
-checkname:      precipcollected_flag
-checksignature: obs;RR_24&&&302;;0,-46080|refobs;KLSTART,KLOBS;;
-active:         0 6 * * *
-fromtime:       1500-01-01 00:00

@@ -1,3 +1,0 @@
-checkname      : eq_uneq 
-qcx            : QC1-2-42
-checksignature : obs;DD,FF;;|meta;DD_CX,FF_CY;;

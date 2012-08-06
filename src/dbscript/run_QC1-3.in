@@ -1,0 +1,5 @@
+#! /bin/sh
+
+
+__PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3a max
+__PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3b no

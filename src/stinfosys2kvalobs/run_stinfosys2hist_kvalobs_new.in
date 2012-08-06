@@ -1,0 +1,87 @@
+#! /bin/sh
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+
+PERL5LIB=__PERL5LIB__
+BINDIR=__PKGLIBBINDIR__
+KVCONFIG=__KVCONFIG__
+
+if [ "z$KVCONFIG" = "z" ]; then
+	echo "Cant find '$KVCONFIG'."
+	exit 1
+fi
+
+##export METADIR=$HOME/src/kvalobs_metadata
+##METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
+
+if [ "z$METADIR" = "z" ]; then
+	echo "The environment variable METADIR must be set."
+	echo "METADIR is set to where the archived (CVS/svn) "
+	echo "metadata is located."
+	exit 1
+fi
+
+#echo "KVALOBS=$KVALOBS"
+#echo "METADIR=$METADIR"
+
+
+DUMPDIR=`$KVCONFIG --logdir`/stkv_tabledump
+mkdir -p  $DUMPDIR
+
+## PRODUCTION
+$BINDIR/station2kvalobs.pl -1 > $DUMPDIR/station.utf-8
+$BINDIR/obs_pgm2kvalobs_new.pl -1 > $DUMPDIR/obs_pgm.out
+$BINDIR/param2kvalobs.pl       > $DUMPDIR/param.utf-8
+$BINDIR/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
+
+$BINDIR/station_info_avg2kvalobs.pl > $DUMPDIR/station_info_avg2kvalobs.out
+$BINDIR/hp.pl -1 > $DUMPDIR/hp.out
+
+cp -p $METADIR/station_metadata/T_KC.out $DUMPDIR/T_KC.out
+cat $DUMPDIR/station_info_avg2kvalobs.out $DUMPDIR/hp.out $DUMPDIR/T_KC.out > $DUMPDIR/station_metadata.out
+
+for TABLE in param station message_format
+do
+  iconv -f utf-8 -t latin1  $DUMPDIR/$TABLE.utf-8 > $DUMPDIR/$TABLE.latin1
+  if [ -n "$1" ]; then 
+      #echo "latin1"
+      cp -p $DUMPDIR/$TABLE.latin1  $DUMPDIR/$TABLE.out
+  else
+      #echo "utf-8"
+      cp -p $DUMPDIR/$TABLE.utf-8   $DUMPDIR/$TABLE.out
+  fi
+done
+
+## COPY TO METADIR    
+for TABLE in param obs_pgm station
+do       
+    if ! diff -q  $DUMPDIR/$TABLE.out  $METADIR/$TABLE/$TABLE.out
+    then
+	if [ -s $DUMPDIR/$TABLE.out ]; then
+	    cp -upv $DUMPDIR/$TABLE.out $METADIR/$TABLE/$TABLE.out
+	else
+            echo "Empty file:  $DUMPDIR/$TABLE.out"
+        fi
+    fi
+done
+
+
+for TABLE in station_metadata # historisk
+do
+    if ! diff -q  $DUMPDIR/$TABLE.out  $METADIR/hist_$TABLE/$TABLE.out
+    then
+	if [ -s $DUMPDIR/$TABLE.out ]; then
+	    cp -upv $DUMPDIR/$TABLE.out $METADIR/hist_$TABLE/$TABLE.out
+	else
+            echo "Empty file:  $DUMPDIR/$TABLE.out"
+        fi
+    fi
+done
+
+if ! diff -q $DUMPDIR/message_format.out $METADIR/types/types.out
+then
+    cp -upv $DUMPDIR/message_format.out $METADIR/types/types.out
+fi

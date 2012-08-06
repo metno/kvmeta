@@ -107,12 +107,13 @@ my $where_clause=join(" AND ",@where_arr);
 
 #print "$where_clause\n";
 
-
+#my $cols="stationid,lat,lon,countryid,municipid,hs,hv,hp,maxspeed,name,short_name,wmono,ontologyid,fromtime,totime,edited_by,edited_at";
+my $cols="stationid,lat,lon,hs,maxspeed,name,wmono,fromtime";
 
 if( scalar(@where_arr) == 0 ){
-    $sth=$dbh->prepare("select * from station") or die "Can't prep\n";
+    $sth=$dbh->prepare("select $cols from station") or die "Can't prep\n";
 }else{
-    $sth=$dbh->prepare("select * from station where $where_clause") or die "Can't prep\n";
+    $sth=$dbh->prepare("select $cols from station where $where_clause") or die "Can't prep\n";
 }
 
 $sth->execute;
@@ -130,10 +131,9 @@ my @row_list;
                $row[$i]="\\N"; 
            } 
        }
-       #print "$row[0]|$row[1]|$row[2]|$row[5]|$row[8]|$row[9]|$row[11]|$row[0]|$row[12]|$row[13]|\N|$row[14]|$t|$row[16]\n";
        push( @row_list, \@row );
 
-       $stationf{$row[0]}{$row[16]}=1;
+       $stationf{$row[0]}{$row[7]}=1;
 
        if( not exists $station_counter{$row[0]}){
            $station_counter{$row[0]}=1;
@@ -142,14 +142,16 @@ my @row_list;
        }
    }
 
-
 $sth->finish;
-$dbh->disconnect;
+
+my %network_station_icao=      fill_network_station($dbh, 101);
+my %network_station_call_sign= fill_network_station($dbh, 6);
+
 
 my %pstationid;
 
 foreach my $stationid ( keys %station_counter ){
-  if( $station_counter{$stationid}>1 ){
+  if( $station_counter{$stationid} > 1 ){
      my $maxtime='1500-01-01';
      foreach my $fromtime ( keys %{$stationf{$stationid}} ){
         if( greater_than($fromtime,$maxtime) ){
@@ -165,23 +167,55 @@ foreach my $ref_row ( @row_list ){
    my @row=@{$ref_row};
    my $len=@row;
 
-   if( exists $stationid_fromtime{$row[0]}{$row[16]} ){
-       if ( $stationid_fromtime{$row[0]}{$row[16]} == 0 ){
-            $row[11]="\\N";
+   if( exists $stationid_fromtime{$row[0]}{$row[7]} ){
+       if ( $stationid_fromtime{$row[0]}{$row[7]} == 0 ){
+            $row[6]="\\N";
        }
    }
 
    if( exists $wmono_filter{$row[0]} ) {
-       $row[11]="\\N";
+       $row[6]="\\N";
    }
 
    if ( exists $pstationid{$row[0]} ){
-       if( $pstationid{$row[0]} ne $row[16] ){ next; }
+       if( $pstationid{$row[0]} ne $row[7] ){ next; }
    }
+ 
+   my $environmentid = get_environmentid( $dbh, $row[0] );
 
-   print "$row[0]|$row[1]|$row[2]|$row[5]|$row[8]|$row[9]|$row[11]|$row[0]|$row[12]|$row[13]|\\N|$row[14]|t|$row[16]\n";
-
+   my $icaoid = "\\N";
+   if ( exists $network_station_icao{$row[0]} ){
+        $icaoid = $network_station_icao{$row[0]};
+	if( length($icaoid) > 4 ){ 
+	    #my $len=length($icaoid);print "length = $len \n";
+            $icaoid =~ s/'//g;
+            #$len=length($icaoid); print "new length = $len \n";
+	}
+        while( length($icaoid) > 4 ){
+            #my $len=length($icaoid);print "clength = $len \n"; 
+            chop $icaoid;
+            #$len=length($icaoid); print "new clength = $len \n";
+        }
+   }
+   my $call_sign = "\\N";
+   if ( exists $network_station_call_sign{$row[0]} ){
+        $call_sign = $network_station_call_sign{$row[0]};
+        if( length($call_sign) > 7 ){ 
+	    #my $len=length($call_sign);print "length = $len \n";
+            $call_sign =~ s/'//g;
+            #$len=length($call_sign); print "new length = $len \n";
+	}
+        while( length($call_sign) > 7 ){
+            #my $len=length($call_sign);print "clength = $len \n"; 
+            chop $call_sign;
+            #$len=length($call_sign); print "new clength = $len \n";
+        }
+   }
+       
+   print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$row[0]|$icaoid|$call_sign|\\N|$environmentid|t|$row[7]\n";
 }
+
+$dbh->disconnect;
 
 sub greater_than{
   my $l=shift;
@@ -199,4 +233,46 @@ sub greater_than{
   }
 
   return 0;
+}
+
+
+sub get_environmentid {
+  my ( $dbh, $stationid ) = @_;
+
+  my $sth = $dbh->prepare(
+   "select environmentid from  environment_station where  stationid=$stationid and fromtime = ( select max(fromtime) from environment_station where stationid=$stationid)"
+   );
+   $sth->execute;
+    
+   my $environmentid;
+   if ( $environmentid = $sth->fetchrow_array ) {
+    
+   }else{
+     $environmentid=0;   
+   }
+
+   $sth->finish;
+
+  return $environmentid;
+}
+
+
+sub fill_network_station {
+    my ( $dbh, $networkid ) = @_;
+    my $sth;
+
+    $sth = $dbh->prepare(
+        "select stationid, external_stationcode from network_station where totime IS NULL and networkid=$networkid"
+    );
+
+    $sth->execute;
+    my %s;
+
+    while ( my @row = $sth->fetchrow_array ) {
+        $s{"$row[0]"} = $row[1];
+    }
+
+    $sth->finish;
+
+    return %s;
 }

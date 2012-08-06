@@ -1,4 +1,0 @@
-qcx		: QC1-2-72.c8
-checkname	: geok08_card_snowdepth_decrease_toomuch_snow
-checksignature	: obs;RR_24&&&402,SA&&&402,V4&&&402,V5&&&402,V6&&&402;;0,-1501
-active		: 0 6,7 * * *

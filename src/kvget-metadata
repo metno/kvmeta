@@ -1,0 +1,62 @@
+#! /bin/sh
+
+## Script to update metadata tables in Kvalobs.
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+PGDATABASE=kvalobs
+PGUSER=kvalobs
+
+if [ "z$PGHOST" != "z" ]; then
+	PGHOST=localhost
+fi
+
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
+METAGET=$(kvconfig --datadir)/kvalobs/metaget
+
+if [ -n "$1" ]; then
+   METAGET=$PWD
+   echo "argumentet er $1"
+   tar xvvjf $1
+else
+   mkdir -p -m700 "$METAGET"
+   cd $METAGET
+   wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2 | tar xvvj 
+fi
+
+PSQL=psql 
+
+## ** MAIN **
+
+echo "Sletter tabellene metadatatype og station_metadata"
+$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+
+echo "Sletter tabellen station der static=true";
+$PSQL -a -c "delete from station where static=true"
+
+echo "Oppdaterer tabellene metadatatype station_metadata station";
+for TABLE in metadatatype station_metadata station
+do
+    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    assert_table_not_empty $TABLE
+done
+
+
+echo "Oppdaterer tabellene algorithms checks station_param types param obs_pgm model qcx_info operator";
+for TABLE in algorithms checks station_param types param obs_pgm station_metadata model qcx_info operator
+do
+    $PSQL -a -c "truncate table $TABLE"
+    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    assert_table_not_empty $TABLE
+done
+
