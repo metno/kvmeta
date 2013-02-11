@@ -1,5 +1,13 @@
 #! /bin/sh
 
+station_param_auto_path=`__PKGLIBBINDIR__/print_station_param_auto_path.pl`
+while read line 
+do 
+    echo $line
+    __PKGLIBBINDIR__/dbQC1-3 ${1} $line
+done < $station_param_auto_path/QC1-3.conf
 
-__PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3a max
-__PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3b no
+
+##################################
+# __PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3a max
+# __PKGLIBBINDIR__/dbQC1-3 ${1} QC1-3b no

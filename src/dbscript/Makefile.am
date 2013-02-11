@@ -33,6 +33,7 @@ dist_bin_SCRIPTS = \
 	station_param2kvalobsdb \
 	checks2kvalobsdb \
 	checks_sensor \
+	print_station_param_auto_path.pl \
         ../kvinstall_metadata 
 
 nodist_pkglibexec_SCRIPTS = \
