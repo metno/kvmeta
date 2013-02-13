@@ -82,7 +82,7 @@ $htoday{"8"}=243;
 $htoday{"9"}=273;
 $htoday{"10"}=304;
 $htoday{"11"}=334;
-$htoday{"12"}=365;
+$htoday{"12"}=366;
 
 my @aline=();
 my $line;

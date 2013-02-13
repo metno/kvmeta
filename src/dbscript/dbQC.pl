@@ -180,7 +180,7 @@ $val{"stationid"} = 0;
 $val{"level"} = 0;
 $val{"sensor"} =  '0';
 $val{"fromday"} = 1;
-$val{"today"} = 365;
+$val{"today"} = 366;
 $val{"hour"} = -1;
 $val{"desc_metadata"} = "\\N";
 

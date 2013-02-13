@@ -92,7 +92,7 @@ while( defined($line=<MYFILE>) ){
             my $level = 0;
 	    my $sensor =  '0';
 	    my $fromday = 0;
-	    my $today = 365;
+	    my $today = 366;
             my $hour=-1;
 
 	    if( exists $m_param{"$paramid"}  && !exists $stored_param{"$paramid"} ) {

@@ -37,7 +37,7 @@ sub readstfile {
     my $level   = 0;
     my $sensor  = '0';
     my $fromday = 1;
-    my $today   = 365;
+    my $today   = 366;
     my $hour    = -1;
     my $qcx;
     my $metadata;

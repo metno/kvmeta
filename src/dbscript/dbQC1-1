@@ -240,7 +240,7 @@ while( defined($line=<MYFILE>) ){
             my $stationid = trim($sline[0]);
 	    my $paramid = trim($sline[1]);
 	    my $fromday = 1;
-            my $today   = 365;
+            my $today   = 366;
             
 	    $obj->not_auto($stationid,$paramid,0, \%m_param, \%m_station, \%m_obs_pgm, \%m_station_param);
            
@@ -288,7 +288,7 @@ if( $len_argv > 4 ){
             my $stationid = trim($sline[0]);
 	    my $paramid = trim($sline[1]);
 	    my $fromday = 1;
-            my $today   = 365;
+            my $today   = 366;
             my $sensor = $default_sensor;
 	    my $level = $default_level;
             my $metadata = "max;highest;high;low;lowest;min\\n".trim($sline[2]);

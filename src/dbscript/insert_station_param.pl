@@ -52,7 +52,7 @@ my $paramid;
 my $level=0;
 my $sensor='0';
 my $fromday = 1;
-my $today = 365;
+my $today = 366;
 my $qcx;
 my $metadata;
 my $desc_metadata="\\N";
