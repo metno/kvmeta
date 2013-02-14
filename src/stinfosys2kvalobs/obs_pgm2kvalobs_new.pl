@@ -29,8 +29,6 @@
 # 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-
-
 use strict;
 use DBI;
 use stinfosys;
@@ -41,6 +39,10 @@ my $len=@ARGV;
 if( $len == 0 ){
     print STDERR "scriptet krever ett argument som er et tall som er lik -2 eller større\n";
     exit 0;
+}
+my $kvname="metno";
+if( $len == 2 ){
+    my $kvname=$ARGV[1];
 }
 
 
@@ -65,7 +67,22 @@ if( $len == 0 ){
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Cant't connect";
 my $sth;
-my $sth2;
+
+my %NOT_METNO;
+if( $kvname eq "metno" ){
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid != 1") or die "Can't prep\n"; 
+    $sth->execute;
+    while (my @row = $sth->fetchrow()) {
+        $NOT_METNO{$row[0]}{$row[1]}=$row[2];
+    }
+}else{
+   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid=( select kvalobsid from kvalobs where name=$kvname");
+   $sth->execute;
+   while (my @row = $sth->fetchrow()) {
+        $NOT_METNO{$row[0]}{$row[1]}=$row[2];
+   }
+}
+
 
 my $base_sql="select stationid,paramid,hlevel,nsensor,message_formatid,priority_message,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obspgm_h";
 
@@ -77,10 +94,10 @@ if( $days_back == -1 ){# fullstendig historisk med alle data
    $sth=$dbh->prepare("$base_sql where ( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)") or die "Can't prep\n";
 }
 
-
 $sth->execute;
 
 my $week="t|t|t|t|t|t|t";
+
 while (my @row = $sth->fetchrow()) {
     my $hour=$row[7];
     $hour =~ s/[\s{}]//g;
@@ -93,10 +110,16 @@ while (my @row = $sth->fetchrow()) {
 	#print "Totime IKKE DEFINERT \n";
 	$totime="\\N";
     }
-
-    print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
+    if( $kvname eq "metno" ){
+        if( not exists $NOT_METNO{$row[0]}{$row[4]} ){
+            print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
+        }
+    }else{
+        if( exists $NOT_METNO{$row[0]}{$row[4]} ){
+            print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
+        }
+    }
 }
-
 
 $sth->finish;
 $dbh->disconnect;
