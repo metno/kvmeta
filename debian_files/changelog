@@ -1,3 +1,18 @@
+kvalobs-metadata (2.7.4~rc5-1) unstable; urgency=low
+
+  * Changed totime 365 -> 366 in several files
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 13 Feb  2013 15:01:00 +0200
+
+
+kvalobs-metadata (2.7.4~rc4-1) unstable; urgency=low
+
+  * Changed run_QC1-3.in
+  * Added print_station_param_auto_path.pl
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 13 Feb  2013 11:00:00 +0200
+
+
 kvalobs-metadata (2.7.4~rc3-1) unstable; urgency=low
 
   * Delimiter '|' for the file QC1-1_all.out
