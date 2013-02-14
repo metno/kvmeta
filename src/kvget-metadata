@@ -9,7 +9,8 @@ set -e  # Exit if a simple shell command fails
 PGDATABASE=kvalobs
 PGUSER=kvalobs
 
-#Temporary hack until we use utf8 in kvalobs and stinfosys
+#Temporary hack until we use utf8 in kvalobs
+# stinfosys is already utf8
 export LANG=latin1
 
 if [ "z$PGHOST" = "z" ]; then
