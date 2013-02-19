@@ -43,18 +43,25 @@ else
 fi
 
 cd $DUMPDIR
-sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_CHECK.sql
-sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_PARAM_GROUPS.sql
-$BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.lst QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
+# sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_CHECK.sql
+# sqlplus -S ${KLUSER}/${KLPASSWD}@${KLDATABASE} < $BINDIR/RANGE_PARAM_GROUPS.sql
+# echo "sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE}"
+# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $HOME/bin/RANGE_CHECK.sql
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $BINDIR/RANGE_CHECK.sql
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $BINDIR/RANGE_PARAM_GROUPS.sql
+
+sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
+
+$BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.out QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
 
 
 ## COPY TO station_param   
 for FILE in station_param_QC1-1.out
 do       
-    if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/$FILE
+    if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/station_param_auto/$FILE
     then
         if [ -s $DUMPDIR/$FILE ]; then
-            cp -upv $DUMPDIR/$FILE $METADIR/station_param/$FILE
+            cp -upv $DUMPDIR/$FILE $METADIR/station_param/station_param_auto/$FILE
         else
             echo "Empty file:  $DUMPDIR/$FILE"
         fi

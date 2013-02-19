@@ -67,9 +67,10 @@ my $narg=@ARGV;
 my %metafile;
 my %param_group;
 
+my $fromfile_param;
 if ( $narg > 1 ){
    my $fromfile=$ARGV[0];
-   my $fromfile_param=station_param_name($ARGV[1]);
+   $fromfile_param=station_param_name($ARGV[1]);
    
    if ( $narg > 2 ){  
        my $fromfile_param_group=$ARGV[2];
@@ -112,7 +113,8 @@ if ( $narg > 1 ){
    }
    close( MYFILEP );
 
-    my $splitter=',';
+    my $splitter='\|';
+    print "fromfile=$fromfile \n";
     open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
     while( defined($line=<MYFILE>) ){
         $line=trim($line);
@@ -135,7 +137,7 @@ if ( $narg > 1 ){
 		my $calc_highest = trim($sline[8]);
 		my $calc_high = trim($sline[9]);
 		my $calc_low = trim($sline[10]);
-		my $calc_lowest = trim($sline[11]);            
+		my $calc_lowest = trim($sline[11]);        
 
                 print_station_param($stationid,$MONTH,$paramid,$level,
                                     $highest,$high,$low,$lowest );
@@ -161,7 +163,7 @@ sub print_station_param{
    if( exists $metafile{"$paramid,$level"} ){
        # print "OK exist \n";	
    }else{
-       print "$paramid,$level eksisterer ikke for dette \n";
+       print "ERROR: paramid=$paramid og level=$level eksisterer ikke i filen $fromfile_param :: ERROR in $stationid,$MONTH,$paramid,$level,$highest,$high,$low,$lowest\n";
    }
 
    my ($min,$max) = @{$metafile{"$paramid,$level"}};
