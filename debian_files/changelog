@@ -1,3 +1,10 @@
+kvalobs-metadata (2.7.4-1) unstable; urgency=low
+
+  * Changed dbQC1-1, run_QC1-1.in, run_QC1-1_all.in.sh and station_param2kvalobsdb
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 16 Apr  2013 23:55:00 +0100
+
+
 kvalobs-metadata (2.7.4~rc7-1) unstable; urgency=low
 
   * Changed run_klima2kvalobs.in, RANGE_CHECK.sql and RANGE_CHECK2station_param.pl
