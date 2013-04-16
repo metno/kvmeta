@@ -55,25 +55,22 @@
 # splitter4="\\s+"
 # $stationid $paramid max;highest;high;low;lowest;min
 
-# Dette scriptet tar 4-5 argumenter $arg, QC1-1_stasjonsGrenser, QC1-1_fasteGrenser, QC1-1param og QC1-1extra der det siste argumentet er frivillig.
-# $arg er det første argumentet og kan ha verdiene all, gen og ins
-# QC1-1_stasjonsGrenser er det andre argumentet, 
-# QC1-1_fasteGrenser er det tredje argumentet, 
-# QC1-1param er det fjerde argumentet og 
-# QC1-1extra er det femte argumentet og er frivillig.
+# Dette scriptet tar 3-4 argumenter QC1-1_stasjonsGrenser, QC1-1_fasteGrenser, QC1-1param og QC1-1extra der det siste argumentet er frivillig.
+# QC1-1_stasjonsGrenser er det første argumentet, 
+# QC1-1_fasteGrenser er det andre argumentet, 
+# QC1-1param er det tredje argumentet og 
+# QC1-1extra er det fjerde argumentet og er frivillig.
                                              
 use POSIX;
 use strict;
-use intodb;
+# use intodb;
 use logdbQC;
 use dbQC;
 
 my $QCX = "QC1-1";
+my $outfilename= "QC1-1.out";
 my $fromtime= get_fromtime();
 #my $path= get_station_param_path();
-
-my $arg       = $ARGV[0];
-my $outfilename= $QCX.".out";
 
 my %m_station;
 my %m_param;
@@ -86,14 +83,13 @@ my $hour=-1;
 my $default_level = 0;
 my $default_sensor = '0';
 
-
-if( $arg eq "gen" || $arg eq "all" ){   
+   
 my $obj= new logdbQC;
 my %m_station_param;
  
-my $fromfile  = station_param_name($ARGV[1]);
-my $fromfile2 = station_param_name($ARGV[2]);
-my $fromfile3 = station_param_name($ARGV[3]);
+my $fromfile  = station_param_name($ARGV[0]);
+my $fromfile2 = station_param_name($ARGV[1]);
+my $fromfile3 = station_param_name($ARGV[2]);
 
 my $len_argv = @ARGV;
 
@@ -273,8 +269,8 @@ close(MYFILE);
 
 select(MYFILEOUT);
 
-if( $len_argv > 4 ){
-    my $fromfile4 = station_param_name($ARGV[4]);
+if( $len_argv > 3 ){
+    my $fromfile4 = station_param_name($ARGV[3]);
     open(MYFILE,$fromfile4) or die "Can't open $fromfile: $!\n";
     # Under her så skrives ut filen QC1-1extra som er det fjerde argumentet
 
@@ -320,16 +316,12 @@ if( $len_argv > 4 ){
   }
 }
 
-
 $obj->print_log($QCX);
 
-}
-
-
-if( $arg eq "ins" || $arg eq "all" ){
-    select(STDOUT);
-    fintodb( ".", "station_param", $outfilename, $QCX, '|' );
-}
+#if( $arg eq "ins" || $arg eq "all" ){
+#    select(STDOUT);
+#    fintodb( ".", "station_param", $outfilename, $QCX, '|' );
+#}
 
 
 

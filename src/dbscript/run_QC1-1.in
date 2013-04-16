@@ -1,3 +1,3 @@
 #! /bin/sh
 
-__PKGLIBBINDIR__/dbQC1-1 ${1} QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param
+__PKGLIBBINDIR__/dbQC1-1 QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param

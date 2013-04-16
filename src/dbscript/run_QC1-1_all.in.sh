@@ -49,20 +49,18 @@ PSQL=psql
 
 ## ** MAIN **
 echo "Oppdaterer tabellen station_param"
-for TABLE in station_param
-do
-    $PSQL -a -c "truncate table $TABLE"
-done
 
+$PSQL -a -c "truncate table station_param"
 
-# Table station_param need several scripts for updating
-for COMMAND in "run_QC1-1 all"
-do
-    $LIBEXECDIR/$COMMAND
-done 
+$LIBEXECDIR/dbQC1-1 QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param
+## $PSQL -a -c "delete from station_param where qcx like 'QC1-1%'"
+#$PSQL -a -c "\copy station_param from QC1-1.out DELIMITER '|'"
 
+# Because this is supposed to run in a cronjob we need methods that do not stop everything because of duplicates in the QC1-1.out file
+echo "$LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log"
+$LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log
 
-echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log"
-$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.log
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log
 
 $PSQL -a -c "\copy station_param to QC1-1_all.out DELIMITER '|'"
