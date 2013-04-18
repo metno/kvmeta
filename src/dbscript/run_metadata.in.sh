@@ -94,8 +94,8 @@ do
     $LIBEXECDIR/$COMMAND
 done
 
-echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log"
-$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out nonhour > $DUMPDIR/station_param_QCX.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out nonhour > $DUMPDIR/station_param_QCX.log
 
 
 # Table checks need several scripts for updating

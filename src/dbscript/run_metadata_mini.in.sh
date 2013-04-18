@@ -55,7 +55,7 @@ PSQL=psql
 #$PSQL -a -c "TRUNCATE metadatatype CASCADE"
 #$PSQL -a -c "\copy metadatatype from '$METADIR/metadatatype/metadatatype.out' DELIMITER '|'"
 
-echo "Oppdaterer tabellene obs_pgm qcx_info operator"
+echo "Oppdaterer tabellene station types param obs_pgm station_metadata model qcx_info operator"
 for TABLE in station types param obs_pgm station_metadata model qcx_info operator
 do
     $PSQL -c "\copy $TABLE to $DUMPDIR/$TABLE.out DELIMITER '|'"
@@ -94,8 +94,8 @@ do
     $LIBEXECDIR/$COMMAND
 done
 
-echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log"
-$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out > $DUMPDIR/station_param_QCX.log
+echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out nonhour > $DUMPDIR/station_param_QCX.log"
+$LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out nonhour > $DUMPDIR/station_param_QCX.log
 
 
 # Table checks need several scripts for updating
