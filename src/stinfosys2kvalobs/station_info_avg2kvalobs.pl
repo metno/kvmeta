@@ -49,7 +49,7 @@ my $stpasswd=st_passwd();
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Cant't connect";
  my $sth;
 
- $sth=$dbh->prepare("select stationid,year,description from station_info where code='Tl' and docformatid=0 order by stationid,year") or die "Can't prep\n";
+ $sth=$dbh->prepare("select stationid,year,description from station_info where code='Tl' and docformatid='0' order by stationid,year") or die "Can't prep\n";
  $sth->execute;
 
 my %PH;
