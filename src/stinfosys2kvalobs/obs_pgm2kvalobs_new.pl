@@ -42,9 +42,10 @@ if( $len == 0 ){
 }
 my $kvname="metno";
 if( $len == 2 ){
-    my $kvname=$ARGV[1];
+    $kvname=$ARGV[1];
 }
 
+# print "kvname=$kvname\n";
 
     my $days_back=$ARGV[0];
     #my $days_back=365;
@@ -68,15 +69,26 @@ if( $len == 2 ){
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Cant't connect";
 my $sth;
 
+
+
 my %NOT_METNO;
+my %METNO;
 if( $kvname eq "metno" ){
-    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid != 1") or die "Can't prep\n"; 
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid != 1 and sendtokvalobs is true") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
     }
+
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid = 1 and sendtokvalobs is true") or die "Can't prep\n"; 
+    $sth->execute;
+    while (my @row = $sth->fetchrow()) {
+        $METNO{$row[0]}{$row[1]}=$row[2];
+    }
+
+    
 }else{
-   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid=( select kvalobsid from kvalobs where name=$kvname");
+   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
    $sth->execute;
    while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
@@ -111,7 +123,7 @@ while (my @row = $sth->fetchrow()) {
 	$totime="\\N";
     }
     if( $kvname eq "metno" ){
-        if( not exists $NOT_METNO{$row[0]}{$row[4]} ){
+        if( ( not exists $NOT_METNO{$row[0]}{$row[4]} ) or ( exists $METNO{$row[0]}{$row[4]} ) ){
             print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
         }
     }else{
