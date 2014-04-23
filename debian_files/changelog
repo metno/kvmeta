@@ -1,8 +1,24 @@
+kvalobs-metadata (2.7.7-1) unstable; urgency=low
+  * station_info_avg2kvalobs.pl changed because of new stinfosys database
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 2 Sep  2013 17:36:00 +0200
+
+kvalobs-metadata (2.7.6-1) unstable; urgency=low
+  * QC1-3c added to  run_metadata
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 24 Jun  2013 16:52:00 +0200
+
+kvalobs-metadata (2.7.5-1) unstable; urgency=low
+
+  * Bugfix run_metadata.in.sh run_metadata_mini.in.sh
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 18 Apr  2013 13:42:00 +0200
+
 kvalobs-metadata (2.7.4-1) unstable; urgency=low
 
   * Changed dbQC1-1, run_QC1-1.in, run_QC1-1_all.in.sh and station_param2kvalobsdb
 
- -- Terje Reite <terje.reite@met.no>  Tue, 16 Apr  2013 23:55:00 +0100
+ -- Terje Reite <terje.reite@met.no>  Tue, 16 Apr  2013 23:55:00 +0200
 
 
 kvalobs-metadata (2.7.4~rc7-1) unstable; urgency=low
