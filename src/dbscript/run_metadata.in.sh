@@ -100,7 +100,7 @@ $LIBEXECDIR/station_param2kvalobsdb station_param_QCX.out nonhour > $DUMPDIR/sta
 
 # Table checks need several scripts for updating
 for COMMAND in "checks_auto QC1-1_checks"  "checks_auto QC1-3a_checks" \
-    "checks_auto  QC1-3b_checks" "checks_auto  QC1-4_checks"
+    "checks_auto  QC1-3b_checks" "checks_auto  QC1-3c_checks" "checks_auto  QC1-4_checks"
 do
     $LIBEXECDIR/$COMMAND
 done
