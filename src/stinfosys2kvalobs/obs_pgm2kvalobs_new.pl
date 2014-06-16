@@ -69,18 +69,18 @@ if( $len == 2 ){
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Cant't connect";
 my $sth;
 
-
+# my $where="(totime is NULL or totime > now()) and fromtime < now()";
 
 my %NOT_METNO;
 my %METNO;
 if( $kvname eq "metno" ){
-    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid != 1 and sendtokvalobs is true") or die "Can't prep\n"; 
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid in ( 2, 3 ) and sendtokvalobs is true") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
     }
 
-    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid = 1 and sendtokvalobs is true") or die "Can't prep\n"; 
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid = 1 ") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $METNO{$row[0]}{$row[1]}=$row[2];
