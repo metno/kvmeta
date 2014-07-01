@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+# Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
+#
+# $Id: station_param_all 3058 2011-08-26 14:30:13Z terjeer $
+#
+# Copyright (C) 2007 met.no
+#
+# Contact information:
+# Norwegian Meteorological Institute
+# Box 43 Blindern
+# 0313 OSLO
+# NORWAY
+# email: kvalobs-dev@met.no
+#
+# This file is part of KVALOBS_METADATA
+# 
+# KVALOBS_METADATA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#
+# KVALOBS_METADATA is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc., 
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+use POSIX;
+use strict;
+use DBI;
+use dbQC;
+use File::Copy;
+use Cwd qw(cwd);
+
+my $INSTANCE;
+my $TABLE;
+my $argn = @ARGV;
+
+if( $argn > 1 ){
+   $INSTANCE = $ARGV[0];#SVV
+   $TABLE    = $ARGV[1];
+}else{
+   print "Too few arguments \n";
+}
+
+my $kvpasswd=get_passwd();
+my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+	die "Connect failed: $DBI::errstr";
+
+my $dbh2 = DBI->connect("dbi:Pg:dbname=$INSTANCE","kvalobs",$kvpasswd,{RaiseError => 1}) ||
+	die "Connect failed: $DBI::errstr";
+
+my @stlist;
+my $sth2=$dbh2->prepare("select distinct stationid from obs_pgm");
+$sth2->execute;
+while ( my @row = $sth2->fetchrow_array) {
+    #print join(',',@row) , "\n";
+    push(@stlist,$row[0]);
+}
+$sth2->finish;
+my $lstlist=join(',',@stlist);
+
+$sth2=$dbh2->prepare("truncate $TABLE");
+$sth2->execute;
+$sth2->finish;
+
+print "TABLE=$TABLE \n";
+
+if( $argn <= 2 ){
+    my $num_columns;
+
+    $sth2=$dbh2->prepare("select count(*) from information_schema.columns where table_name='$TABLE'");
+    $sth2->execute;
+    if ( my @row = $sth2->fetchrow_array) {
+        $num_columns=$row[0];
+    }
+    $sth2->finish;
+
+    print "num_columns= $num_columns \n";
+    my $placeholders = join ", ", ("?") x $num_columns;
+    #print "placeholders checks=$placeholders \n";
+
+    $sth2=$dbh2->prepare("insert into $TABLE values ($placeholders)");
+    my $sth=$dbh->prepare("select * from $TABLE where stationid=0 or stationid in ($lstlist)");
+    $sth->execute;
+    while ( my @row = $sth->fetchrow_array) {
+        #print join(',',@row) , "\n";
+        $sth2->execute(@row);
+    }
+    $sth2->finish;
+    $sth->finish;
+}else{
+    my $PATH = $ARGV[2];  #$METADIST_INSTANCE/kvmeta
+    my $sth=$dbh->prepare("COPY (select * from $TABLE where stationid=0 or stationid in ($lstlist)) to '$PATH/$TABLE.out' DELIMITER '|'");
+    $sth->execute;
+    $sth->finish;
+}
+
+
+$dbh->disconnect;
+$dbh2->disconnect;
+
+
