@@ -90,7 +90,7 @@ $sth2->finish;
 
 
 if( scalar(@not_NULL_stlist) > 0 ){
-    print "HEI \n";
+    #print "HEI \n";
 
     my $not_NULL_stlist=join(',',@not_NULL_stlist);
 
@@ -106,12 +106,8 @@ if( scalar(@not_NULL_stlist) > 0 ){
     }
     $sth2->finish;
 
-
     my $lstlist_sql= '(' . join(') or (',@stlist_sql) . ')';
     print $lstlist_sql . "\n";
-
-exit 0;
-
 
    $sth=$dbh->prepare("select * from $TABLE where ($lstlist_sql)");
    $sth->execute;
@@ -124,16 +120,44 @@ exit 0;
 }
 
 
-#my @NULL_stlist;
-#my $sth=$dbh->prepare("select distinct stationid from $TABLE where typeid is NULL");
-#$sth->execute;
-#while ( my @row = $sth->fetchrow_array) {
-#    # print join(',',@row) , "\n";
-#    push(@NULL_stlist,$row[0]);
-#}
-#$sth->finish;
+my @NULL_stlist;
+$sth=$dbh->prepare("select distinct stationid from $TABLE where typeid is NULL and stationid <> 0");
+$sth->execute;
+while ( my @row = $sth->fetchrow_array) {
+    # print join(',',@row) , "\n";
+    push(@NULL_stlist,$row[0]);
+}
+$sth->finish;
 
-$sth=$dbh->prepare("select * from $TABLE where stationid=0 or typeid is NULL");
+
+if( scalar(@NULL_stlist) > 0 ){
+    #print "HEI \n";
+    my $NULL_stlist=join(',',@NULL_stlist);
+
+    my @stlist;
+    $sth2=$dbh2->prepare("select distinct stationid from obs_pgm where stationid in ($NULL_stlist)");
+    $sth2->execute;
+    while ( my @row = $sth2->fetchrow_array) {
+        #print join(',',@row) , "\n";
+        push(@stlist,$row[0]);
+    }
+
+    if( scalar(@stlist) > 0 ){
+	my $lstlist=join(',',@stlist);
+
+	$sth=$dbh->prepare("select * from $TABLE where stationid in ($lstlist)");
+	$sth->execute;
+	while ( my @row = $sth->fetchrow_array) {
+	    # print join(',',@row) , "\n";
+	    $sth2_insert->execute(@row);
+	    $sth2->finish;
+	}
+	$sth->finish;
+    }
+}
+
+
+$sth=$dbh->prepare("select * from $TABLE where stationid=0");
 $sth->execute;
 while ( my @row = $sth->fetchrow_array) {
       # print join(',',@row) , "\n";
@@ -145,5 +169,3 @@ $sth->finish;
 
 $dbh->disconnect;
 $dbh2->disconnect;
-
-

@@ -35,7 +35,9 @@ dist_bin_SCRIPTS = \
 	checks2kvalobsdb \
 	checks_sensor \
 	print_station_param_auto_path.pl \
-        ../kvinstall_metadata 
+	table_instance \
+	table_type_instance \
+        ../kvinstall_metadata
 
 nodist_pkglibexec_SCRIPTS = \
 	dbQC.pm 
