@@ -9,8 +9,9 @@ SUBDIRS=dbscript \
 EXTRA_DIST=kvget-metadata-cron.in
 
 dist_bin_SCRIPTS = kvget-metadata-cron \
-                   kvget-metadata
-                   
+                   kvget-metadata \
+                   kvget-metadata-instance
+
 kvget-metadata-cron:	kvget-metadata-cron.in
 	sed s,__KVCONFIG__,$(KVCONFIG), $< \
     | sed s,__PKGLIBBINDIR__,$(bindir),  > $@
