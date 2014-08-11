@@ -73,25 +73,50 @@ my $sth;
 
 my %NOT_METNO;
 my %METNO;
+my %NOT_METNO_station;
+my %METNO_station;
+
 if( $kvname eq "metno" ){
-    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid in ( 2, 3 ) and sendtokvalobs is true") or die "Can't prep\n"; 
+####### message_formatid <> 0
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and kvalobsid in ( 2, 3 ) and sendtokvalobs is true") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
     }
 
-    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid = 1 ") or die "Can't prep\n"; 
+    $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and kvalobsid = 1 ") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $METNO{$row[0]}{$row[1]}=$row[2];
     }
 
+####### message_formatid=0
+    $sth=$dbh->prepare("select stationid,kvalobsid from message_in where message_formatid=0 and kvalobsid in ( 2, 3 ) and sendtokvalobs is true") or die "Can't prep\n"; 
+    $sth->execute;
+    while (my @row = $sth->fetchrow()) {
+        $NOT_METNO_station{$row[0]}=$row[1];
+    }
+
+    $sth=$dbh->prepare("select stationid,kvalobsid from message_in where message_formatid=0 and kvalobsid = 1 ") or die "Can't prep\n"; 
+    $sth->execute;
+    while (my @row = $sth->fetchrow()) {
+        $METNO_station{$row[0]}=$row[1];
+    }
+
     
 }else{
-   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
+####### message_formatid <> 0
+   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
    $sth->execute;
    while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
+   }
+
+####### message_formatid=0
+   $sth=$dbh->prepare("select stationid,kvalobsid from message_in where message_formatid=0 and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
+   $sth->execute;
+   while (my @row = $sth->fetchrow()) {
+        $NOT_METNO_station{$row[0]}=$row[1];
    }
 }
 
@@ -123,11 +148,11 @@ while (my @row = $sth->fetchrow()) {
 	$totime="\\N";
     }
     if( $kvname eq "metno" ){
-        if( ( not exists $NOT_METNO{$row[0]}{$row[4]} ) or ( exists $METNO{$row[0]}{$row[4]} ) ){
+        if( ( not exists $NOT_METNO{$row[0]}{$row[4]} ) or ( exists $METNO{$row[0]}{$row[4]} ) or ( not exists $NOT_METNO_station{$row[0]} ) or ( exists $METNO_station{$row[0]} ) ){
             print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
         }
     }else{
-        if( exists $NOT_METNO{$row[0]}{$row[4]} ){
+        if( (exists $NOT_METNO{$row[0]}{$row[4]}) or (exists $NOT_METNO_station{$row[0]}) ){
             print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
         }
     }
