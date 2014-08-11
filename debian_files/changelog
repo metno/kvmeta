@@ -1,3 +1,16 @@
+kvalobs-metadata (2.8.0-1) unstable; urgency=low
+  * changed run_metadata_instance.in.sh
+  * added table_instance
+  * added table_type_instance
+	
+ -- Terje Reite <terje.reite@met.no>  Fri, 11 July  2014 12:28:00 +0200
+
+
+kvalobs-metadata (2.7.9-1) unstable; urgency=low
+  * added kvget-metadata-instance
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 12 May  2014 14:14:00 +0200
+
 kvalobs-metadata (2.7.8-1) unstable; urgency=low
   * added run_metadata_instance.in.sh
 
