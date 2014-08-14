@@ -45,11 +45,18 @@ PSQL=psql
 echo "Sletter tabellene metadatatype og station_metadata"
 $PSQL -a -c "TRUNCATE metadatatype CASCADE"
 
+echo "Oppdaterer tabellene metadatatype station_metadata";
+for TABLE in metadatatype station_metadata
+do
+    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    assert_table_not_empty $TABLE
+done
+
 echo "Sletter tabellen station der static=true";
 $PSQL -a -c "delete from station where static=true"
 
-echo "Oppdaterer tabellene metadatatype station_metadata station";
-for TABLE in metadatatype station_metadata station
+echo "Oppdaterer tabellen station";
+for TABLE in station
 do
     $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
