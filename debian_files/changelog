@@ -1,3 +1,9 @@
+kvalobs-metadata (2.8.1-1) unstable; urgency=low
+  *  Bugfix kvget-metadata
+  *  Bugfix kvget-metadata-instance
+	
+ -- Terje Reite <terje.reite@met.no>  Thu, 14 Aug  2014 13:23:00 +0200
+
 kvalobs-metadata (2.8.0-1) unstable; urgency=low
   * changed run_metadata_instance.in.sh
   * added table_instance
