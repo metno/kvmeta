@@ -82,12 +82,19 @@ if( $kvname eq "metno" ){
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
+	#if ( $row[0] eq "33990" ){
+	#       print "NOT_METNO:$row[0], $row[1] \n";
+	#} 
+        
     }
 
     $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and kvalobsid = 1 ") or die "Can't prep\n"; 
     $sth->execute;
     while (my @row = $sth->fetchrow()) {
         $METNO{$row[0]}{$row[1]}=$row[2];
+	#if ( $row[0] eq "33990" ){
+	#       print "METNO:$row[0], $row[1] \n";
+	#} 
     }
 
 ####### message_formatid=0
@@ -148,7 +155,10 @@ while (my @row = $sth->fetchrow()) {
 	$totime="\\N";
     }
     if( $kvname eq "metno" ){
-        if( ( not exists $NOT_METNO{$row[0]}{$row[4]} ) or ( exists $METNO{$row[0]}{$row[4]} ) or ( not exists $NOT_METNO_station{$row[0]} ) or ( exists $METNO_station{$row[0]} ) ){
+        #if(  $row[0] eq "33990" ){
+	#    print "metno:$row[0],$row[4] \n";
+	#}
+        if( (( not exists $NOT_METNO{$row[0]}{$row[4]} ) and ( not exists $NOT_METNO_station{$row[0]} ) ) or ( exists $METNO{$row[0]}{$row[4]} ) or ( exists $METNO_station{$row[0]} ) ){
             print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$outhour|$week|$row[9]|$totime\n";
         }
     }else{
