@@ -1,3 +1,8 @@
+kvalobs-metadata (2.8.2-1) unstable; urgency=low
+  *  Bugfix obs_pgm2kvalobs_new.pl
+	
+ -- Terje Reite <terje.reite@met.no>  Thu, 18 Aug  2014 17:13:00 +0200
+
 kvalobs-metadata (2.8.1-1) unstable; urgency=low
   *  Bugfix kvget-metadata
   *  Bugfix kvget-metadata-instance
