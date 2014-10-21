@@ -1,11 +1,16 @@
+kvalobs-metadata (2.8.3-1) unstable; urgency=low
+  * changed station2kvalobs.pl
+	
+ -- Terje Reite <terje.reite@met.no>  Fri, 19 Sep  2014 17:21:00 +0200
+
 kvalobs-metadata (2.8.2-1) unstable; urgency=low
-  *  Bugfix obs_pgm2kvalobs_new.pl
+  * Bugfix obs_pgm2kvalobs_new.pl
 	
  -- Terje Reite <terje.reite@met.no>  Thu, 18 Aug  2014 17:13:00 +0200
 
 kvalobs-metadata (2.8.1-1) unstable; urgency=low
-  *  Bugfix kvget-metadata
-  *  Bugfix kvget-metadata-instance
+  * Bugfix kvget-metadata
+  * Bugfix kvget-metadata-instance
 	
  -- Terje Reite <terje.reite@met.no>  Thu, 14 Aug  2014 13:23:00 +0200
 

@@ -144,8 +144,9 @@ my @row_list;
 
 $sth->finish;
 
-my %network_station_icao=      fill_network_station($dbh, 101);
-my %network_station_call_sign= fill_network_station($dbh, 6);
+my %network_station_icao      = fill_network_station($dbh, 101);
+my %network_station_call_sign = fill_network_station($dbh, 6);
+my %network_environment       = fill_network_environment($dbh);
 
 
 my %pstationid;
@@ -239,19 +240,23 @@ sub greater_than{
 sub get_environmentid {
   my ( $dbh, $stationid ) = @_;
 
-  my $sth = $dbh->prepare(
-   "select environmentid from  environment_station where  stationid=$stationid and fromtime = ( select max(fromtime) from environment_station where stationid=$stationid)"
-   );
-   $sth->execute;
+  my $environmentid=0;
+  #my $sth = $dbh->prepare(
+  # "select environmentid from  environment_station where  stationid=$stationid and fromtime = ( select max(fromtime) from environment_station where stationid=$stationid)"
+   #);
+  # $sth->execute;
     
-   my $environmentid;
-   if ( $environmentid = $sth->fetchrow_array ) {
-    
-   }else{
-     $environmentid=0;   
-   }
+   
+   #if ( $environmentid = $sth->fetchrow_array ) {
+   # 
+   #}else{
+   #  $environmentid=0;
+   #}
+   #$sth->finish;
 
-   $sth->finish;
+  if( defined $network_environment{$stationid} ){
+      $environmentid=$network_environment{$stationid};
+  } 
 
   return $environmentid;
 }
@@ -272,6 +277,34 @@ sub fill_network_station {
         $s{"$row[0]"} = $row[1];
     }
 
+    $sth->finish;
+
+    return %s;
+}
+
+
+sub fill_network_environment {
+    my ( $dbh ) = @_;
+
+    my $sth;
+    my %s;
+    my @nlist=( 101, 104, 105, 107, 113, 114 );
+    my $snlist=join(',',@nlist);
+
+    $sth = $dbh->prepare("select stationid, networkid from network_station where totime IS NULL and networkid in ($snlist)");
+    $sth->execute;
+    while ( my @row = $sth->fetchrow_array ) {
+        my $environmentid=$row[1] - 100;
+        $s{"$row[0]"} = $environmentid;
+    }
+    $sth->finish;
+
+    $sth = $dbh->prepare("select stationid from station where maxspeed > 0");
+    $sth->execute;
+    while ( my @row = $sth->fetchrow_array ) {
+        my $environmentid=6;
+        $s{"$row[0]"} = $environmentid;
+    }
     $sth->finish;
 
     return %s;
