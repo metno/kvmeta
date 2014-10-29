@@ -64,7 +64,7 @@ done
 
 
 echo "Oppdaterer tabellene algorithms checks station_param types param obs_pgm model qcx_info operator";
-for TABLE in algorithms checks station_param types param obs_pgm station_metadata model qcx_info operator
+for TABLE in algorithms checks station_param types param obs_pgm model qcx_info operator
 do
     $PSQL -a -c "truncate table $TABLE"
     $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
