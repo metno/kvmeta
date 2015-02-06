@@ -33,12 +33,12 @@
 # Description: This script prints station_param format files based on information from stinfosys. The select returns heights with metadata from sensor_info where measurement_methodid=217701 and paramid=112.
 # For further information of measurement_methodid and paramid contact stinfosys.
 #
-# Usage: ./sensor_info2kvalobs.pl
+# Usage: ./sensor_info2kv.pl
 #
 # Arguments: none
 #
 # Example:
-# $BINDIR/sensor_info2kvalobs.pl > $DUMPDIR/station_param_QCX.out
+# $BINDIR/sensor_info2kv.pl > $DUMPDIR/station_param_QCX.out
 
 use strict;
 use DBI;
@@ -49,6 +49,7 @@ use trim;
 # CONST
 my $paramid = 112; # snow depth
 my $measurement_methodid =217701; # Ultrasonic method
+my $default_min_clear_factor=50;
 # END CONST
 
 # my %hfromday = fhfromday(); # from dbQC.pm
@@ -83,10 +84,17 @@ if ( my $val = $sth->fetchrow() ) {
 $sth->finish;
 
 
+#$sth =
+#  $dbh->prepare(
+#"select stationid, hlevel, sensor, physical_height,fromtime from sensor_info where measurement_methodid=$measurement_methodid and paramid=$paramid"
+#  ) or die "Can't prep\n";
+#$sth->execute;
+
+
 $sth =
   $dbh->prepare(
-"select stationid, hlevel, sensor, physical_height,fromtime from sensor_info where measurement_methodid=$measurement_methodid and paramid=$paramid"
-  ) or die "Can't prep\n";
+"select si.stationid, si.hlevel, si.sensor, si.physical_height,si.fromtime,em.description from equipmentmodel em ,equipment eq, sensor_info si where eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid=$measurement_methodid and paramid=$paramid"
+    ) or die "Can't prep\n";
 $sth->execute;
 
 
@@ -96,9 +104,10 @@ while ( my @row = $sth->fetchrow() ) {
     my $sensor          = $row[2];
     my $physical_height = $row[3];
     my $fromtime        = $row[4];
+    my $description     = $row[5];
 
     print_station_param( $stationid, $paramid, $hlevel, $sensor,
-        $physical_height, $fromtime );
+        $physical_height, $fromtime, $description );
 
 }
 $sth->finish;
@@ -121,23 +130,32 @@ $dbh->disconnect;
 
 
 sub print_station_param {
-    my ( $stationid, $paramid, $level, $sensor, $physical_height, $fromtime ) =
+    my ( $stationid, $paramid, $level, $sensor, $physical_height, $fromtime, $description ) =
       @_;
 
     # INPUT: Physical height for a sensor with metadata.
     # SIDE_EFFECT: Print two lines formatted as the station_param format for the checks QC1-1 and QC1-0-autosnow.
     # RETURN VALUE: none
 
+    my $min_clear_factor;
+    if( $description =~ "min_klaring" ){   
+        my @a=split /=/,$description;
+        $min_clear_factor=trim($a[1]);
+    }else{
+	$min_clear_factor= $default_min_clear_factor;
+    }
+    #print "$description|$min_clear_factor\n";
     my $desc_metadata = "\\N";
     my $fromday       = 1;
-    my $today         = 365;
+    my $today         = 366;
 
     my $h;
     if ( ( !defined $physical_height ) or $physical_height eq "" ) {
-        $h = ( $default_physical_height - 0.5 ) * 100;
+        $h = ( $default_physical_height ) * 100 -  $default_min_clear_factor;
     }
     else {
-        $h = ( $physical_height - 0.5 ) * 100;
+        $h = ( $physical_height ) * 100 - $min_clear_factor; # $min_clear_factor is something that was originally given in cm in Stinfosys, 
+                                                             # $physical_height is in meter 
     }
 
     my $metadata = "max;highest;high;low;lowest;min\\n$h;$h;$h;-3.0;-3.0;-3.0";

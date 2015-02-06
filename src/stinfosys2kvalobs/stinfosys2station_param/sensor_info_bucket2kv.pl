@@ -141,7 +141,7 @@ sub print_station_param {
 
     my $desc_metadata = "\\N";
     my $fromday       = 1;
-    my $today         = 365;
+    my $today         = 366;
 
     # my $qcx  = "QC1-1-104";
     my $maxV = $V + 115;
