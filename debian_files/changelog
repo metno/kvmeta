@@ -1,3 +1,8 @@
+kvalobs-metadata (2.8.5-1) unstable; urgency=low
+  * changed param2kvalobs.pl
+
+ -- Terje Reite <terje.reite@met.no>  Thu, 15 Jan  2015 17:44:00 +0200
+
 kvalobs-metadata (2.8.4-1) unstable; urgency=low
   * changed run_klima2kvalobs.in
 

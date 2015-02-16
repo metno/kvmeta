@@ -66,7 +66,7 @@ while (my @row = $sth->fetchrow()) {
           }
     }
    
-      print "$row[0]|$row[1]|$row[2]|$row[4]|$row[5]|$row[8]\n";
+      print "$row[0]|$row[1]|$row[2]|$row[4]|$row[5]|$row[8]|$row[9]\n";
   }
 
 $sth->finish;
