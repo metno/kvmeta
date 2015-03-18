@@ -32,9 +32,8 @@
 use strict;
 use DBI;
 use trim;
-use Date::Calc qw( check_date check_time Delta_Days Today );
 use dbQC;
-use station_param;
+
 
 my $narg=@ARGV;
 if( $narg == 0 ){
@@ -64,7 +63,7 @@ if ( $narg > 0 ){
 	    $isnonhour=1;
 	}
     }
-
+    # print "fromfile=$fromfile \n";
     my $splitter='\|';
     open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
     while( defined(my $line=<MYFILE>) ){
@@ -97,16 +96,16 @@ if ( $narg > 0 ){
 	       if ( $desc_metadata eq '\N' ){
                   $desc_metadata="";
 	       }
-	       
-	       # print "HELLO 0 $stationid,$paramid,$level,$fromday \n";
+	       #if( $stationid == 33950 ){
+	       #   print "HELLO 0 $stationid,$paramid,$level,$sensor,$fromday,$today,$hour,$qcx \n";
+	       #}
 
                eval{
-                   if ( !execute_program(
-                                $dbh,           $fromfile, $control,
-                                $stationid,     $paramid,  $level,
-                                $sensor,        $fromday,  $today,
-                                $hour,          $qcx,      $metadata,
-                                $desc_metadata, $fromtime
+                   if ( !insert_update_station_param(
+			     $dbh,   $control, $stationid, $paramid,
+			     $level, $sensor,  $fromday,   $today,
+			     $hour,  $qcx,     $metadata,  $desc_metadata,
+			     $fromtime
                           )
                        ){
                             print "ERROR: station_param2kvalobsdb::execute_program har feilet\n" ;
@@ -116,3 +115,89 @@ if ( $narg > 0 ){
         } 
     }  
 }
+
+
+sub insert_update_station_param {
+    my (
+        $dbh,   $control, $stationid, $paramid,
+        $level, $sensor,  $fromday,   $today,
+        $hour,  $qcx,     $metadata,  $desc_metadata,
+        $fromtime
+      )
+      = @_;
+
+    #my $metadataE="E" . "'" . $metadata . "'";
+    #print "metadataE=$metadataE \n";
+    #$metadata=$metadataE;
+
+    #################
+    my $sth;
+    my $count;
+    eval {
+        $sth = $dbh->prepare(
+            "SELECT count(*) FROM station_param \
+                           WHERE  stationid=? AND paramid=? AND level=? AND \
+                                  fromday=? AND today=? AND hour=? AND sensor=? AND \
+                                  qcx=? AND fromtime=?"
+        );
+
+        $sth->execute($stationid,$paramid,$level,$fromday,$today,$hour,$sensor,$qcx,$fromtime);
+
+        my @row = ();
+
+        if ( @row = $sth->fetchrow_array ) {
+            $count = $row[0];
+        }
+        $sth->finish;
+    };
+    warn $@ if $@;
+
+    if ($@) { print "tt0=$@"; return 0; }
+
+    #if(  ! defined $count ){
+    #	print "not defined count: $stationid,$paramid,$level,$fromday,$today,$hour,$sensor,$qcx,$fromtime \n";
+    #    ##exit 0;
+    #}
+
+    if ( $count > 0 ) {
+            if ( $control eq "ins" || $control eq 'R' ) {
+                    eval {
+                        print
+"1: $stationid, $paramid, $qcx, $metadata: Denne raden i station_param tabellen blir naa replaced \n";
+                        $sth = $dbh->prepare(
+                            "UPDATE station_param \
+                                  SET   metadata = E'$metadata', desc_metadata = '$desc_metadata' \
+                                  WHERE stationid=$stationid AND paramid=$paramid AND level=$level AND \
+                                        fromday=$fromday AND today=$today AND hour=$hour AND sensor='$sensor' AND \
+                                        qcx = '$qcx' AND fromtime = '$fromtime'"
+                        );
+                        $sth->execute;
+                        $sth->finish;
+                    };
+                    if ($@) { print "tt=$@"; return 0; }
+                    return 1;
+	    }else {
+                print "$stationid, $paramid, $qcx: Denne raden har verdier i fra for; ingen oppdateringer \n";
+                return 1;
+            }
+    }else{
+
+      #$stationid, $paramid, $level, $sensor, $fromday, $today, $qcx, $metadata, $desc_metadata, $fromtime
+      print "3: $stationid, $paramid, $qcx, $metadata: denne raden blir naa lagt til \n";
+      eval {
+        $sth = $dbh->prepare(
+        "INSERT INTO station_param VALUES('$stationid','$paramid','$level','$sensor','$fromday','$today',\
+                                                  '$hour','$qcx',E'$metadata','$desc_metadata','$fromtime')"
+        );
+        $sth->execute;
+	#    "INSERT INTO station_param VALUES(?,?,?,?,?,?,?,?,?,?,?)"
+        #);
+        #$sth->execute($stationid,$paramid,$level,$sensor,$fromday,$today,$hour,$qcx,"E\'$metadata\'",$desc_metadata,$fromtime);
+	# Fungerer ikke - tilbake til den gode gamle ...
+        $sth->finish;
+    };
+    if ($@) { print "tt=$@"; return 0; }
+    return 1;
+    }
+}
+
