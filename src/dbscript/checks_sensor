@@ -56,6 +56,11 @@ if( $argn > 1 ){
     chdir($filedir);
 }
 
+my $table="checks";
+if( $argn > 2 ){
+    $table= $ARGV[2];
+}
+
 print "START \n";
 
 my $kvpasswd=get_passwd();
@@ -96,33 +101,45 @@ print "END \n";
 sub checks {
     my ($fromfile, $control) = @_;
 
-    my ( $qcx_basis, $medium_qcx, $language, $checkname, $checksignature_basis, $active, $fromtime )=read_checks($fromfile, $control);
-
+    my ( $qcx_basis, $medium_qcx, $language, $checkname, $checksignature_basis, $active, $fromtime, $rtypeid )=read_checks($fromfile, $control);
+    if( ! defined $rtypeid ){
+	$rtypeid="";
+    }
     # returnerer liste av ($stationid, $level, $sensor_param1,  $sensor_param2 ... )            
-    my @st_list=make_st_level_sensor_list( $checksignature_basis, $control );
+    my @st_list=make_st_level_sensor_list( $checksignature_basis, $control, $rtypeid );
 
     foreach my $st ( @st_list ){
         my ($stationid, $typeid, $level, $href )=@{$st};
 
         # returnerer liste av ( $qcx, $checksignature ) for en spesifikk stasjon, level, sensor kombinasjon
-        my @qcx_checksignature_list=make_qcx_checksignature( $stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis );
+        my @qcx_checksignature_list=make_qcx_checksignature( $stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis, $rtypeid );
         foreach my $q_ch ( @qcx_checksignature_list ){
            my ( $qcx, $checksignature )=@{$q_ch};
            # print "$stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime \n";
            insert_DB( $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime );
         }
     }
+
+    if( $rtypeid eq "" ){
+	insert_DB( 0, $qcx_basis, $medium_qcx, $language, $checkname, $checksignature_basis, $active, $fromtime ); 
+    }
+
 }
 
 
 sub  make_st_level_sensor_list{
-   my ($checksignature, $control )=@_;
+   my ($checksignature, $control, $rtypeid )=@_;
 
    my @paramlist=simple_parse_checksignature($checksignature);
 
-   my $sth = $dbh->prepare("select stationid, typeid, level, paramid, nr_sensor from obs_pgm where totime is null and paramid in ( select paramid from param where name in ( " . join( ",", map { "?" } @paramlist ) . " ) )");
-   $sth->execute( @paramlist );
-
+   my $sth;
+   if( $rtypeid eq "" ){
+       $sth = $dbh->prepare("select stationid, typeid, level, paramid, nr_sensor from obs_pgm where totime is null and paramid in ( select paramid from param where name in ( " . join( ",", map { "?" } @paramlist ) . " ) )");
+       $sth->execute( @paramlist );
+   }else{
+       $sth = $dbh->prepare("select stationid, typeid, level, paramid, nr_sensor from obs_pgm where totime is null and typeid=$rtypeid and paramid in ( select paramid from param where name in ( " . join( ",", map { "?" } @paramlist ) . " ) )");
+       $sth->execute( @paramlist );
+   }
    
    my %stl;
    # the point here is that the list of paramid,nsensor for a certain $stationid, $typeid, $level combination is made
@@ -187,7 +204,7 @@ sub simple_parse_checksignature{
 
 
 sub make_qcx_checksignature{
-    my ($stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis )=@_;
+    my ($stationid, $typeid, $level, $href, $qcx_basis, $checksignature_basis, $rtypeid )=@_;
     #print "mqc1 $stationid, $typeid, $level, $qcx_basis, $checksignature_basis \n";
 
     my ($first,@rsplit)=split('\|',$checksignature_basis);
@@ -206,7 +223,9 @@ sub make_qcx_checksignature{
 	my @sensorlist=();
         # print "$stationid,$typeid,$level,$paramid,$nsensor \n";
         for( my $sensor=0; $sensor < $nsensor; $sensor ++ ){ # $t="$param&$level&$sensor&$typeid";
-              push(@sensorlist,$sensor);  
+	    if(  $rtypeid ne "" or $sensor !=0 or $level !=0 ){
+                 push(@sensorlist,$sensor);
+	    }  
         }
 	$param_sensorlist{$param}=\@sensorlist;
    }
@@ -302,6 +321,7 @@ sub read_checks {
     my $checksignature;
     my $active= "* * * * *";
     my $fromtime= get_fromtime();
+    my $typeid="";
 
 
     while( defined($line=<MYFILE>) ){
@@ -358,6 +378,10 @@ sub read_checks {
 		    $fromtime = $l;
 		    $counter++;
 		    print "fromtime=$fromtime  counter= $counter";  print "\n";
+		}elsif( $r eq "typeid"){
+		    $fromtime = $l;
+		    $counter++;
+		    print "typeid=$typeid  counter= $counter";  print "\n";
 		}
 		
 	    }  
@@ -379,29 +403,22 @@ sub read_checks {
 sub insert_DB{
   my ( $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime ) = @_;
 
-  my $sth = $dbh->prepare("SELECT language FROM checks \ 
-                           WHERE stationid=$stationid AND qcx='$qcx' AND fromtime='$fromtime'");
+  my $sth = $dbh->prepare("SELECT count(*) FROM $table \ 
+                           WHERE stationid=$stationid AND qcx='$qcx' AND language=$language AND fromtime='$fromtime'");
   $sth->execute;
 
-  my @row=();
-  my @language_already=();
-
-  while (@row = $sth->fetchrow_array) {
-    push(@language_already,$row[0]);
+  my $count;
+  if( my @row = $sth->fetchrow_array ){
+      $count=$row[0];
   }
   $sth->finish;
 
-  my $len_language=@language_already;
-  print "length of language is $len_language\n";
-  print "qcx=$qcx og fromtime=$fromtime\n";
+  print "stationid=$stationid; qcx=$qcx; fromtime=$fromtime\n";
 
-  if( $len_language > 0 ){
-      print "length of language is $len_language\n";
-      foreach(@language_already){
-	  if($_ eq $language){ 
-	      if(  $control eq "ins" || $control eq 'R' ){
+  if( $count > 0 ){ 
+	  if(  $control eq "ins" || $control eq 'R' ){
 		  print " $qcx: Denne checken blir naa replaced";
-		  my $sth = $dbh->prepare("UPDATE checks \
+		  my $sth = $dbh->prepare("UPDATE $table \
                                   SET  checkname = '$checkname',\
                                   checksignature = '$checksignature',\
                                   active         = '$active'\
@@ -409,31 +426,14 @@ sub insert_DB{
                   $sth->execute;
                   $sth->finish;
                   return;
-	      }
-              else{
-	        print " $checkname: Dette spraaket er $_ og finnes i fra for; ingen oppdateringer \n";
-	        exit 0;
-	      }
-	  }
-          else{
-	      print " $checkname finnes ogsaa for spraak $_ \n";
-	  }
-      }
+	   }
+           else{
+	        print "ingen oppdateringer \n";
+	        return;
+	  }  
   }
 
-  ########################
-
-    #print " $checkname: Denne algoritmen blir naa replaced";
-    #my $sth = $dbh->prepare("UPDATE algorithms \
-    #                        SET  signature = '$signature', script = '$script' \
-    #                        WHERE language like '$language' AND checkname like '$checkname'");
-    #$sth->execute;
-    #$sth->finish;
-
-
-
-
-  $sth = $dbh->prepare("INSERT INTO checks VALUES($stationid,'$qcx','$medium_qcx',$language, \
+  $sth = $dbh->prepare("INSERT INTO $table VALUES($stationid,'$qcx','$medium_qcx',$language, \
                         '$checkname', '$checksignature', '$active','$fromtime')");
   $sth->execute;
   
