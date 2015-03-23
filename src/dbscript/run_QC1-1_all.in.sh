@@ -53,6 +53,7 @@ echo "Oppdaterer tabellen station_param"
 $PSQL -a -c "truncate table station_param"
 
 $LIBEXECDIR/dbQC1-1 QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param
+$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_1.out
 ## $PSQL -a -c "delete from station_param where qcx like 'QC1-1%'"
 #$PSQL -a -c "\copy station_param from QC1-1.out DELIMITER '|'"
 
@@ -60,7 +61,12 @@ $LIBEXECDIR/dbQC1-1 QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param
 echo "$LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log
 
+$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2.out
+$PSQL -a -c "delete from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2_delete.out
+
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log
+
+$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_3.out
 
 $PSQL -a -c "\copy station_param to QC1-1_all.out DELIMITER '|'"

@@ -1,3 +1,25 @@
+kvalobs-metadata (2.8.8-1) unstable; urgency=low
+  * changed run_klima2kvalobs.in
+  * changed RANGE_CHECK2station_param.pl
+  * changed run_QC1-1_all.in.sh
+  * changed extra_tables.sql
+  * changed checks_sensor
+  * added run_checks_sensor_test.in
+  
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 23 Mar  2015 15:40:00 +0200
+
+kvalobs-metadata (2.8.7-1) unstable; urgency=low
+  * Bugfix station_param2kvalobsdb
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 26 Feb  2015 15:20:00 +0200
+
+kvalobs-metadata (2.8.6-1) unstable; urgency=low
+  * changed sensor_info2kv.pl 
+  * changed sensor_info_bucket2kv.pl
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 17 Feb  2015 11:58:00 +0200
+
 kvalobs-metadata (2.8.5-1) unstable; urgency=low
   * changed param2kvalobs.pl
 

@@ -62,6 +62,15 @@ while (@row = $sth->fetchrow_array) {
 }
 $sth->finish;
 
+
+my %st_maxspeed;
+$sth = $dbh->prepare('select distinct stationid from station where maxspeed > 0');
+$sth->execute;
+while (@row = $sth->fetchrow_array) {
+    $st_maxspeed{"$row[0]"}=1;
+}
+$sth->finish;
+
 ###########################
 my $narg=@ARGV;
 my %metafile;
@@ -138,10 +147,12 @@ if ( $narg > 1 ){
 		my $calc_high = trim($sline[9]);
 		my $calc_low = trim($sline[10]);
 		my $calc_lowest = trim($sline[11]);        
-
-                print_station_param($stationid,$MONTH,$paramid,$level,
+		
+		if( ! exists $st_maxspeed{$stationid} ){
+                    print_station_param($stationid,$MONTH,$paramid,$level,
                                     $highest,$high,$low,$lowest );
                                     # $calc_highest,$calc_high,$calc_low,$calc_lowest);
+		}
 	    }
         }
     }
