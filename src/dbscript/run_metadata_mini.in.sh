@@ -55,6 +55,10 @@ PSQL=psql
 #$PSQL -a -c "TRUNCATE metadatatype CASCADE"
 #$PSQL -a -c "\copy metadatatype from '$METADIR/metadatatype/metadatatype.out' DELIMITER '|'"
 
+echo "Sletter tabellen checks_description"
+$PSQL -a -c "TRUNCATE TABLE checks_description" 
+$PSQL -a -c "\copy checks_description from '$METADIR/checks_description/checks_description.out' DELIMITER '|'"
+
 echo "Oppdaterer tabellene station types param obs_pgm station_metadata model qcx_info operator"
 for TABLE in station types param obs_pgm station_metadata model qcx_info operator
 do

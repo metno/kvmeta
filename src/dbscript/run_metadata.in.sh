@@ -50,6 +50,9 @@ assert_table_not_empty() {
 PSQL=psql 
 
 ## ** MAIN **
+echo "Sletter tabellen checks_description"
+$PSQL -a -c "TRUNCATE TABLE checks_description" 
+$PSQL -a -c "\copy checks_description from '$METADIR/checks_description/checks_description.out' DELIMITER '|'"
 
 echo "Sletter tabellene metadatatype og station_metadata"
 $PSQL -a -c "TRUNCATE metadatatype CASCADE"

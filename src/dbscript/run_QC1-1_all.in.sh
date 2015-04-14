@@ -12,14 +12,21 @@ set -e  # Exit if a simple shell command fails
 #    exit 1
 #fi
 
-KVCONFIG=__KVCONFIG__
 LIBEXECDIR=__PKGLIBBINDIR__
 PERL5LIB=__PERL5LIB__
-METADIR=`$KVCONFIG --datadir`/kvalobs/metadata
+
+if [ -f  $HOME/etc/metakvalobs.conf ]; then
+   . $HOME/etc/metakvalobs.conf
+else
+   echo "Missing file:  $HOME/etc/metakvalobs.conf"
+   exit 1
+fi
 
 #if [ -z "$PGPASSWORD" ]; then
 #    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`
 #fi
+
+cd $DUMPDIR
 
 PGDATABASE=kvalobs
 PGUSER=kvalobs
@@ -29,11 +36,7 @@ if [ "z$PGHOST" != "z" ]; then
 	PGHOST=localhost
 fi
 
-DUMPDIR="/tmp/$USER/kvalobs/var/log/tabledump"
-rm -rf $DUMPDIR
-mkdir -p -m700 /tmp/$USER/kvalobs/var/log/
-mkdir -m700 $DUMPDIR
-LOGFILE="$DUMPDIR/table_update.log"
+
 
 
 ## ** Subroutines **
@@ -52,21 +55,37 @@ echo "Oppdaterer tabellen station_param"
 
 $PSQL -a -c "truncate table station_param"
 
+# This code only generates the file  QC1-1.out in the directory this code is running
 $LIBEXECDIR/dbQC1-1 QC1-1_stasjonsGrenser QC1-1_fasteGrenser QC1-1param
-$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_1.out
-## $PSQL -a -c "delete from station_param where qcx like 'QC1-1%'"
-#$PSQL -a -c "\copy station_param from QC1-1.out DELIMITER '|'"
 
-# Because this is supposed to run in a cronjob we need methods that do not stop everything because of duplicates in the QC1-1.out file
+# This runs in a cronjob --> use methods that do not stop everything because of duplicates in the QC1-1.out file
+# --> use  station_param2kvalobsdb instead of just: $PSQL -a -c "\copy station_param from QC1-1.out DELIMITER '|'"
+# If one gives  only one argument to the script station_param2kvalobsdb it takes the fromfile from the current directory, 
+# that is the file  QC1-1.out generated in the $DUMPDIR directory  is used
 echo "$LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log
-
-$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2.out
-$PSQL -a -c "delete from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2_delete.out
+$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_1.out
 
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log
 
-$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_3.out
+$PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2.out
+
+$PSQL -a -c "delete from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_2_delete.out
 
 $PSQL -a -c "\copy station_param to QC1-1_all.out DELIMITER '|'"
+
+
+## COPY TO station_param   
+for FILE in QC1-1_all.out
+do       
+    if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/station_param_auto/$FILE
+    then
+        if [ -s $DUMPDIR/$FILE ]; then
+            cp -upv $DUMPDIR/$FILE $METADIR/station_param/station_param_auto/$FILE
+            cp -upv $DUMPDIR/$FILE $METADIR_AUTO/station_param_auto/$FILE
+        else
+            echo "Empty file:  $DUMPDIR/$FILE"
+        fi
+    fi
+done
