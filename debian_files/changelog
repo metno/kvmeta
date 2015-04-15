@@ -1,3 +1,10 @@
+kvalobs-metadata (2.8.10-1) unstable; urgency=low
+  * changed run_metadata_instance.in.sh, added table checks_description
+  * changed run_metadata.in.sh, added table checks_description
+  * changed run_metadata_mini.in.sh, added table checks_description
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 14 Apr  2015 17:46:00 +0200
+
 kvalobs-metadata (2.8.9-1) unstable; urgency=low
   * changed run_QC1-1_all.in.sh
 
