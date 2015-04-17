@@ -1,6 +1,6 @@
 #! /bin/sh
 
-KV_METADIR=/usr/share/kvalobs/metadata
+KV_METADIR=/usr/share/kvalobs/metadata_test
 
 
 if [ "z$METADIR" = "z" ]; then
