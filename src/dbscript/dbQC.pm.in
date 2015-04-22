@@ -20,9 +20,10 @@ my $temp;
 
 #my $kvconfig=`which kvconfig`;
 
-
-$metadata=`kvconfig --datadir`; 
+$metadata=`kvconfig --datadir`;
+$metadata_test=$metadata;
 $metadata = trim( $metadata )  . "/kvalobs/metadata";
+$metadata_test = trim( $metadata_test )  . "/kvalobs/metadata_test";
 
 if( defined($dev=$ENV{"METADIR"})){
    if( substr($dev,-1,1) eq '/' ){
@@ -103,6 +104,11 @@ sub get_checks_manual_path{
 
 sub get_checks_semi_auto_path{
     return "$metadata/checks/checks_semi_auto";
+}
+
+
+sub get_checks_semi_auto_test_path{
+    return "$metadata_test/checks/checks_semi_auto";
 }
 
 
