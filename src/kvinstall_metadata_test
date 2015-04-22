@@ -3,15 +3,17 @@
 KV_METADIR=/usr/share/kvalobs/metadata_test
 
 
-if [ "z$METADIR" = "z" ]; then
-   echo "The environment variable METADIR must be set "
+if [ "z$METADIRTEST" = "z" ]; then
+   echo "The environment variable METADIRTEST must be set "
    echo "and point to the kvalobs version control metadata ( SVN or git ). "
    exit 1
 fi
 
+METADIR=$METADIRTEST
+
 if ! cd $KV_METADIR; then
     echo "Can not change directory to $KV_METADIR."
-    exit 1
+    mkdir -pv $KV_METADIR
 fi
 
 #
