@@ -112,50 +112,20 @@ done
 echo "$LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log"
 $LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log
 
+## semi_auto/semi_manual
+echo "$LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log"
+$LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log
 
+## Manual
 for COMMAND in run_algorithm_all run_station_param_all  run_checks_all
 do
     echo "$LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out"
     $LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out
 done  
 
-
-METADIST=`$KVCONFIG --datadir`/kvalobs/metadist
-mkdir -p -m700 "$METADIST/kvmeta"
-echo "Sjekker antall linjer i tabellene og dumper tabellene"
+echo "Sjekker antall linjer i tabellene"
 for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
 do
     assert_table_not_empty $TABLE
-    $PSQL -c "\copy $TABLE to $METADIST/kvmeta/$TABLE.out DELIMITER '|'"
 done
 
-
-assert_table_not_empty station
-$PSQL -c "\copy ( select * from station  where static='t' ) to $METADIST/kvmeta/station.out DELIMITER '|'"
-
-
-cd $METADIST
-kvmetadist=kvmeta-$(date +%Y%m%d).tar.bz2
-
-CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
-SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
-echo "CLIENT_ENCODING=${CLIENT_ENCODING}"
-echo "SERVER_ENCODING=${SERVER_ENCODING}"
-
-## CHARSET CONVERSION FOR UTF8
-if [ $CLIENT_ENCODING = UTF8 ] && [ $SERVER_ENCODING = UTF8 ]; then
-  mkdir -p -m700 "$METADIST/kvmeta_UTF8"
-  for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
-  do
-     iconv -f utf-8 -t latin1  $METADIST/kvmeta/$TABLE.out >  $METADIST/kvmeta/$TABLE.latin1
-     mv $METADIST/kvmeta/$TABLE.out    $METADIST/kvmeta_UTF8/$TABLE.utf8
-     mv $METADIST/kvmeta/$TABLE.latin1 $METADIST/kvmeta/$TABLE.out
-  done
-fi
-
-
-if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) || ( $CLIENT_ENCODING = UTF8 && $SERVER_ENCODING = UTF8 ) ]] ; then
-   tar cpjf  $kvmetadist kvmeta
-   cp -pv  kvmeta-$(date +%Y%m%d).tar.bz2  kvmeta.tar.bz2
-   rm -rf   $METADIST/kvmeta
-fi
