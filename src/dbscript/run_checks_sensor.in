@@ -4,6 +4,7 @@ use POSIX;
 use strict;
 use dbQC;
 use File::Find;
+use intodb;
 
 my $path= get_checks_semi_auto_path();
 print "path=$path \n";
@@ -29,7 +30,11 @@ sub Wanted
 chdir($path);
 foreach my $sub ( keys %subd){
    print "sub=$sub \n";
-   system("__PKGLIBBINDIR__/checks_sensor ins $sub");
+   system("__PKGLIBBINDIR__/checks_sensor ins $sub checks_semi_auto");
    chdir($path);
 }
 
+my $path_out=get_checks_path();
+my $checks_semi_auto_out=$path_out . "/" . "checks_semi_auto.out";
+print "checks_semi_auto_out=$checks_semi_auto_out \n";
+fimport("copy checks_semi_auto to '$checks_semi_auto_out' DELIMITER '|'"); 

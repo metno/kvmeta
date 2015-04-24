@@ -1,7 +1,7 @@
 package intodb;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw( fintodb flintodb dtodb static_intodb all_intodb );
+@EXPORT = qw( fintodb flintodb dtodb static_intodb all_intodb fimport);
 
 
 use POSIX;

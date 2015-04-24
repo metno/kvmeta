@@ -155,7 +155,11 @@ done
 echo "$LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log"
 $LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log
 
+## semi_auto/semi_manual
+echo "$LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log"
+$LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log
 
+## Manual
 for COMMAND in run_algorithm_all run_station_param_all  run_checks_all
 do
       echo "$LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out"
