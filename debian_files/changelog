@@ -1,3 +1,8 @@
+kvalobs-metadata (2.8.12-1) unstable; urgency=low
+  * changed checks_sensor
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 29 Apr  2015 12:12:00 +0200
+
 kvalobs-metadata (2.8.11-1) unstable; urgency=low
   * changed run_metadata_instance.in.sh
   * changed run_metadata.in.sh

@@ -223,7 +223,8 @@ sub make_qcx_checksignature{
 	my @sensorlist=();
         # print "$stationid,$typeid,$level,$paramid,$nsensor \n";
         for( my $sensor=0; $sensor < $nsensor; $sensor ++ ){ # $t="$param&$level&$sensor&$typeid";
-	    if(  $rtypeid ne "" or $sensor !=0 or $level !=0 ){
+	    #if( $rtypeid ne "" or $sensor !=0 or $level !=0 ){
+            if( $rtypeid ne "" or $nsensor > 1 or $level !=0 ){
                  push(@sensorlist,$sensor);
 	    }  
         }
@@ -270,21 +271,27 @@ sub make_qcx_checksignature{
 	my @par_slist=@{$par_slist_ref};
         my $checksignature= $start . ';';
 	my $qcx= $qcx_basis . '_L' . $level . '_T' . $typeid . '_';
+        my $is_sensor_0=1;
         foreach my $par_ref ( @par_slist ){
 	   my @ps= @{$par_ref};
            my ($param, $sensor)=@ps;
+           if( $sensor != 0 ){
+	       $is_sensor_0 = 0; 
+           } 
            # print "$param :: $sensor \n";
 	   $checksignature .= "$param&$level&$sensor&$typeid" . ',';
            $qcx .= $param . ":" . $sensor . "_";
 	}
-        chop $checksignature;
-        chop $qcx;
-        # print "qcx=$qcx \n";
-        my @ch=($checksignature,@rsplit);
-        $checksignature=join('|',@ch);
-        my @a=( $qcx, $checksignature );
-        my $tt=\@a;
-        push(@qcx_checksignature_list,$tt);
+        if( $level !=0 or $is_sensor_0 == 0 ){ 
+	    chop $checksignature;
+	    chop $qcx;
+	    # print "qcx=$qcx \n";
+	    my @ch=($checksignature,@rsplit);
+	    $checksignature=join('|',@ch);
+	    my @a=( $qcx, $checksignature );
+	    my $tt=\@a;
+	    push(@qcx_checksignature_list,$tt);
+	}
    }
    return @qcx_checksignature_list;
 }
