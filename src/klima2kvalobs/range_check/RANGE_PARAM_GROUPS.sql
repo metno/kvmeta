@@ -6,5 +6,5 @@ SET TRIMSPOOL ON
 SET FEEDBACK  OFF
 set space 1 lines 500
 select PARAMID||','||G_PARAMID
-from t_grensev_param_grupper;
+from T_RANGE_CHECK_PARAM_GROUP;
 spool off
