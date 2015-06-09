@@ -1,0 +1,66 @@
+#! /bin/sh
+
+## Script to update metadata tables in Kvalobs.
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+export LANG=en_US.latin1
+
+PGDATABASE=kvalobs
+PGUSER=kvalobs
+
+
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
+#METAGET=/usr/share/kvalobs/metaget
+METAGET=/usr/share/kvalobs
+
+KRO="kro"
+if [ -f $HOME/.kro  ]; then
+    KRO=`cat $HOME/.kro`
+fi
+
+
+if [ -n "$1" ]; then
+   METAGET=$PWD
+   echo "argumentet er $1"
+   # tar xvvjf $1
+else
+    DUMPDIR="$METAGET/dumpdir"
+    mkdir -p -m700 $DUMPDIR
+    mkdir -p -m700 "$METAGET/utesperring"
+    #cd "$METAGET/dumpdir"
+    FILE=utesperring.sql
+    LOGDIR=$HOME/log/utesperring
+    mkdir -p $LOGDIR
+
+    wget -O - http://$KRO/utesperring.sql > $DUMPDIR/$FILE
+    if ! [ -s $DUMPDIR/$FILE ]; then
+       echo "Filen $DUMPDIR/$FILE er tom" > $LOGDIR/utesperring.log
+       exit 1
+    fi  
+
+    echo "$DUMPDIR/$FILE"
+    echo "$METAGET/utesperring/utesperring.sql"
+
+    #if ! diff -q  $DUMPDIR/$FILE  $METAGET/utesperring/utesperring.sql
+    #then
+       if [ -f $METAGET/utesperring/utesperring.sql  ]; then
+            mv -uv $METAGET/utesperring/utesperring.sql $METAGET/utesperring/utesperring.sql.old
+       fi 
+       cp -pv $DUMPDIR/$FILE $METAGET/utesperring/utesperring.sql
+       PSQL=psql
+       #psql -f /metno/kvalobs/insert_qc1_0.sql
+       $PSQL -f $METAGET/utesperring/utesperring.sql
+       #cp -pv  $METAGET/utesperring/utesperring.sql $HOME/insert_qc1_0.sql
+    #fi
+fi
