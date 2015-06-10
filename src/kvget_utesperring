@@ -52,8 +52,8 @@ else
     echo "$DUMPDIR/$FILE"
     echo "$METAGET/utesperring/utesperring.sql"
 
-    #if ! diff -q  $DUMPDIR/$FILE  $METAGET/utesperring/utesperring.sql
-    #then
+    if ! diff -q  $DUMPDIR/$FILE  $METAGET/utesperring/utesperring.sql
+    then
        if [ -f $METAGET/utesperring/utesperring.sql  ]; then
             mv -uv $METAGET/utesperring/utesperring.sql $METAGET/utesperring/utesperring.sql.old
        fi 
@@ -62,5 +62,5 @@ else
        #psql -f /metno/kvalobs/insert_qc1_0.sql
        $PSQL -f $METAGET/utesperring/utesperring.sql
        #cp -pv  $METAGET/utesperring/utesperring.sql $HOME/insert_qc1_0.sql
-    #fi
+    fi
 fi
