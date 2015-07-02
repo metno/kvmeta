@@ -26,6 +26,7 @@ fi
 #    PGPASSWORD=`grep dbpass ~/.kvpasswd | sed -e 's/ *dbpass *//'`
 #fi
 
+mkdir -p $DUMPDIR
 cd $DUMPDIR
 
 PGDATABASE=kvalobs
