@@ -92,7 +92,7 @@ if( $len<1 ){
 my $outfilename = $ARGV[0].".out";
 
 my $kvpasswd=get_passwd();
-my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
           die "Connect failed: $DBI::errstr";
 
  

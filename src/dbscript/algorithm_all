@@ -61,7 +61,7 @@ if( $argn> 1 ){
 print "START \n";
 
 my $kvpasswd=get_passwd();
-our $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+our $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
 	die "Connect failed: $DBI::errstr";
 
 foreach my $file (<*.pl>){

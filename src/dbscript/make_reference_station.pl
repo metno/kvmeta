@@ -94,7 +94,7 @@ sub fill_station_klima{
    #print @driver_names;
 
    my $kvpasswd=get_passwd();
-   my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs", $kvpasswd,{RaiseError => 1}) ||
+   my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs", $kvpasswd,{RaiseError => 1}) ||
         die "Connect failed: $DBI::errstr";
 
     my $sth = $dbh->prepare('select stationid, klima from stationid_klima where klima IS NOT NULL');
@@ -123,7 +123,7 @@ sub fill_station_test{
   #print @driver_names;
 
     my $kvpasswd=get_passwd();
-    my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs", $kvpasswd,{RaiseError => 1}) ||
+    my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs", $kvpasswd,{RaiseError => 1}) ||
 	die "Connect failed: $DBI::errstr";
 
     my $sth = $dbh->prepare('select stationid, name, wmonr from station');

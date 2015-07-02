@@ -14,7 +14,7 @@ sub insert_DB{
   my ( $control, $stationid, $paramid, $level, $sensor, $fromday, $today, $qcx, $metadata, $desc_metadata, $fromtime ) = @_;
 
   my $kvpasswd=get_passwd();
-  my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+  my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
 	die "Connect failed: $DBI::errstr";
 
 

@@ -38,7 +38,7 @@ use dbQC;
 my $name=$ARGV[0];
 
  my $kvpasswd=get_passwd();
- my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+ my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
  die "Connect failed: $DBI::errstr";
 
  my $sth = $dbh->prepare("select paramid from param where name like '$name'");
