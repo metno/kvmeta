@@ -1,0 +1,36 @@
+#!/bin/sh
+
+export HOME=/metno/kvalobs
+export METADIR=$HOME/kvmetadata
+export PGHOST=localhost
+export PGPORT=5432
+cd $HOME
+
+mkdir -pv $HOME/var/log
+
+LIBEXECDIR=__PKGLIBBINDIR__
+$LIBEXECDIR/kvinstall_metadata
+$LIBEXECDIR/run_metadata_instance SVV PROJ > $HOME/var/log/run_metadata_instance.log
+
+(
+nr=0
+while [ $nr -le 2 ]
+do
+     # echo "$count"
+     # grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l
+     nr=`grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l`
+     sleep 5
+done
+
+grep bz2 $HOME/var/log/run_metadata_instance.log
+)
+
+cp -pv /usr/share/kvalobs/metadist/kvmeta_METNO.tar.bz2 /usr/share/kvalobs/metadist/kvmeta.tar.bz2
+
+grep error    $HOME/var/log/run_metadata_instance.log
+grep Error    $HOME/var/log/run_metadata_instance.log
+grep ERROR    $HOME/var/log/run_metadata_instance.log
+
+grep warning  $HOME/var/log/run_metadata_instance.log
+grep Warning  $HOME/var/log/run_metadata_instance.log
+grep WARNING  $HOME/var/log/run_metadata_instance.log
