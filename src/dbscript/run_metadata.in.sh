@@ -123,6 +123,10 @@ do
     $LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out
 done  
 
+$LIBEXECDIR/QC1-1manual.pl QC1-1manual.out > $DUMPDIR/QC1-1manual_standard_format.out
+echo "$LIBEXECDIR/station_param2kvalobsdb $DUMPDIR/QC1-1manual_standard_format.out > $DUMPDIR/QC1-1manual_standard_format.log"
+$LIBEXECDIR/station_param2kvalobsdb $DUMPDIR/QC1-1manual_standard_format.out > $DUMPDIR/QC1-1manual_standard_format.log
+
 echo "Sjekker antall linjer i tabellene"
 for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
 do

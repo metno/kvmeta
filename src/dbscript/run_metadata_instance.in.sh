@@ -166,6 +166,9 @@ do
       $LIBEXECDIR/$COMMAND > $DUMPDIR/$COMMAND.out
 done  
 
+$LIBEXECDIR/QC1-1manual.pl QC1-1manual.out > $DUMPDIR/QC1-1manual_standard_format.out
+echo "$LIBEXECDIR/station_param2kvalobsdb $DUMPDIR/QC1-1manual_standard_format.out > $DUMPDIR/QC1-1manual_standard_format.log"
+$LIBEXECDIR/station_param2kvalobsdb $DUMPDIR/QC1-1manual_standard_format.out > $DUMPDIR/QC1-1manual_standard_format.log
 
 #### MAKING METADATA PACKAGES ####
 METADIST=`$KVCONFIG --datadir`/kvalobs/metadist

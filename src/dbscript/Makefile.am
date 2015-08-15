@@ -12,7 +12,8 @@ nodist_bin_SCRIPTS =\
 	run_QC1-1 \
 	run_QC1-1_all \
 	run_checks_sensor \
-	run_checks_sensor_test
+	run_checks_sensor_test \
+	kvmeta_all
 
 dist_bin_SCRIPTS = \
 	run_station \
@@ -37,6 +38,8 @@ dist_bin_SCRIPTS = \
 	print_station_param_auto_path.pl \
 	table_instance \
 	table_type_instance \
+	dbQC1-1_only_QC1-1param.pl \
+	QC1-1manual.pl \
         ../kvinstall_metadata
 
 nodist_pkglibexec_SCRIPTS = \
@@ -91,8 +94,11 @@ run_checks_sensor: run_checks_sensor.in
 run_checks_sensor_test: run_checks_sensor_test.in 
 	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
 
+kvmeta_all: kvmeta_all.in 
+	sed s,__PKGLIBBINDIR__,$(bindir), $< > $@
+
+
 
 EXTRA_DIST = run_metadata.in.sh run_metadata_instance.in.sh run_QC1-1_all.in.sh run_QC1-1.in run_QC1-3.in run_QC1-4.in dbQC.pm.in \
-	run_station_param_all.in run_algorithm_all.in run_checks_all.in run_checks_sensor.in  run_checks_sensor_test.in
-
+	run_station_param_all.in run_algorithm_all.in run_checks_all.in run_checks_sensor.in  run_checks_sensor_test.in kvmeta_all.in
 CLEANFILES= $(nodist_bin_SCRIPTS) $(nodist_pkglibexec_SCRIPTS)

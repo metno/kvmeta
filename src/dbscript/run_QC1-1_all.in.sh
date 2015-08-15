@@ -67,6 +67,8 @@ echo "$LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb QC1-1.out > $DUMPDIR/sp_QC1-1.log
 $PSQL -a -c "select count(*) from station_param where stationid in (select distinct stationid from station where maxspeed > 0)" > $DUMPDIR/sp_speed_QC1-1_1.out
 
+$LIBEXECDIR/dbQC1-1_only_QC1-1param.pl QC1-1param > $DUMPDIR/only_QC1-1param.log
+
 echo "$LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log"
 $LIBEXECDIR/station_param2kvalobsdb station_param_QC1-1.out nonhour > $DUMPDIR/station_param_QC1-1.log
 

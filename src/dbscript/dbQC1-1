@@ -53,7 +53,8 @@
 # medium_qcx4 = QC1-1extra
 # time4=0
 # splitter4="\\s+"
-# $stationid $paramid max;highest;high;low;lowest;min
+# voluntary argument level
+# $stationid $paramid max;highest;high;low;lowest;min [level]
 
 # Dette scriptet tar 3-4 argumenter QC1-1_stasjonsGrenser, QC1-1_fasteGrenser, QC1-1param og QC1-1extra der det siste argumentet er frivillig.
 # QC1-1_stasjonsGrenser er det første argumentet, 
@@ -286,7 +287,12 @@ if( $len_argv > 3 ){
 	    my $fromday = 1;
             my $today   = 366;
             my $sensor = $default_sensor;
-	    my $level = $default_level;
+            my $level;
+            if( $len > 3 ){
+		$level = trim($sline[3]);
+            }else{
+		$level = $default_level;
+	    }
             my $metadata = "max;highest;high;low;lowest;min\\n".trim($sline[2]);
             my $desc_metadata = "\\N";
 
