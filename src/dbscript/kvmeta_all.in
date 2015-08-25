@@ -1,11 +1,5 @@
 #!/bin/sh
 
-export HOME=/metno/kvalobs
-export METADIR=$HOME/kvmetadata
-export PGHOST=localhost
-export PGPORT=5432
-cd $HOME
-
 mkdir -pv $HOME/var/log
 
 LIBEXECDIR=__PKGLIBBINDIR__
