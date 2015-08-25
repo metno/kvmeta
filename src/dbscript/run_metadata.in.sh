@@ -27,9 +27,9 @@ PGDATABASE=kvalobs
 PGUSER=kvalobs
 
 
-if [ "z$PGHOST" != "z" ]; then
-	PGHOST=localhost
-fi
+#if [ "z$PGHOST" != "z" ]; then
+#	PGHOST=localhost
+#fi
 
 DUMPDIR="/tmp/$USER/kvalobs/var/log/tabledump"
 rm -rf $DUMPDIR
