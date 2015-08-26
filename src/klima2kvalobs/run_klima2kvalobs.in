@@ -30,6 +30,8 @@ sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
 
 $BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.out QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
 
+sort $DUMPDIR/station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.sorted
+mv $DUMPDIR/station_param_QC1-1.sorted $DUMPDIR/station_param_QC1-1.out
 
 ## COPY TO station_param   
 for FILE in station_param_QC1-1.out
