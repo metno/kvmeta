@@ -20,6 +20,7 @@ export ORACLE_HOME
 export PATH
 export LD_LIBRARY_PATH
 
+mkdir -pv $DUMPDIR 
 cd $DUMPDIR
 
 sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK.sql
