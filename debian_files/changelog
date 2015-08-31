@@ -1,3 +1,28 @@
+kvalobs-metadata (2.9.3-1) unstable; urgency=low
+  * changed run_klima2kvalobs.in
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 26 Aug  2015 15:48:00 +0200
+
+kvalobs-metadata (2.9.2-1) unstable; urgency=low
+  * changed run_metadata.in.sh, commented out "PGHOST=localhost" 
+  * changed run_metadata_instance.in.sh, commented out "PGHOST=localhost" 
+  * changed run_QC1-1_all.in.sh, commented out "PGHOST=localhost" 
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 25 Aug  2015 10:40:00 +0200
+
+kvalobs-metadata (2.9.1-1) unstable; urgency=low
+  * added kvmeta_all.in
+  * added dbQC1-1_only_QC1-1param.pl
+  * added QC1-1manual.pl
+  * changed checks2kvalobsdb
+  * changed run_QC1-1_all.in.sh, added dbQC1-1_only_QC1-1param.pl
+  * changed dbQC1-1
+  * changed Makefile.am
+  * changed run_metadata_instance.in.sh, added QC1-1manual.pl
+  * changed run_metadata.in.sh, added QC1-1manual.pl
+
+ -- Terje Reite <terje.reite@met.no>  Sat, 15 Aug  2015 14:42:00 +0200
+
 kvalobs-metadata (2.8.12-1) unstable; urgency=low
   * changed checks_sensor
 

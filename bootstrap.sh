@@ -61,6 +61,11 @@ sudo chmod g+ws /usr/share/kvalobs/
 sudo mkdir -pv /usr/share/kvalobs/metadata
 sudo chown -R kvalobs:kvalobs /usr/share/kvalobs/metadata
 
+sudo mkdir -pv /var/log/kvalobs/
+sudo chgrp kvalobs /var/log/kvalobs/
+sudo chmod g+ws /var/log/kvalobs/
+
+
 # sudo -u kvalobs cp -puv /metno/kvalobs/kvmetadata_auto/station_param_auto/station_param_QC1-1.out /metno/kvalobs/kvmetadata/station_param/station_param_auto
 
 # HUSK /etc/resolv.conf
