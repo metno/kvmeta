@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 ## Script to update metadata tables in Kvalobs.
 
@@ -9,13 +9,19 @@ set -e  # Exit if a simple shell command fails
 PGDATABASE=kvalobs
 PGUSER=kvalobs
 
-#Temporary hack until we use utf8 in kvalobs
-# stinfosys is already utf8
-export LANG=latin1
+PSQL=psql
+CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
+SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
+echo "CLIENT_ENCODING=${CLIENT_ENCODING}"
+echo "SERVER_ENCODING=${SERVER_ENCODING}"
 
-if [ "z$PGHOST" = "z" ]; then
-	PGHOST=localhost
+if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) ]] ; then
+   export LANG=latin1
 fi
+
+#if [ "z$PGHOST" = "z" ]; then
+#	PGHOST=localhost
+#fi
 
 ## ** Subroutines **
 assert_table_not_empty() {
@@ -28,6 +34,8 @@ assert_table_not_empty() {
 
 METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
+KVMETA=kvmeta
+
 if [ -n "$1" ]; then
    METAGET=$PWD
    echo "argumentet er $1"
@@ -35,10 +43,12 @@ if [ -n "$1" ]; then
 else
    mkdir -p -m700 "$METAGET"
    cd $METAGET
-   wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2 | tar xvvj 
+   if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) ]] ; then
+       wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2 | tar xvvj 
+   else
+       wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2 | tar xvvj
+   fi
 fi
-
-PSQL=psql 
 
 ## ** MAIN **
 
@@ -48,7 +58,7 @@ $PSQL -a -c "TRUNCATE metadatatype CASCADE"
 echo "Oppdaterer tabellene metadatatype station_metadata";
 for TABLE in metadatatype station_metadata
 do
-    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
 
@@ -58,7 +68,7 @@ $PSQL -a -c "delete from station where static=true"
 echo "Oppdaterer tabellen station";
 for TABLE in station
 do
-    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
 
@@ -67,7 +77,7 @@ echo "Oppdaterer tabellene algorithms checks station_param types param obs_pgm m
 for TABLE in algorithms checks station_param types param obs_pgm model qcx_info operator
 do
     $PSQL -a -c "truncate table $TABLE"
-    $PSQL -c "\copy $TABLE from $METAGET/kvmeta/$TABLE.out DELIMITER '|'"
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
 
