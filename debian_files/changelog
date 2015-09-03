@@ -1,3 +1,11 @@
+kvalobs-metadata (2.9.4-1) unstable; urgency=low
+  * changed run_metadata_instance.in.sh, generating UTF8 package
+  * changed kvget-metadata, support of UTF8 package
+  * changed kvmeta_all.in
+
+ -- Terje Reite <terje.reite@met.no>  Thu, 3 Sep  2015 10:00:00 +0200
+
+
 kvalobs-metadata (2.9.3-1) unstable; urgency=low
   * changed run_klima2kvalobs.in
 
