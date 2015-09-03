@@ -20,6 +20,7 @@ grep bz2 $HOME/var/log/run_metadata_instance.log
 )
 
 cp -pv /usr/share/kvalobs/metadist/kvmeta_METNO.tar.bz2 /usr/share/kvalobs/metadist/kvmeta.tar.bz2
+cp -pv /usr/share/kvalobs/metadist/kvmeta_METNO_UTF8.tar.bz2 /usr/share/kvalobs/metadist/kvmeta_UTF8.tar.bz2
 
 grep error    $HOME/var/log/run_metadata_instance.log
 grep Error    $HOME/var/log/run_metadata_instance.log

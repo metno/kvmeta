@@ -294,6 +294,7 @@ do
    
    cd $METADIST_INSTANCE
    kvmetadist=kvmeta_${INSTANCE}-$(date +%Y%m%d).tar.bz2
+   kvmetadist_UTF8=kvmeta_${INSTANCE}_UTF8-$(date +%Y%m%d).tar.bz2
 
    CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
    SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
@@ -302,19 +303,24 @@ do
 
    ## CHARSET CONVERSION FOR UTF8
    if [ $CLIENT_ENCODING = UTF8 ] && [ $SERVER_ENCODING = UTF8 ]; then
-     mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_UTF8"
+     ### mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_UTF8"
+     mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_latin1"
      for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
      do
-        iconv -f utf-8 -t latin1  $METADIST_INSTANCE/kvmeta/$TABLE.out >  $METADIST_INSTANCE/kvmeta/$TABLE.latin1
-        mv $METADIST_INSTANCE/kvmeta/$TABLE.out    $METADIST_INSTANCE/kvmeta_UTF8/$TABLE.utf8
-        mv $METADIST_INSTANCE/kvmeta/$TABLE.latin1 $METADIST_INSTANCE/kvmeta/$TABLE.out
+        iconv -f utf-8 -t latin1  $METADIST_INSTANCE/kvmeta/$TABLE.out >  $METADIST_INSTANCE/kvmeta_latin1/$TABLE.out
      done
+     tar cpjf  $kvmetadist_UTF8 kvmeta
+     cp -pv    $kvmetadist_UTF8 kvmeta_${INSTANCE}_UTF8.tar.bz2
+     rm -rf    $METADIST_INSTANCE/kvmeta_UTF8
+     mv $METADIST_INSTANCE/kvmeta $METADIST_INSTANCE/kvmeta_UTF8
+     # rm -rf    $METADIST_INSTANCE/kvmeta
+     mv $METADIST_INSTANCE/kvmeta_latin1 $METADIST_INSTANCE/kvmeta
    fi
 
 
    if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) || ( $CLIENT_ENCODING = UTF8 && $SERVER_ENCODING = UTF8 ) ]] ; then
       tar cpjf  $kvmetadist kvmeta
-      cp -pv    $kvmetadist  kvmeta_${INSTANCE}.tar.bz2
+      cp -pv    $kvmetadist kvmeta_${INSTANCE}.tar.bz2
       rm -rf   $METADIST_INSTANCE/kvmeta
    fi  
    date
