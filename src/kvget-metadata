@@ -32,7 +32,14 @@ assert_table_not_empty() {
 	fi
 }
 
-METAGET=$(kvconfig --datadir)/kvalobs/metaget
+DATADIR=/usr/share
+METAGET=$DATADIR/kvalobs/metaget
+
+if hash kvconfig 2>/dev/null; then
+    METAGET=$(kvconfig --datadir)/kvalobs/metaget
+fi
+
+# METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
 KVMETA=kvmeta
 
