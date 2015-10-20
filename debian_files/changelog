@@ -1,3 +1,9 @@
+kvalobs-metadata (2.9.6-1) unstable; urgency=low
+  * changed run_metadata.in.sh, because of new table_instance
+  * changed table_instance
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 20 Oct  2015 17:17:00 +0200
+
 kvalobs-metadata (2.9.5-1) unstable; urgency=low
   * changed kvget-metadata
 

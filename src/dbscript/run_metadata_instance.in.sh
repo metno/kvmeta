@@ -1,8 +1,6 @@
 #! /bin/bash
 
-
 ## Script to update metadata tables in Kvalobs.
-
 
 set -a  # export variables to the environment of subsequent commands
 set -e  # Exit if a simple shell command fails
@@ -273,13 +271,11 @@ do
    if [ "$INSTANCE" =  "METNO" ]; then
        # necessary because of speed
        $LIBEXECDIR/table_instance $INSTANCE $TABLE "$METADIST_INSTANCE/kvmeta"
-       $PSQL -d $INSTANCE -c "\copy $TABLE from $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
-       assert_table_not_empty_instance $INSTANCE $TABLE
    else
        $LIBEXECDIR/table_instance $INSTANCE $TABLE
-       assert_table_not_empty_instance $INSTANCE $TABLE
-       $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
    fi
+   assert_table_not_empty_instance $INSTANCE $TABLE
+   $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
    
    TABLE="station_metadata"
    echo "TABLE er station_metadata, instansen  er $INSTANCE"

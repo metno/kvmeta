@@ -67,9 +67,10 @@ $sth2=$dbh2->prepare("truncate $TABLE");
 $sth2->execute;
 $sth2->finish;
 
-print "TABLE=$TABLE \n";
+
 
 if( $argn <= 2 ){
+    print "TABLE=$TABLE \n";
     my $num_columns;
 
     $sth2=$dbh2->prepare("select count(*) from information_schema.columns where table_name='$TABLE'");
@@ -93,10 +94,28 @@ if( $argn <= 2 ){
     $sth2->finish;
     $sth->finish;
 }else{
-    my $PATH = $ARGV[2];  #$METADIST_INSTANCE/kvmeta
-    my $sth=$dbh->prepare("COPY (select * from $TABLE where stationid=0 or stationid in ($lstlist)) to '$PATH/$TABLE.out' DELIMITER '|'");
-    $sth->execute;
-    $sth->finish;
+    # http://www.perlmonks.org/?node_id=945369
+    # https://metacpan.org/pod/DBD::Pg#COPY-support
+
+    
+    $dbh->do("COPY (select * from $TABLE where stationid=0 or stationid in ($lstlist)) TO STDOUT DELIMITER '|'");
+    my @data;
+    my $x=0;
+    1 while $dbh->pg_getcopydata(\$data[$x++]) >= 0;  
+
+    $dbh2->do("COPY $TABLE FROM STDIN DELIMITER '|'");
+    for my $t (@data){
+	$dbh2->pg_putcopydata("$t");
+    }
+
+    # my $PATH = $ARGV[2];  #$METADIST_INSTANCE/kvmeta
+    #my $len= @data;
+    #print "len=$len \n";
+    #my $t=$data[10];
+    #print  $t;
+    #$dbh2->pg_putcopydata("$t");
+
+    $dbh2->pg_putcopyend();	
 }
 
 
