@@ -1,5 +1,10 @@
 #!/bin/sh
 
+export HOME
+export METADIR
+export PGHOST
+export PGPORT
+
 mkdir -pv $HOME/var/log
 
 LIBEXECDIR=__PKGLIBBINDIR__
@@ -8,7 +13,7 @@ $LIBEXECDIR/run_metadata_instance SVV PROJ > $HOME/var/log/run_metadata_instance
 
 (
 nr=0
-while [ $nr -le 2 ]
+while [ $nr -lt 6 ]
 do
      # echo "$count"
      # grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l
