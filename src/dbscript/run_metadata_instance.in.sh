@@ -64,7 +64,8 @@ $PSQL -a -c "TRUNCATE TABLE checks_description"
 $PSQL -a -c "\copy checks_description from '$METADIR/checks_description/checks_description.out' DELIMITER '|'"
 
 echo "Sletter tabellene metadatatype og station_metadata"
-$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+#$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+( $PSQL -a -c "TRUNCATE metadatatype CASCADE" 3>&1 1>&2 2>&3 | grep -v NOTICE ) 3>&1 1>&2 2>&3 | grep 'TRUNCATE'
 $PSQL -a -c "\copy metadatatype from '$METADIR/metadatatype/metadatatype.out' DELIMITER '|'"
 
 
@@ -227,7 +228,7 @@ do
    
    mkdir -p -m700 "$METADIST_INSTANCE/kvmeta"
    echo "Sjekker antall linjer i tabellene og dumper tabellene"
-   for TABLE in algorithms station types param metadatatype model qcx_info operator
+   for TABLE in algorithms station types param metadatatype model qcx_info operator qc2_interpolation_best_neighbors
    do
      assert_table_not_empty $TABLE
      $PSQL -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
@@ -301,7 +302,7 @@ do
    if [ $CLIENT_ENCODING = UTF8 ] && [ $SERVER_ENCODING = UTF8 ]; then
      ### mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_UTF8"
      mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_latin1"
-     for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator
+     for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator qc2_interpolation_best_neighbors
      do
         iconv -f utf-8 -t latin1  $METADIST_INSTANCE/kvmeta/$TABLE.out >  $METADIST_INSTANCE/kvmeta_latin1/$TABLE.out
      done

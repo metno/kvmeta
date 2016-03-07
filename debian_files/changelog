@@ -1,3 +1,13 @@
+kvalobs-metadata (2.9.10-1) unstable; urgency=low
+  * changed run_metadata_instance.in.sh
+
+ -- Terje Reite <terje.reite@met.no>  Thu, 11 Feb  2015 12:06:00 +0200
+
+kvalobs-metadata (2.9.9-1) unstable; urgency=low
+  * changed run_metadata_instance.in.sh
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 18 Jan  2015 16:20:00 +0200
+
 kvalobs-metadata (2.9.8-1) unstable; urgency=low
   * changed kvmeta_all.in
 

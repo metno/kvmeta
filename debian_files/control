@@ -6,7 +6,7 @@ Build-Depends: debhelper, autotools-dev, debconf,
  devscripts, fakeroot, build-essential, lintian, autoconf,
  automake, libdbd-pg-perl, libdbi-perl, libperl5.18 (>= 5.8.8), 
  libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3), 
- less, bzip2
+ less, bzip2, kv-update-gap-db
 Standards-Version: 3.8.3
 Homepage: https://kvalobs.wiki.met.no/doku.php?id=kvalobs
 
@@ -22,7 +22,7 @@ Package: kvalobs-metadata
 Architecture: any
 Depends: libdbd-pg-perl, libdbi-perl, libperl5.18 (>= 5.8.8), 
  libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3),
- less, bzip2
+ less, bzip2, kv-update-gap-db 
 Description: Metadata to kvalobs
  The package contains scripts to read metadata from stinfosys.
  The package contains scripts to upload the data to a kvalobs database
