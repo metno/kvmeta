@@ -11,6 +11,9 @@ EXTRA_DIST=kvget-metadata-cron.in
 dist_bin_SCRIPTS = kvget-metadata-cron \
                    kvget-metadata \
                    kvget-metadata-instance \
+                   insert_update_delete_table.pl \
+                   insert_update_delete_table_speed.pl \
+                   kvget-metadata_insert_update_delete \
                    kvinstall_metadata 
 
 kvget-metadata-cron:	kvget-metadata-cron.in

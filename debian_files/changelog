@@ -1,12 +1,31 @@
+kvalobs-metadata (2.9.13-1) unstable; urgency=low
+  * changed kvget-metadata_insert_update_delete
+  * added insert_update_delete_table_speed.pl
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 16 Mar  2016 17:54:00 +0200
+
+
+kvalobs-metadata (2.9.12-1) unstable; urgency=low
+  * changed kvget-metadata_insert_update_delete  DATADIR=/var/lib
+  * changed kvget-metadata                       DATADIR=/var/lib
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 14 Mar  2016 17:40:00 +0200
+
+kvalobs-metadata (2.9.11-1) unstable; urgency=low
+  * added kvget-metadata_insert_update_delete
+  * added insert_update_delete_table.pl
+
+ -- Terje Reite <terje.reite@met.no>  Thu, 10 Mar  2016 11:44:00 +0200
+
 kvalobs-metadata (2.9.10-1) unstable; urgency=low
   * changed run_metadata_instance.in.sh
 
- -- Terje Reite <terje.reite@met.no>  Thu, 11 Feb  2015 12:06:00 +0200
+ -- Terje Reite <terje.reite@met.no>  Thu, 11 Feb  2016 12:06:00 +0200
 
 kvalobs-metadata (2.9.9-1) unstable; urgency=low
   * changed run_metadata_instance.in.sh
 
- -- Terje Reite <terje.reite@met.no>  Mon, 18 Jan  2015 16:20:00 +0200
+ -- Terje Reite <terje.reite@met.no>  Mon, 18 Jan  2016 16:20:00 +0200
 
 kvalobs-metadata (2.9.8-1) unstable; urgency=low
   * changed kvmeta_all.in

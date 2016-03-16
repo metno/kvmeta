@@ -32,7 +32,7 @@ assert_table_not_empty() {
 	fi
 }
 
-DATADIR=/usr/share
+DATADIR=/var/lib
 METAGET=$DATADIR/kvalobs/metaget
 
 if hash kvconfig 2>/dev/null; then

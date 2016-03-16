@@ -14,7 +14,8 @@ Homepage: https://kvalobs.wiki.met.no/doku.php?id=kvalobs
 Package: kvget-metadata
 Architecture: any
 Suggests: kvalobs-metadata
-Depends:  postgresql (>= 8.3), bzip2, wget
+Depends: libdbd-pg-perl, libdbi-perl, libperl5.18 (>= 5.8.8),
+  postgresql (>= 8.3), bzip2, wget
 Description: Metadata to kvalobs
  The package contains a script to get metadata to kvalobs from the repository.
 
