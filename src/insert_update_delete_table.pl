@@ -160,7 +160,7 @@ my %hpval;
                      # "/(?<!bar)foo/" matches any occurrence of "foo" that does
                      # not follow "bar".  Works only for fixed-width look-
                      # behind.
-	   @a=split /(?<!\\)\|/, $line; # titte mer på dette
+	   @a=split /(?<!\\)\|/, $line; # leave '\|' alone and only splits at '|'
         }else{
 	   @a=split /\|/, $line;
         }
@@ -176,8 +176,11 @@ my %hpval;
 
        foreach my $elem (@a){
 	   $elem=trim($elem);
+	   if( $elem=~ /\\n/ ){
+               $elem=~ s/\\n/\n/g; 
+	   }
 	   if( $elem=~ $seq ){
-	       $elem=~ s/\\\|/\|/;
+	       $elem=~ s/\\\|/\|/g;
            } 
 	   if( (not defined $elem) or ($elem eq "") or ($elem eq '\N') ){
 	       $a[$c]=undef;
@@ -252,11 +255,11 @@ my %hpval;
 	      $sth->execute(@sql_bind);
 
               print "SELECT $nkeystr FROM $tablename WHERE $sql_clause \n";
-
-	      if ( my @row = $sth->fetchrow() ){
+	      my @row;
+	      if ( @row = $sth->fetchrow() ){
 		  my $k=0;
 		  foreach my $elem (@row){
-		      if( not defined $elem ){
+		      if( (not defined $elem) or ($elem eq "") ){
 			  $row[$k]="NULL";
 		      }
 		      $row[$k]=trim($row[$k]);
@@ -272,6 +275,11 @@ my %hpval;
 			  $row[$indx]= 'f';
                       }
                   }
+	      }else{
+		  $exist=0;
+		  print " DATABASE ERROR";$sth->finish;next;
+	      }
+	      $sth->finish;
 		  my $old=join(",",@row);
                   my $new;
 		  foreach my $indx (@nkeyindx){
@@ -320,12 +328,6 @@ my %hpval;
 		  }else{
 		      	print " UNCHANGED";
 		  }
-	      
-	      }else{
-		  $exist=0;
-		  print " DATABASE ERROR";$sth->finish;next;
-	      }
-	      $sth->finish;
 	  }elsif($exist==2) {
 	    print " INSERT";
 	    my $qmark = join "," => ("?") x @a;
@@ -342,10 +344,13 @@ my %hpval;
 ########################################
 # delete
 
+my $not_delete="";
 if( defined $ARGV[5] ){
     print "ARGV5 $ARGV[5] \n";
     if( $ARGV[5] eq "nd" ){
 	exit 0;
+    }else{
+	$not_delete=$ARGV[5];
     }
 }
 
@@ -358,9 +363,16 @@ if( defined $ARGV[5] ){
   #              delete FROM $tablename WHERE $sql_clause
   #              });
 
-  $sth = $dbh->prepare(qq{
+  if( $not_delete ne "" ){
+       $sth = $dbh->prepare(qq{
+          SELECT * FROM $tablename WHERE  NOT ( $not_delete )
+       });
+  }else{
+       $sth = $dbh->prepare(qq{
           SELECT * FROM $tablename
        });
+  }
+
   $sth->execute();
 	 
   while(my @row = $sth->fetchrow()){
@@ -418,7 +430,14 @@ if( defined $ARGV[5] ){
 	   #	$c++;
 	   # }
 	   # my $tableline=join(',',@row);
-	   print "EXTRA TO BE DELETED $pval_row_str :: delete FROM $tablename WHERE $sql_clause :: ";
+	   # print "EXTRA TO BE DELETED $pval_row_str :: delete FROM $tablename WHERE $sql_clause :: ";
+   
+	   if( $not_delete ne "" ){
+	       $sql_clause= $sql_clause . " AND NOT ( $not_delete )"; 
+	       print "EXTRA TO MAYBE BE PRESERVED $pval_row_str :: delete FROM $tablename WHERE $sql_clause :: ";
+	   }else{
+	       print "EXTRA TO BE DELETED $pval_row_str :: delete FROM $tablename WHERE $sql_clause :: ";
+           }
 
 	   my $sth_delete = $dbh->prepare(qq{
                  delete FROM $tablename WHERE $sql_clause

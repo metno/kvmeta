@@ -187,7 +187,7 @@ my $sth_nkeystr = $dbh->prepare(qq{
                      # "/(?<!bar)foo/" matches any occurrence of "foo" that does
                      # not follow "bar".  Works only for fixed-width look-
                      # behind.
-	   @a=split /(?<!\\)\|/, $line; # titte mer på dette
+	   @a=split /(?<!\\)\|/, $line; # leave '\|' alone and only splits at '|'
         }else{
 	   @a=split /\|/, $line;
         }
@@ -203,8 +203,11 @@ my $sth_nkeystr = $dbh->prepare(qq{
 
        foreach my $elem (@a){
 	   $elem=trim($elem);
+	   if( $elem=~ /\\n/ ){
+               $elem=~ s/\\n/\n/g; 
+	   }
 	   if( $elem=~ $seq ){
-	       $elem=~ s/\\\|/\|/;
+	       $elem=~ s/\\\|/\|/g;
            } 
 	   if( (not defined $elem) or ($elem eq "") or ($elem eq '\N') ){
 	       $a[$c]=undef;
@@ -268,11 +271,11 @@ my $sth_nkeystr = $dbh->prepare(qq{
 	      $sth_nkeystr->execute(@sql_bind);
 
               print "SELECT $nkeystr FROM $tablename WHERE $sql_clause \n";
-
-	      if ( my @row = $sth_nkeystr->fetchrow() ){
+	      my @row;
+	      if ( @row = $sth_nkeystr->fetchrow() ){
 		  my $k=0;
 		  foreach my $elem (@row){
-		      if( not defined $elem ){
+		      if( (not defined $elem) or ($elem eq "") ){
 			  $row[$k]="NULL";
 		      }
 		      $row[$k]=trim($row[$k]);
@@ -288,6 +291,11 @@ my $sth_nkeystr = $dbh->prepare(qq{
 			  $row[$indx]= 'f';
                       }
                   }
+	      }else{
+		  $exist=0;
+		  print " DATABASE ERROR";$sth_nkeystr->finish;next;
+	      }
+	      $sth_nkeystr->finish;
 		  my $old=join(",",@row);
                   my $new;
 		  foreach my $indx (@nkeyindx){
@@ -304,10 +312,11 @@ my $sth_nkeystr = $dbh->prepare(qq{
 		  };chop $new;
 		   # print "OLD $old \n";
 		   # print "NEW $new \n";
-		 
+
 		  if( $old ne $new ){ # compare oldvalue in db with new value from file
                       print "OLD $old \n";
 		      print "NEW $new \n";
+                      
                       if( ( exists $hcol{fromtime} ) and ( exists $hcol{totime} ) ){  
                           my $index_fromtime=$hcol{fromtime};
 			  my $index_totime=$hcol{totime};
@@ -335,11 +344,6 @@ my $sth_nkeystr = $dbh->prepare(qq{
 		      	print " UNCHANGED";
 		  }
 	      
-	      }else{
-		  $exist=0;
-		  print " DATABASE ERROR";$sth_nkeystr->finish;next;
-	      }
-	      $sth_nkeystr->finish;
 	  }elsif($exist==2) {
 	    print " INSERT";
 	    $sth_insert->execute(@a);

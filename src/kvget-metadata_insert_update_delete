@@ -39,11 +39,11 @@ mkdir -pv $LOGDIR
 DATADIR=/var/lib
 METAGET=$DATADIR/kvalobs/metaget
 
-if hash kvconfig 2>/dev/null; then
-    METAGET=$(kvconfig --datadir)/kvalobs/metaget
-fi
+#if hash kvconfig 2>/dev/null; then
+#    METAGET=$(kvconfig --datadir)/kvalobs/metaget
+#fi
 
-# METAGET=$(kvconfig --datadir)/kvalobs/metaget
+### METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
 KVMETA=kvmeta
 
@@ -85,17 +85,33 @@ fi
 
 
 
-echo "Oppdaterer tabellene station og metadatatype";
-for TABLE in station metadatatype
+echo "Oppdaterer tabellen metadatatype";
+for TABLE in metadatatype
 do
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
     assert_table_not_empty $TABLE
 done
 
+echo "Oppdaterer tabellen station";
+for TABLE in station
+do
+    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
+    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "static=false" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+    assert_table_not_empty $TABLE
+done
 
-echo "Oppdaterer tabellene algorithms checks types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata";
-for TABLE in algorithms checks types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata
+echo "Oppdaterer tabellen checks";
+for TABLE in checks
+do
+    #$PSQL -a -c "truncate table $TABLE"
+    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
+    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "checkname='push6flag' AND active='* * * * *'" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    assert_table_not_empty $TABLE
+done
+
+echo "Oppdaterer tabellene algorithms types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata";
+for TABLE in algorithms types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata
 do
     #$PSQL -a -c "truncate table $TABLE"
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
@@ -104,7 +120,7 @@ do
 done
 
 
-echo "station_param obs_pgm";
+echo "Oppdaterer tabellene station_param obs_pgm";
 for TABLE in station_param obs_pgm
 do
     #$PSQL -a -c "truncate table $TABLE"
