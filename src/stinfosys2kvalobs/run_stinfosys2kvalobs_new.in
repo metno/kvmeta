@@ -19,7 +19,7 @@ fi
 
 if [ "z$METADIR" = "z" ]; then
 	echo "The environment variable METADIR must be set."
-	echo "METADIR is set to where the archived (CVS/svn) "
+	echo "METADIR is set to where the archived (CVS/svn/git) "
 	echo "metadata is located."
 	exit 1
 fi

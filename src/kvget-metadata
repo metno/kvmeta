@@ -35,11 +35,11 @@ assert_table_not_empty() {
 DATADIR=/var/lib
 METAGET=$DATADIR/kvalobs/metaget
 
-if hash kvconfig 2>/dev/null; then
-    METAGET=$(kvconfig --datadir)/kvalobs/metaget
-fi
+#if hash kvconfig 2>/dev/null; then
+#    METAGET=$(kvconfig --datadir)/kvalobs/metaget
+#fi
 
-# METAGET=$(kvconfig --datadir)/kvalobs/metaget
+### METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
 KVMETA=kvmeta
 

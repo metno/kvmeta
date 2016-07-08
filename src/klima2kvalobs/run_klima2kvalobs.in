@@ -9,6 +9,15 @@ BINDIR=__PKGLIBBINDIR__
 
 DVH=$HOME
 
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
 if [ -f  $DVH/etc/klima.conf ]; then
    . $DVH/etc/klima.conf
 else
@@ -29,9 +38,21 @@ sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_
 sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
 
 $BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.out QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
+ 
+sort $DUMPDIR/station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.orig.sorted
 
-sort $DUMPDIR/station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.sorted
-mv $DUMPDIR/station_param_QC1-1.sorted $DUMPDIR/station_param_QC1-1.out
+# Insert_update the table station_param_nonhour_klima
+# This table has the same structure as the table station_param, but lacks the column hour
+LOGDIR=$HOME/var/log/insert_update_delete_table_klima
+mkdir -pv $LOGDIR
+
+echo "Oppdaterer tabellen station_param_nonhour_klima";
+TABLE=station_param_nonhour_klima
+  /usr/bin/insert_update_delete_table_speed.pl localhost 5432 $TABLE $DUMPDIR/station_param_QC1-1.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+  assert_table_not_empty $TABLE
+  psql -c "\copy $TABLE to $DUMPDIR/station_param_nonhour_klima.out DELIMITER '|'"
+
+sort $DUMPDIR/station_param_nonhour_klima.out > $DUMPDIR/station_param_QC1-1.out
 
 ## COPY TO station_param   
 for FILE in station_param_QC1-1.out

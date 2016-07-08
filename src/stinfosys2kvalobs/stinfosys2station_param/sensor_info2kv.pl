@@ -49,6 +49,7 @@ use trim;
 # CONST
 my $paramid = 112; # snow depth
 my $measurement_methodid =217701; # Ultrasonic method
+my $measurement_methodid_list = "217701,217703";
 my $default_min_clear_factor=50;
 # END CONST
 
@@ -80,9 +81,23 @@ my $default_physical_height;
 if ( my $val = $sth->fetchrow() ) {
     $default_physical_height = $val;
 }
-
 $sth->finish;
 
+$sth = $dbh->prepare("select distinct stationid from obspgm_h where message_formatid=316"); 
+$sth->execute;
+my %is316;
+while ( my @row = $sth->fetchrow() ) {
+    $is316{$row[0]}=1;
+}
+$sth->finish;
+
+$sth = $dbh->prepare("select distinct stationid, message_formatid from obspgm_h where stationid in ( select distinct stationid from obspgm_h where message_formatid=316 and paramid=112) and message_formatid <> 316 order by stationid, message_formatid"); 
+$sth->execute;
+my %statm;
+while ( my @row = $sth->fetchrow() ) {
+    $statm{$row[0]}{$row[1]}=1;
+}
+$sth->finish;
 
 #$sth =
 #  $dbh->prepare(
@@ -93,7 +108,7 @@ $sth->finish;
 
 $sth =
   $dbh->prepare(
-"select si.stationid, si.hlevel, si.sensor, si.physical_height,si.fromtime,em.description from equipmentmodel em ,equipment eq, sensor_info si where eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid=$measurement_methodid and paramid=$paramid"
+"select si.stationid, si.hlevel, si.sensor, si.physical_height,si.fromtime,em.description from equipmentmodel em ,equipment eq, sensor_info si where eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid"
     ) or die "Can't prep\n";
 $sth->execute;
 
@@ -164,7 +179,16 @@ sub print_station_param {
 "$stationid|$paramid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
 
     $metadata = "R1\\n2";
-    my $qcx = "QC1-0-autosnow";
-    print
+    if( ! exists $is316{$stationid} ){
+	my $qcx = "QC1-0-autosnow";
+	print
 "$stationid|$paramid|$level|$sensor|$fromday|$today|$qcx|$metadata|$desc_metadata|$fromtime\n";
+    }else{
+	foreach my $mf ( keys %{$statm{$stationid}} ){
+	    my $qcx = "QC1-0-autosnow" . "_" . $mf;
+	print
+"$stationid|$paramid|$level|$sensor|$fromday|$today|$qcx|$metadata|$desc_metadata|$fromtime\n";
+	}
+
+    }
 }

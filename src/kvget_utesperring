@@ -6,7 +6,6 @@ set -a  # export variables to the environment of subsequent commands
 set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
-export LANG=en_US.latin1
 
 PGDATABASE=kvalobs
 PGUSER=kvalobs
@@ -21,8 +20,7 @@ assert_table_not_empty() {
 	fi
 }
 
-#METAGET=/usr/share/kvalobs/metaget
-METAGET=/usr/share/kvalobs
+METAGET=/var/lib/kvalobs
 
 KRO="kro"
 if [ -f $HOME/.kro  ]; then

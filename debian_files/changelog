@@ -1,3 +1,39 @@
+kvalobs-metadata (2.9.18-1) unstable; urgency=low
+  * changed sensor_info2kv.pl
+  * changed run_stinfosys2kvalobs_new.in
+  * changed run_stinfosys2hist_kvalobs_new.in
+  * changed kvinstall_metadata_test
+  * changed kvinstall_metadata
+  * changed run_checks_sensor.in
+  * changed run_checks_sensor_test.in
+
+ -- Terje Reite <terje.reite@met.no>  Thu, 7 Jul  2016 14:00:00 +0200
+
+kvalobs-metadata (2.9.17-1) unstable; urgency=low
+  * added distinct_qcx2checks_intodb
+  * changed run_metadata_instance.in.sh
+  * changed run_metadata.in.sh
+
+ -- Terje Reite <terje.reite@met.no>  Fri, 1 Jul  2016 15:42:00 +0200
+
+kvalobs-metadata (2.9.16-1) unstable; urgency=low
+  * changed sensor_info2kv.pl
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 29 Jun  2016 13:12:00 +0200
+
+kvalobs-metadata (2.9.15-1) unstable; urgency=low
+  * changed run_klima2kvalobs.in
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 11 May  2016 16:37:00 +0200
+
+kvalobs-metadata (2.9.14-1) unstable; urgency=low
+  * changed insert_update_delete_table.pl
+  * changed insert_update_delete_table_speed.pl
+  * changed run_metadata_instance.in.sh
+  * changed kvget-metadata_insert_update_delete
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 05 Apr  2016 15:25:00 +0200
+
 kvalobs-metadata (2.9.13-1) unstable; urgency=low
   * changed kvget-metadata_insert_update_delete
   * added insert_update_delete_table_speed.pl

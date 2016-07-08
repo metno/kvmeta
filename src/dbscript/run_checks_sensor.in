@@ -20,7 +20,7 @@ sub Wanted
 #   print $_ . "\n"; 
 # print $File::Find::dir . "\n";
 
-   if(  ! ($File::Find::dir =~ /\.svn/) && ( $File::Find::dir ne $path ) ){
+   if(  (! ($File::Find::dir =~ /\.svn/)) && (! ($File::Find::dir =~ /\.git/)) && ( $File::Find::dir ne $path ) ){
        # print $File::Find::dir . "\n";
        $subd{$File::Find::dir}=1;
    }       

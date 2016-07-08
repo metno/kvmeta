@@ -154,6 +154,9 @@ done
 echo "$LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log"
 $LIBEXECDIR/checks2kvalobsdb checks_qcx.out > $DUMPDIR/checks_qcx.log
 
+echo "$LIBEXECDIR/distinct_qcx2checks_intodb \"0~QC1-0-autosnow~QC1-0~1~summer_snow~obs;SA%;;|meta;SA_R1;;~* * * * *~1500-01-01 00:00:00\"  > $DUMPDIR/distinct_qcx2checks_intodb_autosnow.log"
+$LIBEXECDIR/distinct_qcx2checks_intodb "0~QC1-0-autosnow~QC1-0~1~summer_snow~obs;SA%;;|meta;SA_R1;;~* * * * *~1500-01-01 00:00:00"  > $DUMPDIR/distinct_qcx2checks_intodb_autosnow.log
+
 ## semi_auto/semi_manual
 echo "$LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log"
 $LIBEXECDIR/checks2kvalobsdb checks_semi_auto.out > $DUMPDIR/checks_semi_auto.log

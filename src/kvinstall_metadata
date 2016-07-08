@@ -101,6 +101,7 @@ fi
 
 find . -name CVS -type d -exec rm -rf {} \; > /dev/null 2>&1
 find . -name .svn -type d -exec rm -rf {} \; > /dev/null 2>&1
+find . -name .git -type d -exec rm -rf {} \; > /dev/null 2>&1
 
 tar cpf - $metadirs | (cd $KV_METADIR; tar xpf - )
 

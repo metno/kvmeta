@@ -34,6 +34,7 @@ dist_bin_SCRIPTS = \
 	checks_all \
 	station_param2kvalobsdb \
 	checks2kvalobsdb \
+	distinct_qcx2checks_intodb \
 	checks_sensor \
 	print_station_param_auto_path.pl \
 	table_instance \

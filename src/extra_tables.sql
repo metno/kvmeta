@@ -27,3 +27,17 @@ CREATE TABLE checks_semi_auto_test (
 	fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, qcx, language, fromtime )
 );
+
+CREATE TABLE station_param_nonhour_klima (
+	stationid INTEGER NOT NULL,
+	paramid   INTEGER NOT NULL,
+	level	  INTEGER DEFAULT 0,	 
+	sensor	  CHAR(1) DEFAULT '0',
+	fromday	  INTEGER NOT NULL,
+	today	  INTEGER NOT NULL,
+        qcx       TEXT NOT NULL,
+	metadata  TEXT DEFAULT NULL,
+        desc_metadata TEXT DEFAULT NULL,
+        fromtime TIMESTAMP NOT NULL,
+	UNIQUE ( stationid, paramid, level, sensor, fromday, today, qcx, fromtime )
+);
