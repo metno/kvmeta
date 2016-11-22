@@ -1,0 +1,185 @@
+#!/usr/bin/perl -w
+# Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
+#
+# $Id: distinct_qcx2checks_intodb 2016-07-01 terjeer $
+#
+# Copyright (C) 2016 met.no
+#
+# Contact information:
+# Norwegian Meteorological Institute
+# Box 43 Blindern
+# 0313 OSLO
+# NORWAY
+# email: kvalobs-dev@met.no
+#
+# This file is part of KVALOBS_METADATA
+# 
+# KVALOBS_METADATA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#
+# KVALOBS_METADATA is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc., 
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+use strict;
+use DBI;
+use trim;
+use dbQC;
+
+
+my $narg=@ARGV;
+if( $narg == 0 ){
+   print "This script distinct_qcx2checks_intodb demands one argument \n";
+   exit 0;
+}
+# "0~QC1-0-autosnow~QC1-0~1~summer_snow~obs;SA%;;|meta;SA_R1;;~* * * * *~1500-01-01 00:00:00"
+
+my $kvpasswd=get_passwd();
+my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
+        die "Connect failed: $DBI::errstr";
+
+my $control="ins";
+
+if ( $narg > 0 ){
+    #my $checks_path=get_checks_path();
+    #my $fromfile=$checks_path . '/' . $ARGV[0];
+
+  #if( ( -f $fromfile ) && ( -r $fromfile ) ){  
+    my $splitter='~';
+   # open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
+   # while( defined(my $line=<MYFILE>) ){
+        # $line=trim($line);
+
+    my $line=$ARGV[0];
+
+        if( length($line) > 0 ){
+            my @sline=split /$splitter/,$line;
+            my $len=@sline;
+            #print "$sline[0] =  $len \n";
+            if( $len > 1 ){
+	       my $stationid=trim($sline[0]);
+               my $qcx=trim($sline[1]);
+               my $medium_qcx=trim($sline[2]);
+               my $language=trim($sline[3]);
+               my $checkname=trim($sline[4]);
+	       my $checksignature=trim($sline[5]);
+	       my $active=trim($sline[6]);
+               my $fromtime=trim($sline[7]);
+	       
+	       # print "HELLO 0 $stationid,$paramid,$level,$fromday \n";
+
+	       my $sth = $dbh->prepare("select distinct qcx from station_param where qcx like '$qcx%'"); 
+	       $sth->execute;
+	       my @row=();
+	       while (@row = $sth->fetchrow_array) {
+		   my $lqcx=$row[0];
+                   my $lchecksignature=$checksignature;
+                   if( $lqcx=~ '_' ){
+		       my @arr=split('_',$lqcx);
+                       my $alen=@arr;
+                       if( $alen == 2 ){
+                           #susbstitute template in $checksignature with the second value
+                           my $typeid=$arr[1];
+                           # print "typeid=$typeid \n";
+                           my $var="&&&$typeid";
+                           # print $var . "\n";
+                           print "checksignature=$checksignature \n";
+                           $lchecksignature=~ s/%/$var/;
+			   print "lchecksignature=$lchecksignature \n"; 
+		       }
+                    }else{
+			   #substitute template in $checksignature with nothing
+			   print "typeid is NULL \n";
+			   print "checksignature=$checksignature \n";
+			   $lchecksignature=~ s/%//;
+			   print "lchecksignature=$lchecksignature \n";
+		    }
+	       
+                   eval{
+                     if ( !insert_DB(
+                       $dbh, $stationid, $lqcx, $medium_qcx, $language, $checkname, 
+                       $lchecksignature, $active, $fromtime )
+                       ){
+                            print "ERROR:  distinct_qcx2checks_intodb::execute_program har feilet\n" ;
+                        }
+                   }
+}   
+	    }
+        } 
+    } 
+  
+
+
+
+sub insert_DB{
+  my ( $dbh, $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime ) = @_;
+
+  my $sth = $dbh->prepare("SELECT language FROM checks \ 
+                           WHERE stationid=$stationid AND qcx='$qcx' AND fromtime='$fromtime'");
+  $sth->execute;
+
+  my @row=();
+  my @language_already=();
+
+  while (@row = $sth->fetchrow_array) {
+    push(@language_already,$row[0]);
+  }
+  $sth->finish;
+
+  my $len_language=@language_already;
+  print "length of language is $len_language\n";
+  print "qcx=$qcx og fromtime=$fromtime\n";
+
+  if( $len_language > 0 ){
+      print "length of language is $len_language\n";
+      foreach(@language_already){
+	  if($_ eq $language){ 
+	      if(  $control eq "ins" || $control eq 'R' ){
+		  print " $qcx: Denne checken blir naa replaced\n";
+		  my $sth = $dbh->prepare("UPDATE checks \
+                                  SET  checkname = '$checkname',\
+                                  checksignature = '$checksignature',\
+                                  active         = '$active'\
+                                  WHERE qcx='$qcx' AND fromtime='$fromtime'");
+                  $sth->execute;
+                  $sth->finish;
+                  return 1;
+	      }
+              else{
+	        print " $checkname: Dette spraaket er $_ og finnes i fra for; ingen oppdateringer \n";
+	        return 1;
+	      }
+	  }
+          else{
+	      print " $checkname finnes ogsaa for spraak $_ \n";
+	  }
+      }
+  }
+
+  ########################
+
+    #print " $checkname: Denne algoritmen blir naa replaced";
+    #my $sth = $dbh->prepare("UPDATE algorithms \
+    #                        SET  signature = '$signature', script = '$script' \
+    #                        WHERE language like '$language' AND checkname like '$checkname'");
+    #$sth->execute;
+    #$sth->finish;
+
+
+
+
+  $sth = $dbh->prepare("INSERT INTO checks VALUES($stationid,'$qcx','$medium_qcx',$language, \
+                        '$checkname', '$checksignature', '$active','$fromtime')");
+  $sth->execute;
+  $sth->finish;
+
+  return 1;
+}
