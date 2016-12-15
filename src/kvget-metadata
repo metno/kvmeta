@@ -14,7 +14,7 @@ META_LOCAL_SRC=""
 PGDATABASE=kvalobs
 : ${PGUSER:=$USER}
 : ${PGPORT:=5432}
-: ${PGHOST:=ct58002.int.met.no}
+: ${PGHOST:=localhost}
 
 PSQL=psql
 only_down_load=false
