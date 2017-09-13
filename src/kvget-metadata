@@ -101,13 +101,22 @@ PGPASSFILE="/proc/$$/fd/3"
 
 if [ -f $HOME/etc/kvdblist.conf ]; then
     echo "The file $HOME/etc/kvdblist.conf exists"
-    read -s -p "dbpassword: " PGPASSWORD
     KVDBLIST=`cat $HOME/etc/kvdblist.conf`
     for KVDB in $KVDBLIST
     do
         # echo $KVDB
         PGHOST=$KVDB
-        echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+	if [ -f  $HOME/.pgpass ]; then
+	    PGPASSWORD=`cat $HOME/.pgpass | grep $KVDB | cut -f5 -d:`
+	    ## echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD"
+            echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+	else
+	    echo "The file $HOME/.pgpass does not exist"
+            read -s -p "dbpassword: " PGPASSWORD
+	    ## echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD"
+            echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+	fi
+	
         VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
         VAR=`echo $VARn | tr -d '\n'`
         # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
@@ -119,6 +128,7 @@ if [ -f $HOME/etc/kvdblist.conf ]; then
     done
     # echo "mykvdb=$KVDB"    
 else
+    echo "The file $HOME/etc/kvdblist.conf does not exist"
     read -s -p "dbpassword ($PGHOST): " PGPASSWORD
     echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
 fi
@@ -218,3 +228,7 @@ do
     assert_table_not_empty $TABLE
 done
 
+echo "psql -f $DATADIR/kvalobs/utesperring/utesperring.sql"
+psql -f $DATADIR/kvalobs/utesperring/utesperring.sql
+
+source $HOME/insert.source
