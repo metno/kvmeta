@@ -83,7 +83,7 @@ while [ "$1" != "" ]; do
   shift
 done
 
-echo "host: $PGHOST:$PGPORT"
+
 
 # Create a .pgpass file to use so we do not need to give the
 # password for each call to psql
@@ -98,9 +98,33 @@ exec 3>$PGPASSFILE
 rm $PGPASSFILE
 PGPASSFILE="/proc/$$/fd/3"
 #echo "PGPASSFILE: $PGPASSFILE"
-read -s -p "dbpassword ($PGHOST): " PGPASSWORD
-echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+
+if [ -f $HOME/etc/kvdblist.conf ]; then
+    echo "The file $HOME/etc/kvdblist.conf exists"
+    read -s -p "dbpassword: " PGPASSWORD
+    KVDBLIST=`cat $HOME/etc/kvdblist.conf`
+    for KVDB in $KVDBLIST
+    do
+        # echo $KVDB
+        PGHOST=$KVDB
+        echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+        VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
+        VAR=`echo $VARn | tr -d '\n'`
+        # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
+        #if [ "z$VAR" != "z" ] && [ $VAR == "f" ]; then
+        if [ "z$VAR" = "zf" ]; then
+	    # echo "selected database is $KVDB" 
+	    break 
+        fi
+    done
+    # echo "mykvdb=$KVDB"    
+else
+    read -s -p "dbpassword ($PGHOST): " PGPASSWORD
+    echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+fi
+
 PGPASSWORD=""
+echo "host: $PGHOST:$PGPORT" 
 
 CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
 SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
@@ -117,7 +141,7 @@ fi
 
 ## ** Subroutines **
 assert_table_not_empty() {
-	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	NUM_ROWS=`$PSQL -t -c "select count(*) from $1"`
 	if [ $NUM_ROWS -eq 0 ]; then
 		echo "ERROR: tabellen $1 er tom."
 		exit 1
