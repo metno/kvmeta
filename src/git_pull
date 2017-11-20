@@ -1,0 +1,24 @@
+#!/bin/bash
+
+export HOME=/metno/kvalobs
+export METADIR=$HOME/kvoss_intern/kvmeta
+cd $METADIR 
+
+LOG=$HOME/git_pull.log
+x=6
+while [ $x -gt 0 ]
+do
+    if git pull
+    then
+        echo "start pull: $?" > $LOG
+        exit 0
+    else
+        # sendmail "Error while start pull: $?"
+        echo "Error while start pull: $?" > $LOG
+        sleep 5m
+    fi
+
+    x=$(( $x - 1 ))
+done
+
+exit 1
