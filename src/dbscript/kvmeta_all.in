@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e  # Exit if a simple shell command fails
+
 export HOME
 export METADIR
 export PGHOST
