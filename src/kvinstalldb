@@ -1,0 +1,38 @@
+#!/bin/sh
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+sudo apt-get -y install wget ca-certificates
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+
+sudo apt-get -y install postgresql
+
+
+#==== Opprette brukere til databasen ====
+#kvalobs brukeren: 
+  sudo -u postgres createuser -sER kvalobs
+  
+#pkvalobs brukeren:
+  sudo -u postgres createuser -SREI pkvalobs
+#setter passord til pkvalobs brukeren  
+  sudo -u postgres psql -c "ALTER USER pkvalobs WITH PASSWORD 'kvalobs12'"
+
+#==== Lage en tom database ==== 
+  sudo -u postgres createdb --owner=kvalobs kvalobs
+
+# Installer en OK editor :  
+  sudo apt-get -y install nano
+
+#==== postgresql.conf basis konfigurering ====
+  #== Gjør: ==
+  myversion=`ls -1 /var/lib/postgresql/`
+  sudo -u postgres sed -i.bak "s/^#listen_addresses =.*/listen_addresses = '*'      # what IP address(es) to listen on;/" /etc/postgresql/$myversion/main/postgresql.conf
+  sudo -u postgres grep listen_addresses /etc/postgresql/$myversion/main/postgresql.conf
+
+#== Forklaring: ==
+#http://stackoverflow.com/questions/20568515/how-to-use-sed-to-replace-a-config-files-variable
+
+#Listen_addresses må settes, kan likeså godt settes til å lytte på alle:
+#  listen_addresses = '*'
+
+
