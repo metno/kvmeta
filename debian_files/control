@@ -4,9 +4,9 @@ Priority: extra
 Maintainer: Terje Reite <terje.reite@met.no>
 Build-Depends: debhelper, autotools-dev, debconf,
  devscripts, fakeroot, build-essential, lintian, autoconf,
- automake, libdbd-pg-perl, libdbi-perl, libperl5.18 (>= 5.8.8), 
+ automake, libdbd-pg-perl, libdbi-perl, libperl5.22 (>= 5.8.8), 
  libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3), 
- less, bzip2, kv-update-gap-db
+ less, bzip2
 Standards-Version: 3.8.3
 Homepage: https://kvalobs.wiki.met.no/doku.php?id=kvalobs
 
