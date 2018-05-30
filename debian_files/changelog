@@ -1,7 +1,27 @@
+kvalobs-metadata (2.10.22-1) unstable; urgency=low
+  * bugfix kvget-metadata
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 22 May  2017 14:41:00 +0200
+
+kvalobs-metadata (2.10.21-1) unstable; urgency=low
+  * changed kvget-metadata, added functionality to look for the active database
+
+ -- Terje Reite <terje.reite@met.no>  Fri, 19 May  2017 14:06:00 +0200
+
 kvalobs-metadata (2.9.20-1) unstable; urgency=low
   * fixed kvmeta_all.in
 
- -- Terje Reite <terje.reite@met.no>  Mon, 4 Jan  2017 18:00:00 +0200	
+ -- Terje Reite <terje.reite@met.no>  Mon, 4 Jan  2017 18:00:00 +0200
+
+kvalobs-metadata (2.10.20-1) unstable; urgency=low
+  * changed kvget-metadata
+
+ -- Terje Reite <terje.reite@met.no>  Fri, 16 Dec  2016 16:20:00 +0200
+
+kvalobs-metadata (2.10.19-1) unstable; urgency=low
+  * ported from trusty to xenile
+
+ -- Terje Reite <terje.reite@met.no>  Tue, 22 Nov  2016 18:00:00 +0200
 
 kvalobs-metadata (2.9.19-1) unstable; urgency=low
   * fixed sensor_info2kv.pl
