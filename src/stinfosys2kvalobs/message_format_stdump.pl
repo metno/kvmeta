@@ -35,6 +35,7 @@ use strict;
 use DBI;
 use stinfosys;
 use trim;
+use Encode;
 
     my $stname=  st_name();
     my $sthost=  st_host();
@@ -66,7 +67,7 @@ while (my @row = $sth->fetchrow()) {
           }
     }
    
-      print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]\n";
+      print encode_utf8("$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]\n");
   }
 
 $sth->finish;

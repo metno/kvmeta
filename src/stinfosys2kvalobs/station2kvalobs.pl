@@ -35,6 +35,7 @@ use DBI;
 use stinfosys;
 use trim;
 use wmonr_stinfosys2kvalobs;
+use Encode;
 
 my $len=@ARGV;
 
@@ -213,7 +214,7 @@ foreach my $ref_row ( @row_list ){
         }
    }
        
-   print "$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$row[0]|$icaoid|$call_sign|\\N|$environmentid|t|$row[7]\n";
+   print encode_utf8("$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]|$row[0]|$icaoid|$call_sign|\\N|$environmentid|t|$row[7]\n");
 }
 
 $dbh->disconnect;
