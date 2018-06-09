@@ -1,3 +1,9 @@
+kvalobs-metadata (2.10.23-1) unstable; urgency=low
+  * encoding utf-8 station2kvalobs.pl, param2kvalobs.pl, message_format_stdump.pl
+  * changed run_metadata_instance.in.sh; tables checks, station_param, station_metadata are done instance indepent ( minor change for station, it was already independent ).
+
+ -- Terje Reite <terje.reite@met.no>  Wed, 6 Jun  2018 17:30:00 +0200
+
 kvalobs-metadata (2.10.22-1) unstable; urgency=low
   * bugfix kvget-metadata
 
