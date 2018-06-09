@@ -48,7 +48,7 @@ mkdir -pv $LOGDIR
 
 echo "Oppdaterer tabellen station_param_nonhour_klima";
 TABLE=station_param_nonhour_klima
-  /usr/bin/insert_update_delete_table_speed.pl localhost 5432 $TABLE $DUMPDIR/station_param_QC1-1.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+  $USRBIN/insert_update_delete_table_speed.pl localhost 5432 $TABLE $DUMPDIR/station_param_QC1-1.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
   assert_table_not_empty $TABLE
   psql -c "\copy $TABLE to $DUMPDIR/station_param_nonhour_klima.out DELIMITER '|'"
 
