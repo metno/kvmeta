@@ -235,7 +235,7 @@ do
    
    mkdir -p -m700 "$METADIST_INSTANCE/kvmeta"
    echo "Sjekker antall linjer i tabellene og dumper tabellene"
-   for TABLE in algorithms station types param metadatatype model qcx_info operator qc2_interpolation_best_neighbors
+   for TABLE in algorithms checks station_param station_metadata station types param metadatatype model qcx_info operator qc2_interpolation_best_neighbors
    do
      assert_table_not_empty $TABLE
      $PSQL -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
@@ -270,31 +270,31 @@ do
     $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
    #done
 
-   TABLE="checks"
-   $LIBEXECDIR/table_instance $INSTANCE $TABLE
-   assert_table_not_empty_instance $INSTANCE $TABLE
-   $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
+   # TABLE="checks"
+   # $LIBEXECDIR/table_instance $INSTANCE $TABLE
+   # assert_table_not_empty_instance $INSTANCE $TABLE
+   # $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
    
-   TABLE="station_param"
-   if [ "$INSTANCE" =  "METNO" ]; then
-       # necessary because of speed
-       $LIBEXECDIR/table_instance $INSTANCE $TABLE "$METADIST_INSTANCE/kvmeta"
-   else
-       $LIBEXECDIR/table_instance $INSTANCE $TABLE
-   fi
-   assert_table_not_empty_instance $INSTANCE $TABLE
-   $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
+   # TABLE="station_param"
+   # if [ "$INSTANCE" =  "METNO" ]; then
+   #    # necessary because of speed
+   #    $LIBEXECDIR/table_instance $INSTANCE $TABLE "$METADIST_INSTANCE/kvmeta"
+   # else
+   #    $LIBEXECDIR/table_instance $INSTANCE $TABLE
+   # fi
+   # assert_table_not_empty_instance $INSTANCE $TABLE
+   # $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
    
-   TABLE="station_metadata"
-   echo "TABLE er station_metadata, instansen  er $INSTANCE"
-   $LIBEXECDIR/table_type_instance $INSTANCE $TABLE
-   if [ "$INSTANCE" =  "METNO" ]; then
-       assert_table_not_empty_instance $INSTANCE $TABLE
-   fi
-   $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
+   # TABLE="station_metadata"
+   # echo "TABLE er station_metadata, instansen  er $INSTANCE"
+   # $LIBEXECDIR/table_type_instance $INSTANCE $TABLE
+   # if [ "$INSTANCE" =  "METNO" ]; then
+   #    assert_table_not_empty_instance $INSTANCE $TABLE
+   # fi
+   # $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
 
-   assert_table_not_empty station
-   $PSQL -c "\copy ( select * from station  where static='t' ) to $METADIST_INSTANCE/kvmeta/station.out DELIMITER '|'"
+   # assert_table_not_empty station
+   # $PSQL -c "\copy ( select * from station  where static='t' ) to $METADIST_INSTANCE/kvmeta/station.out DELIMITER '|'"
    
    cd $METADIST_INSTANCE
    kvmetadist=kvmeta_${INSTANCE}-$(date +%Y%m%d).tar.bz2
