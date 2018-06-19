@@ -1,3 +1,14 @@
+kvalobs-metadata (2.10.25-1) unstable; urgency=low
+  * added metadata package METNOSVV
+
+-- Terje Reite <terje.reite@met.no>  Tue, 12 Jun  2018 16:28:00 +0200
+
+kvalobs-metadata (2.10.24-1) unstable; urgency=low
+  * removed obs_pgm constraints in the generation of metadata -->
+  changed dbQC1-1, dbQC1-4, dbQC2d-4.pl, dbQC-simple.pl, QC1-1manual.pl
+
+ -- Terje Reite <terje.reite@met.no>  Mon, 11 Jun  2018 15:10:00 +0200
+
 kvalobs-metadata (2.10.23-1) unstable; urgency=low
   * encoding utf-8 station2kvalobs.pl, param2kvalobs.pl, message_format_stdump.pl
   * changed run_metadata_instance.in.sh; tables checks, station_param, station_metadata are done instance indepent ( minor change for station, it was already independent ).
