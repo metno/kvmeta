@@ -128,10 +128,10 @@ while( defined($line=<MYFILE>) ){
 	       
                if( $stationid != 0 ){
                    if( exists $m_station{"$stationid"} ){ 
-                       if(!exists $m_obs_pgm{"$stationid,$paramid"} ){
-                           $b=0;
-			   #print $stationid; print ":obs_pgm not exist \n";
-                       }
+                       #if(!exists $m_obs_pgm{"$stationid,$paramid"} ){
+                       #    $b=0;
+		       #	   #print $stationid; print ":obs_pgm not exist \n";
+                       #}
                    }else{
 		       #print $stationid; print ":stationid not exist \n";
                        $b=0;

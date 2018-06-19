@@ -151,9 +151,9 @@ while( defined($line=<MYFILE>) ){
                my $b=1;
                if( $stationid != 0 ){
 		   if( exists $m_station{"$stationid"} ){ 
-		       if(!exists $m_obs_pgm{"$stationid,$paramid"} ){
-			   $b=0;
-		       }
+		       #if(!exists $m_obs_pgm{"$stationid,$paramid"} ){
+		       #   $b=0;
+		       #}
 		   }else{
 		       $b=0;
 		   }

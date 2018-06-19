@@ -87,10 +87,10 @@ while( defined(my $line=<MYFILE>) ){
               if( $stationid != 0 ){
 		 if( exists $m_station{"$stationid"} ){ 
 		    # print LOG "bs=$b \n";
-                    if(! exists $m_obs_pgm{"$stationid,$paramid"} ){
-			$b=0;
-			print LOG "bo2=$b :: row in obs_pgm does not exist \n";
-	            }
+                    # if(! exists $m_obs_pgm{"$stationid,$paramid"} ){
+		    #	$b=0;
+		    #	print LOG "bo2=$b :: row in obs_pgm does not exist \n";
+	            # }
 		 }else{
 		    print LOG "bs2=$b :: stationid does not exist \n";
 		    $b=0;
