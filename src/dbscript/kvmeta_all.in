@@ -11,11 +11,11 @@ mkdir -pv $HOME/var/log
 
 LIBEXECDIR=__PKGLIBBINDIR__
 $LIBEXECDIR/kvinstall_metadata
-$LIBEXECDIR/run_metadata_instance SVV PROJ > $HOME/var/log/run_metadata_instance.log 2>&1
+$LIBEXECDIR/run_metadata_instance METNOSVV SVV PROJ > $HOME/var/log/run_metadata_instance.log 2>&1
 
 (
 nr=0
-while [ $nr -lt 6 ]
+while [ $nr -lt 8 ]
 do
      # echo "$count"
      # grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l
@@ -26,7 +26,5 @@ done
 grep bz2 $HOME/var/log/run_metadata_instance.log
 )
 
-cp -pv /usr/share/kvalobs/metadist/kvmeta_METNO.tar.bz2 /usr/share/kvalobs/metadist/kvmeta.tar.bz2
-cp -pv /usr/share/kvalobs/metadist/kvmeta_METNO_UTF8.tar.bz2 /usr/share/kvalobs/metadist/kvmeta_UTF8.tar.bz2
 
 
