@@ -60,6 +60,7 @@ do
     if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/station_param_auto/$FILE
     then
         if [ -s $DUMPDIR/$FILE ]; then
+	    echo "ulike: ny station_param_QC1-1.out"
             cp -upv $DUMPDIR/$FILE $METADIR/station_param/station_param_auto/$FILE
             cp -upv $DUMPDIR/$FILE $METADIR_AUTO/station_param_auto/$FILE
         else
