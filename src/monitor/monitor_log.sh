@@ -15,7 +15,7 @@ then
     echo "No argument supplied"
 else 
     PROGRAM=$1
-    echo "$PROGRAM `date +'%Y-%m-%d'`" > $DIR/${PROGRAM}.finished_log
+    echo "`date +'%Y-%m-%d'`" > $DIR/${PROGRAM}.finished_log
 fi
 
 if [ -n "$2" ]

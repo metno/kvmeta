@@ -1,0 +1,52 @@
+SIMPLE_MONITORING_IF_A_SHELL_FILE_IS_RUN ( by cron)
+Send mail if error
+
+Suggested convention: Use 'finished_log' as an extension to the file you write at the end of the shell script. 
+
+==== Prepare the file to be monitored ====
+On the top of the shell script you write:
+set -e  # Exit if a simple shell command fails
+
+On the bottom of the shell script you write:
+echo "something" > $DIR/mycronjob.finished_log
+
+example:
+echo "mycronjob `date +'%Y-%m-%d'`" > $HOME/var/log/mycronjob.finished_log
+
+==== make the monitoring cronjob ====
+Example: The real cronjob is the first job
+44 5 * * 2,3,4,5 $HOME/bin/run_klima2kvalobs_all > $HOME/var/log/run_klima2kvalobs_all.log
+
+Note: The monitoring job starts 12 hours ( = 720 minutes ) after the real job.
+The real job takes some time so if the job has run the file 'run_klima2kvalobs_all.finished_log'
+should be less than 12 hours. 
+Example: The related monitoring job:
+44 17 * * 2,3,4,5 $HOME/bin/monitor/monitor.sh run_klima2kvalobs_all.finished_log
+
+==== CHANGES IN THE TEMPLATE FILE monitor_template.sh ====
+
+You might need several template files because you have several time
+threshold values you find acceptable. That is several MYMIN values.
+
+Sometimes the job might take longer than 12 hours. Other times 12 hours is an unreaonable long time to wait
+before a message is sent.
+
+The directory is something you will usually  have only one of
+< DIR="MYDIR"
+---
+> DIR=$HOME/var/log/
+
+
+Example "MYMIN" is set to 720, that is the 720 minutes, 12 hours
+#!/bin/bash
+
+if [ -f  $HOME/etc/mailtolist.conf ]; then
+   . $HOME/etc/mailtolist.conf
+else
+   echo "Missing file:  $HOME/etc/mailtolist.conf"
+   exit 1
+fi
+
+TT=`for tt in $ARG; do find $DIR -type f -name $tt -mmin +"MYMIN" done`  
+if [ -n "$TT" ]; then echo $TT | mail -s "monitoring mysystem" $MAILTOLIST; fi
+
