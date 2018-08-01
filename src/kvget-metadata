@@ -6,8 +6,11 @@ set -a  # export variables to the environment of subsequent commands
 set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
-METASRC="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2"
-METASRC_UTF8="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2"
+# METASRC="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2"
+# METASRC_UTF8="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2"
+METASRC="http://157.249.168.104/kvalobs/kvmeta.tar.bz2"
+METASRC_UTF8="http://157.249.168.104/kvalobs/kvmeta_UTF8.tar.bz2"
+
 DATADIR=/var/lib
 METAGET=$DATADIR/kvalobs/metaget
 META_LOCAL_SRC=""
@@ -16,74 +19,12 @@ PGDATABASE=kvalobs
 : ${PGPORT:=5432}
 : ${PGHOST:=localhost}
 
+MAILTO="terjeer@met.no"
+OKDB="false"
+
 PSQL=psql
 only_down_load=false
-force=false
-
-function usage {
-    echo
-    echo " kvget-metadata --help -r -f -h dbhost -p dbport -u user -s metasrc -d destdir "
-    echo
-    echo "kvget-metadata installs the metadata from 'metasrc' if it is given"
-    echo "or downloads the metadata from '$METASRC'."
-    echo "The metadata is installed into a kvalobs database."
-    echo
-    echo "Options:"
-    echo " -h dbhost The postgres database host to connect to, default PGHOST ($PGHOST)."
-    echo " -r download only."
-    echo " -f force update of the postgres tables"
-    echo " -p dbport The port on the host to connect to, default PGPORT ($PGPORT)."
-    echo " -u dbuser The user to connect to the database as, default PGUSER ($PGUSER)."
-    echo " -s metasrc A tar file that contains the metadata to install, "
-    echo "    default it is downloaded from $METASRC."
-    echo " -d metadestdir The dest dir for the metadata file."
-    echo " --help print this help screen and exit."
-    echo
-}
-
-
-while [ "$1" != "" ]; do
-  case $1 in
-    "-h")
-        shift
-        PGHOST=$1
-        ;;
-    "-p")
-        shift
-        PGPORT=$1
-        ;;
-    "-u")
-        shift
-        PGUSER=$1
-        ;;
-    "-s")
-        shift
-        META_LOCAL_SRC=`readlink -f $1`
-        ;;
-    "-d")
-        shift
-        METAGET=$1
-        ;;
-    "-r")
-        only_down_load=true
-        ;;
-    "-f")
-        force=true
-        ;;
-    "--help")
-        usage
-        exit 0
-        ;;
-    *)
-      echo "Invalid argument '$1'."
-      echo
-      usage
-      exit 1
-  esac
-  shift
-done
-
-
+# force=false
 
 # Create a .pgpass file to use so we do not need to give the
 # password for each call to psql
@@ -99,51 +40,54 @@ rm $PGPASSFILE
 PGPASSFILE="/proc/$$/fd/3"
 #echo "PGPASSFILE: $PGPASSFILE"
 
-if [ -f $HOME/etc/kvdblist.conf ]; then
-    echo "The file $HOME/etc/kvdblist.conf exists"
-    KVDBLIST=`cat $HOME/etc/kvdblist.conf`
-    for KVDB in $KVDBLIST
-    do
-        # echo $KVDB
-        PGHOST=$KVDB
-	if [ -f  $HOME/.pgpass ]; then
-	    echo "The file $HOME/.pgpass does exist"
-	    PGPASSWORD=`cat $HOME/.pgpass | grep $KVDB | grep "$PGDATABASE:$PGUSER" | cut -f5 -d:`
-	    ## echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD"
-	    if [ -n  "$PGPASSWORD" ]; then
-		echo "OK"
-		echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
-                # cat $HOME/.pgpass | grep $KVDB | grep 'kvalobs:kvalobs' 1>&3
-	    else
-	        echo "The content of the file $HOME/.pgpass does not match $HOME/etc/kvdblist.conf"
-		continue
-	    fi
-	else
-	    echo "The file $HOME/.pgpass does not exist"
-            read -s -p "dbpassword: " PGPASSWORD
-	    ## echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD"
-            echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
-	fi
-	
-        VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
-        VAR=`echo $VARn | tr -d '\n'`
-        # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
-        #if [ "z$VAR" != "z" ] && [ $VAR == "f" ]; then
-        if [ "z$VAR" = "zf" ]; then
-	    # echo "selected database is $KVDB" 
-	    break 
-        fi
-    done
-    # echo "mykvdb=$KVDB"    
+if [ -f $HOME/.pgpass ]; then
+    echo "The file $HOME/.pgpass does exist"
 else
-    echo "The file $HOME/etc/kvdblist.conf does not exist"
-    read -s -p "dbpassword ($PGHOST): " PGPASSWORD
-    echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" 1>&3
+    echo "The file $HOME/.pgpass does not exist"
+    echo "The file $HOME/.pgpass does not exist" | mail -s "kvget_metadata: The file $HOME/.pgpass does not exist" $MAILTO
+    exit 1
 fi
 
-PGPASSWORD=""
+for ll in `cat $HOME/.pgpass | grep 'kvalobs:kvalobs'| cut -f1 -d:`
+do
+       echo $ll 
+       PGHOST=$ll
+       if cat $HOME/.pgpass | grep $ll | grep 'kvalobs:kvalobs' 1>&3
+       then
+          PGHOST=$ll 
+          if pg_isready
+          then
+              VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
+              VAR=`echo $VARn | tr -d '\n'`
+              # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
+              #if [ "z$VAR" != "z" ] && [ $VAR == "f" ]; then
+              if [ "z$VAR" = "zf" ]; then
+                  # echo "selected database is $ll"
+                  OKDB="true"
+                  break 
+              fi
+          else
+              echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
+              exit 1
+          fi
+       else
+           echo "Noe galt med passordtilordning" | mail -s "kvget_metadata: Noe galt med passordtilordning" $MAILTO
+           exit 1
+       fi
+          
+done
+
+
+if [ "z$OKDB" != "ztrue" ]; then
+        echo "No database that is not in recovery is found" | mail -s "kvget_metadata: No database that is not in recovery is found" $MAILTO
+        exit 1
+fi
+
+echo "Database OK"
+
 echo "host: $PGHOST:$PGPORT" 
-#exit 0
+# exit 0
+
 CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
 SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
 echo "CLIENT_ENCODING=${CLIENT_ENCODING}"
@@ -197,13 +141,13 @@ fi
 
 ## ** MAIN **
 
-if [ "$force" != true ]; then
-    read -p "Update kvalobs metadata tables (y/n): " ANS
-    if [ "$ANS" != "y" ]; then
-        echo "Terminates the metadata update!"
-        exit 0
-    fi
-fi
+# if [ "$force" != true ]; then
+#    read -p "Update kvalobs metadata tables (y/n): " ANS
+#    if [ "$ANS" != "y" ]; then
+#        echo "Terminates the metadata update!"
+#        exit 0
+#    fi
+# fi
 
 echo "Starting metadata update."
 
