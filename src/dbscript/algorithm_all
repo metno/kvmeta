@@ -226,7 +226,8 @@ sub insert_DB{
                                              SET  signature = ?, script = ? \
                                              WHERE language=? AND checkname=?");
 					
-			# print "script=$script \n";		
+			# print "script=$script \n";
+			$script=~ s/\\t//g; # remove tab
 			my $dscript=decode_utf8($script);
                 	$sth->execute($signature,$dscript,$language,$checkname);
                 	$sth->finish;
@@ -256,6 +257,8 @@ sub insert_DB{
 
 	
         $sth = $dbh->prepare("INSERT INTO algorithms VALUES(?,?,?,?)");
+
+	$script=~ s/\\t//g; # remove tab
         my $dscript=decode_utf8($script);
 	# print "script=$script \n";
   	$sth->execute($language,$checkname,$signature,$dscript);
