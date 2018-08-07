@@ -40,6 +40,8 @@ use Cwd qw(cwd);
 use dbQC;
 use trim;
 
+use Encode;
+
 
 my $control = "";
 
@@ -223,7 +225,10 @@ sub insert_DB{
                 	my $sth = $dbh->prepare("UPDATE algorithms \
                                              SET  signature = ?, script = ? \
                                              WHERE language=? AND checkname=?");
-                	$sth->execute($signature,$script,$language,$checkname);
+					
+			# print "script=$script \n";		
+			my $dscript=decode_utf8($script);
+                	$sth->execute($signature,$dscript,$language,$checkname);
                 	$sth->finish;
                 	return;
 				}
@@ -250,8 +255,10 @@ sub insert_DB{
 
 
 	
-  	$sth = $dbh->prepare("INSERT INTO algorithms VALUES(?,?,?,?)");
-  	$sth->execute($language,$checkname,$signature,$script);
+        $sth = $dbh->prepare("INSERT INTO algorithms VALUES(?,?,?,?)");
+        my $dscript=decode_utf8($script);
+	# print "script=$script \n";
+  	$sth->execute($language,$checkname,$signature,$dscript);
   
   	$sth->finish;
 
