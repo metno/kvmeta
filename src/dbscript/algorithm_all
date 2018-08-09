@@ -156,7 +156,8 @@ sub algorithm {
 	    chomp($line);
 		# $line =~ s/\\n/\\\\n/g;
 		# $line =~ s/\\t/\\\\t/g;
-		$line =~ s/\\/\\\\/g;
+		# $line =~ s/\\/\\\\/g; -- We can not have this here now
+		$line =~ s/\\n/ /g; # replace \n in print statements with a blank
 		$algstr .= $line . "\n";
     }
 
