@@ -46,7 +46,7 @@ my $port=$ARGV[1];
 print "host=$host \n";
 print "port=$port \n";
 
-my $kvpasswd=get_passwd();
+my $kvpasswd=get_passwd($host);
 my $dbh = DBI->connect("dbi:Pg:dbname=kvalobs;host=$host;port=$port","kvalobs",$kvpasswd,{RaiseError => 1}) ||
         die "Connect failed: $DBI::errstr";
 
@@ -483,25 +483,28 @@ sub fill{
     return \%s;
 }
 
-
 sub get_passwd{
+    my $host=shift;
     my $home;
     if( defined( $home=$ENV{"HOME"}) ){
         my $home=trim($home);
-        my $kvpasswd= $home . "/.kvpasswd";
+        my $kvpasswd= $home . "/.pgpass";
         open(MYFILE,$kvpasswd ) or return "";
         my $line;
         while( defined($line=<MYFILE>) ){
             $line= trim($line);
             if( length($line)>0 ){
-                my @sline=split /\s+/,$line;
+                my @sline=split /:/,$line;
                 my $len=@sline;
                 if($len>1){
-                    if( defined($sline[1]) ){
-                        return trim($sline[1]);
-                    }
-                }else{
-                    return "";
+		    if( defined($sline[0]) ){
+                        if( $sline[0] eq $host ){
+			    print "host=$host \n"; 
+                            if( defined($sline[-1]) ){
+				return trim($sline[-1]);
+			    }
+			}
+		    }
                 }
             }
         }

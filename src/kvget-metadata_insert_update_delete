@@ -6,10 +6,93 @@ set -a  # export variables to the environment of subsequent commands
 set -e  # Exit if a simple shell command fails
 #set -x  # for debugging, remove later
 
+# METASRC="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2"
+# METASRC_UTF8="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2"
+METASRC="http://157.249.168.104/kvalobs/kvmeta.tar.bz2"
+METASRC_UTF8="http://157.249.168.104/kvalobs/kvmeta_UTF8.tar.bz2"
+
+# BINDIR=/usr/bin
+BINDIR=$HOME/bin
+LOGDIR=$HOME/log/insert_update_delete_table
+mkdir -pv $LOGDIR
+
+DATADIR=/var/lib
+METAGET=$DATADIR/kvalobs/metaget
+META_LOCAL_SRC=""
 PGDATABASE=kvalobs
-PGUSER=kvalobs
+: ${PGUSER:=$USER}
+: ${PGPORT:=5432}
+: ${PGHOST:=localhost}
+
+MAILTO="terjeer@met.no"
+OKDB="false"
 
 PSQL=psql
+only_down_load=false
+# force=false
+
+# Create a .pgpass file to use so we do not need to give the
+# password for each call to psql
+# It works by creating a temporary file. Get a filehandle (3) to the file
+# and delete it. Set the PGPASSFILE environment variable to /proc/PID/fd/3
+# write the credentials to the file. The file is automaticly removed on exit.
+
+rm -f "$HOME/.pgpass.kvget.*"
+PGPASSFILE=$(mktemp $HOME/.pgpass.kvget.XXXXXXX)
+chmod 0600 $PGPASSFILE
+exec 3>$PGPASSFILE
+rm $PGPASSFILE
+PGPASSFILE="/proc/$$/fd/3"
+#echo "PGPASSFILE: $PGPASSFILE"
+
+if [ -f $HOME/.pgpass ]; then
+    echo "The file $HOME/.pgpass does exist"
+else
+    echo "The file $HOME/.pgpass does not exist"
+    echo "The file $HOME/.pgpass does not exist" | mail -s "kvget_metadata: The file $HOME/.pgpass does not exist" $MAILTO
+    exit 1
+fi
+
+for ll in `cat $HOME/.pgpass | grep 'kvalobs:kvalobs'| cut -f1 -d:`
+do
+       echo $ll 
+       PGHOST=$ll
+       if cat $HOME/.pgpass | grep $ll | grep 'kvalobs:kvalobs' 1>&3
+       then
+          PGHOST=$ll 
+          if pg_isready
+          then
+              VARn=`$PSQL --quiet --tuples-only -c 'select pg_is_in_recovery()'`
+              VAR=`echo $VARn | tr -d '\n'`
+              # echo -e "length(VAR)==$(echo -ne "${VAR}" | wc -m)"
+              #if [ "z$VAR" != "z" ] && [ $VAR == "f" ]; then
+              if [ "z$VAR" = "zf" ]; then
+                  # echo "selected database is $ll"
+                  OKDB="true"
+                  break 
+              fi
+          else
+              echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
+              exit 1
+          fi
+       else
+           echo "Noe galt med passordtilordning" | mail -s "kvget_metadata: Noe galt med passordtilordning" $MAILTO
+           exit 1
+       fi
+          
+done
+
+
+if [ "z$OKDB" != "ztrue" ]; then
+        echo "No database that is not in recovery is found" | mail -s "kvget_metadata: No database that is not in recovery is found" $MAILTO
+        exit 1
+fi
+
+echo "Database OK"
+
+echo "host: $PGHOST:$PGPORT" 
+# exit 0
+
 CLIENT_ENCODING=`$PSQL -tc "SHOW CLIENT_ENCODING"| tr -d ' '`
 SERVER_ENCODING=`$PSQL -tc "SHOW SERVER_ENCODING"| tr -d ' '`
 echo "CLIENT_ENCODING=${CLIENT_ENCODING}"
@@ -25,19 +108,13 @@ fi
 
 ## ** Subroutines **
 assert_table_not_empty() {
-	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	NUM_ROWS=`$PSQL -t -c "select count(*) from $1"`
 	if [ $NUM_ROWS -eq 0 ]; then
 		echo "ERROR: tabellen $1 er tom."
 		exit 1
 	fi
 }
 
-BINDIR=/usr/bin
-LOGDIR=$HOME/var/log/insert_update_delete_table
-mkdir -pv $LOGDIR
-
-DATADIR=/var/lib
-METAGET=$DATADIR/kvalobs/metaget
 
 #if hash kvconfig 2>/dev/null; then
 #    METAGET=$(kvconfig --datadir)/kvalobs/metaget
@@ -45,51 +122,45 @@ METAGET=$DATADIR/kvalobs/metaget
 
 ### METAGET=$(kvconfig --datadir)/kvalobs/metaget
 
+mkdir -p -m700 "$METAGET"
+cd $METAGET
 KVMETA=kvmeta
 
-if [ -n "$1" ]; then
-   METAGET=$PWD
-   echo "argumentet er $1"
-   tar xvvjf $1
+if [ -n "$META_LOCAL_SRC" ]; then
+   echo "METASRC: $META_LOCAL_SRC"
+   tar xvvjf $META_LOCAL_SRC
 else
-   mkdir -p -m700 "$METAGET"
-   cd $METAGET
    if [[ ( $CLIENT_ENCODING = LATIN1  &&  $SERVER_ENCODING = LATIN1  ) ]] ; then
-       wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2 | tar xvvj 
+       echo "METASRC: $METASRC"
+       wget -O - $METASRC | tar xvvj
    else
-       wget -O - http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2 | tar xvvj
+       echo "METASRC: $METASRC_UTF8"
+       wget -O - $METASRC_UTF8 | tar xvvj
    fi
+fi
+
+if [ "$only_down_load" = "true" ]; then
+    echo "Metadata downloaded to '$METAGET'"
+    exit 0
 fi
 
 ## ** MAIN **
 
-#echo "Sletter tabellene metadatatype og station_metadata"
-#$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+# if [ "$force" != true ]; then
+#    read -p "Update kvalobs metadata tables (y/n): " ANS
+#    if [ "$ANS" != "y" ]; then
+#        echo "Terminates the metadata update!"
+#        exit 0
+#    fi
+# fi
 
-#echo "Oppdaterer tabellene metadatatype station_metadata";
-#for TABLE in metadatatype station_metadata
-#do
-#    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-#    assert_table_not_empty $TABLE
-#done
-
-#echo "Sletter tabellen station der static=true";
-#$PSQL -a -c "delete from station where static=true"
-
-#echo "Oppdaterer tabellen station";
-#for TABLE in station
-#do
-#    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-#    assert_table_not_empty $TABLE
-#done
-
-
+echo "Starting metadata update."
 
 echo "Oppdaterer tabellen metadatatype";
 for TABLE in metadatatype
 do
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
     assert_table_not_empty $TABLE
 done
 
@@ -97,7 +168,7 @@ echo "Oppdaterer tabellen station";
 for TABLE in station
 do
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "static=false" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "static=false" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
     assert_table_not_empty $TABLE
 done
 
@@ -106,7 +177,7 @@ for TABLE in checks
 do
     #$PSQL -a -c "truncate table $TABLE"
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "checkname='push6flag' AND active='* * * * *'" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "checkname='push6flag' AND active='* * * * *'" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
     assert_table_not_empty $TABLE
 done
 
@@ -115,7 +186,7 @@ for TABLE in algorithms types param model qcx_info operator qc2_interpolation_be
 do
     #$PSQL -a -c "truncate table $TABLE"
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
     assert_table_not_empty $TABLE
 done
 
@@ -125,6 +196,11 @@ for TABLE in station_param obs_pgm
 do
     #$PSQL -a -c "truncate table $TABLE"
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table_speed.pl localhost 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    $BINDIR/insert_update_delete_table_speed.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
     assert_table_not_empty $TABLE
 done
+
+# echo "psql -f $DATADIR/kvalobs/utesperring/utesperring.sql"
+# psql -f $DATADIR/kvalobs/utesperring/utesperring.sql
+
+# source $HOME/insert.source

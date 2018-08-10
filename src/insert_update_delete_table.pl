@@ -32,6 +32,7 @@
 use DBI;
 # use dbQC;
 use strict;
+use Encode;
 # use trim;
 
 my $len=@ARGV;
@@ -45,7 +46,7 @@ my $port=$ARGV[1];
 print "host=$host \n";
 print "port=$port \n";
 
-my $kvpasswd=get_passwd();
+my $kvpasswd=get_passwd($host);
 my $dbh = DBI->connect("dbi:Pg:dbname=kvalobs;host=$host;port=$port","kvalobs",$kvpasswd,{RaiseError => 1}) ||
         die "Connect failed: $DBI::errstr";
 
@@ -174,14 +175,18 @@ my %hpval;
         # my $lena=@a;
         # print "lena=$lena \n";
 
-       foreach my $elem (@a){
+        foreach my $elem (@a){
 	   $elem=trim($elem);
 	   if( $elem=~ /\\n/ ){
                $elem=~ s/\\n/\n/g; 
 	   }
 	   if( $elem=~ $seq ){
 	       $elem=~ s/\\\|/\|/g;
-           } 
+           }
+           if( $elem=~ /\\\\/ ){
+	       $elem=~ s/\\\\/\\/g; 
+	   } 
+ 
 	   if( (not defined $elem) or ($elem eq "") or ($elem eq '\N') ){
 	       $a[$c]=undef;
 	       $b[$c]="NULL";
@@ -190,9 +195,9 @@ my %hpval;
 	       $b[$c]=$elem; 
 	   }
 	   $c++;
-       }
+        }
 
-       print join(',',@b), "\n";	
+        print "ROW :", join(',', @b), "\n";	
       
 ################################## 
 ## delete :: This puts all the keys into the hash $hpval
@@ -254,6 +259,7 @@ my %hpval;
 		  });
 	      $sth->execute(@sql_bind);
 
+	      
               print "SELECT $nkeystr FROM $tablename WHERE $sql_clause \n";
 	      my @row;
 	      if ( @row = $sth->fetchrow() ){
@@ -280,23 +286,26 @@ my %hpval;
 		  print " DATABASE ERROR";$sth->finish;next;
 	      }
 	      $sth->finish;
-		  my $old=join(",",@row);
-                  my $new;
+	      my $old= encode_utf8(join(",",@row));
+	      
+              my $new;
 		  foreach my $indx (@nkeyindx){
 		      if( defined $new ){
-			  $new =  $new . $b[$indx] . ",";
+			  $new =  $new . trim($b[$indx]) . ",";
 		      }else{
 			  print "indx=$indx \n";
                           if( defined $b[$indx] ){
-			      $new = $b[$indx] . ",";
+			      $new = trim($b[$indx]) . ",";
 			  }else{
 			     print "ERROR not defined b with indx $indx";
                           } 
 		      }
 		  };chop $new;
-		   # print "OLD $old \n";
-		   # print "NEW $new \n";
-		 
+		  # print "OLD $old \n";
+	          # print "NEW $new \n";
+	      
+	         $new=~ s/\\t/\t/g;
+	      
 		  if( $old ne $new ){ # compare oldvalue in db with new value from file
                       print "OLD $old \n";
 		      print "NEW $new \n";
@@ -314,7 +323,8 @@ my %hpval;
 		      
 		      my @sql_bind_nkey;
 		      foreach my $indx (@nkeyindx){
-			  push( @sql_bind_nkey, $a[$indx] );
+			  $a[$indx]=~ s/\\t/\t/g;
+			  push( @sql_bind_nkey, decode_utf8($a[$indx]) );
 		      }
 		     # my $sql_clause er definert over
 		     my @sql_bind_update=( @sql_bind_nkey, @sql_bind );
@@ -329,12 +339,16 @@ my %hpval;
 		      	print " UNCHANGED";
 		  }
 	  }elsif($exist==2) {
-	    print " INSERT";
-	    my $qmark = join "," => ("?") x @a;
-            # print $qmark;
-	    $sth = $dbh->prepare("insert into $tablename values($qmark)");
-	    $sth->execute(@a);
-	    $sth->finish;
+	     print " INSERT";
+	     my $qmark = join "," => ("?") x @a;
+             # print $qmark;
+	     $sth = $dbh->prepare("insert into $tablename values($qmark)");
+	     my @da;
+             for my $a_elem ( @a ){
+                push( @da, decode_utf8($a_elem) );
+             }   
+	     $sth->execute(@da);
+	     $sth->finish;
 	  }
        
 
@@ -489,29 +503,34 @@ sub fill{
 
 
 sub get_passwd{
+    my $host=shift;
     my $home;
     if( defined( $home=$ENV{"HOME"}) ){
         my $home=trim($home);
-        my $kvpasswd= $home . "/.kvpasswd";
+        my $kvpasswd= $home . "/.pgpass";
         open(MYFILE,$kvpasswd ) or return "";
         my $line;
         while( defined($line=<MYFILE>) ){
             $line= trim($line);
             if( length($line)>0 ){
-                my @sline=split /\s+/,$line;
+                my @sline=split /:/,$line;
                 my $len=@sline;
                 if($len>1){
-                    if( defined($sline[1]) ){
-                        return trim($sline[1]);
-                    }
-                }else{
-                    return "";
+		    if( defined($sline[0]) ){
+                        if( $sline[0] eq $host ){
+			    print "host=$host \n"; 
+                            if( defined($sline[-1]) ){
+				return trim($sline[-1]);
+			    }
+			}
+		    }
                 }
             }
         }
         return "";
     }
 }
+
 
 sub trim{
     my  $line = shift;
