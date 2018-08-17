@@ -498,7 +498,7 @@ sub get_passwd{
                 my $len=@sline;
                 if($len>1){
 		    if( defined($sline[0]) ){
-                        if( $sline[0] eq $host ){
+                        if( $sline[0] eq $host and $sline[2] eq 'kvalobs' and $sline[3] eq 'kvalobs' ){
 			    print "host=$host \n"; 
                             if( defined($sline[-1]) ){
 				return trim($sline[-1]);

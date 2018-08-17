@@ -180,6 +180,9 @@ my %hpval;
 	   if( $elem=~ /\\n/ ){
                $elem=~ s/\\n/\n/g; 
 	   }
+	   if( $elem=~ /\\t/ ){
+	       $elem=~ s/\\t/\t/g;
+	   }
 	   if( $elem=~ $seq ){
 	       $elem=~ s/\\\|/\|/g;
            }
@@ -304,7 +307,7 @@ my %hpval;
 		  # print "OLD $old \n";
 	          # print "NEW $new \n";
 	      
-	         $new=~ s/\\t/\t/g;
+	         # $new=~ s/\\t/\t/g;
 	      
 		  if( $old ne $new ){ # compare oldvalue in db with new value from file
                       print "OLD $old \n";
@@ -323,7 +326,7 @@ my %hpval;
 		      
 		      my @sql_bind_nkey;
 		      foreach my $indx (@nkeyindx){
-			  $a[$indx]=~ s/\\t/\t/g;
+			  # $a[$indx]=~ s/\\t/\t/g;
 			  push( @sql_bind_nkey, decode_utf8($a[$indx]) );
 		      }
 		     # my $sql_clause er definert over
@@ -517,7 +520,7 @@ sub get_passwd{
                 my $len=@sline;
                 if($len>1){
 		    if( defined($sline[0]) ){
-                        if( $sline[0] eq $host ){
+                        if( $sline[0] eq $host and $sline[2] eq 'kvalobs' and $sline[3] eq 'kvalobs'){
 			    print "host=$host \n"; 
                             if( defined($sline[-1]) ){
 				return trim($sline[-1]);
