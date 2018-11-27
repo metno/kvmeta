@@ -49,7 +49,7 @@ use Encode;
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Vi får ikke forbindelse med databasen";
 
-my $sth=$dbh->prepare("select * from param") or die "Can't prep\n";
+my $sth=$dbh->prepare("select paramid, name, description, unit, hlevel_scale, comment, scalar from param") or die "Can't prep\n";
 $sth->execute;
 
   
@@ -67,7 +67,7 @@ while (my @row = $sth->fetchrow()) {
           }
     }
    
-      print encode_utf8("$row[0]|$row[1]|$row[2]|$row[4]|$row[5]|$row[8]|$row[9]\n");
+      print encode_utf8("$row[0]|$row[1]|$row[2]|$row[3]|$row[4]|$row[5]|$row[6]\n");
   }
 
 $sth->finish;
