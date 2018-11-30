@@ -104,29 +104,78 @@ $sth->finish;
 #"select stationid, hlevel, sensor, physical_height,fromtime from sensor_info where measurement_methodid=$measurement_methodid and paramid=$paramid"
 #  ) or die "Can't prep\n";
 #$sth->execute;
-
+###########################################################
 
 $sth =
-  $dbh->prepare(
-"select si.stationid, si.hlevel, si.sensor, si.physical_height,si.fromtime,em.description from equipmentmodel em ,equipment eq, sensor_info si where eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid"
-    ) or die "Can't prep\n";
+  $dbh->prepare("
+select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is true group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
 $sth->execute;
 
+my $sthval =
+  $dbh->prepare(
+"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is true"
+    ) or die "Can't prep\n";
+# $sth_values->execute;
+
+my %station_param_operational;
 
 while ( my @row = $sth->fetchrow() ) {
     my $stationid       = $row[0];
     my $hlevel          = $row[1];
     my $sensor          = $row[2];
-    my $physical_height = $row[3];
-    my $fromtime        = $row[4];
-    my $description     = $row[5];
+    my $fromtime        = $row[3];
 
-    print_station_param( $stationid, $paramid, $hlevel, $sensor,
-        $physical_height, $fromtime, $description );
+    $station_param_operational{"$stationid,$paramid,$hlevel,$sensor"}=-1;
+
+    $sthval->execute($stationid,$hlevel,$sensor,$fromtime);        
+    if ( my @rowval = $sthval->fetchrow() ) {
+	my $physical_height=$row[0];
+	my $description=$row[1];
+        
+        print_station_param( $stationid, $paramid, $hlevel, $sensor,
+			     $physical_height, $fromtime, $description );
+    }
 
 }
 $sth->finish;
+$sthval->finish;
+####################
+$sth =
+  $dbh->prepare("
+select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is false group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
+$sth->execute;
+
+$sthval =
+  $dbh->prepare(
+"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is false"
+    ) or die "Can't prep\n";
+
+
+# print "Operational is false: \n";
+
+while ( my @row = $sth->fetchrow() ) {
+    my $stationid       = $row[0];
+    my $hlevel          = $row[1];
+    my $sensor          = $row[2];
+    my $fromtime        = $row[3];
+
+    if( ! exists $station_param_operational{"$stationid,$paramid,$hlevel,$sensor"} ){
+	$sthval->execute($stationid,$hlevel,$sensor,$fromtime); 
+	if ( my @rowval = $sthval->fetchrow() ) {
+	    my $physical_height=$row[0];
+	    my $description=$row[1];
+	    print_station_param( $stationid, $paramid, $hlevel, $sensor,
+				 $physical_height, $fromtime, $description );
+	}
+    }
+
+}
+$sth->finish;
+$sthval->finish;
+
 $dbh->disconnect;
+
+
 
 # print_checks($paramid);
 
