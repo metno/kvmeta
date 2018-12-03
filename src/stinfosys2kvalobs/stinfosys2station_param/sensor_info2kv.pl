@@ -129,8 +129,11 @@ while ( my @row = $sth->fetchrow() ) {
 
     $sthval->execute($stationid,$hlevel,$sensor,$fromtime);        
     if ( my @rowval = $sthval->fetchrow() ) {
-	my $physical_height=$row[0];
-	my $description=$row[1];
+	my $physical_height=$rowval[0];
+	#if( $stationid==13655 ){
+        #        print "Operational is true : $stationid :  $physical_height"; 
+	#}
+	my $description=$rowval[1];
         
         print_station_param( $stationid, $paramid, $hlevel, $sensor,
 			     $physical_height, $fromtime, $description );
@@ -162,8 +165,12 @@ while ( my @row = $sth->fetchrow() ) {
     if( ! exists $station_param_operational{"$stationid,$paramid,$hlevel,$sensor"} ){
 	$sthval->execute($stationid,$hlevel,$sensor,$fromtime); 
 	if ( my @rowval = $sthval->fetchrow() ) {
-	    my $physical_height=$row[0];
-	    my $description=$row[1];
+	    my $physical_height=$rowval[0];
+	    my $description=$rowval[1];
+	    #if( $stationid==13655 ){
+            #    print "Operational is false : $stationid :  $physical_height"; 
+	    #}
+	    
 	    print_station_param( $stationid, $paramid, $hlevel, $sensor,
 				 $physical_height, $fromtime, $description );
 	}
@@ -216,10 +223,18 @@ sub print_station_param {
     my $h;
     if ( ( !defined $physical_height ) or $physical_height eq "" ) {
         $h = ( $default_physical_height ) * 100 -  $default_min_clear_factor;
+
+	#if( $stationid==13655 ){
+        #   print "not defined : $stationid : $h"; 
+	#}
     }
     else {
         $h = ( $physical_height ) * 100 - $min_clear_factor; # $min_clear_factor is something that was originally given in cm in Stinfosys, 
-                                                             # $physical_height is in meter 
+                                                             # $physical_height is in meter
+	#if( $stationid==13655 ){
+        #   print "DEFINED : $stationid : $h"; 
+	#}
+	
     }
 
     my $metadata = "max;highest;high;low;lowest;min\\n$h;$h;$h;-3.0;-3.0;-3.0";
