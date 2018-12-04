@@ -165,6 +165,8 @@ sub readstfile {
                 }
                 elsif ( $r eq "fromtime" ) {
                     $is_metadata = 0;
+		    my $rr=shift(@words);
+		    $fromtime    = trim(join($splitter,@words ));
                 }
                 if ( $len == 1 ) {
                     if ( $is_metadata == 1 ) {
