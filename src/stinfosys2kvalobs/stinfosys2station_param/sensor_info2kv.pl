@@ -125,7 +125,7 @@ while ( my @row = $sth->fetchrow() ) {
     my $sensor          = $row[2];
     my $fromtime        = $row[3];
 
-    $station_param_operational{"$stationid,$paramid,$hlevel,$sensor"}=-1;
+    $station_param_operational{"$stationid,$paramid,$hlevel"}=1;
 
     $sthval->execute($stationid,$hlevel,$sensor,$fromtime);        
     if ( my @rowval = $sthval->fetchrow() ) {
@@ -162,7 +162,7 @@ while ( my @row = $sth->fetchrow() ) {
     my $sensor          = $row[2];
     my $fromtime        = $row[3];
 
-    if( ! exists $station_param_operational{"$stationid,$paramid,$hlevel,$sensor"} ){
+    if( ! exists $station_param_operational{"$stationid,$paramid,$hlevel"} ){
 	$sthval->execute($stationid,$hlevel,$sensor,$fromtime); 
 	if ( my @rowval = $sthval->fetchrow() ) {
 	    my $physical_height=$rowval[0];
