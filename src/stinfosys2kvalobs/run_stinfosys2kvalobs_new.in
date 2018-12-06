@@ -42,7 +42,9 @@ $BINDIR/param2kvalobs.pl       > $DUMPDIR/param.utf-8
 $BINDIR/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 
 # station_param
-$BINDIR/sensor_info2kv.pl > $DUMPDIR/station_param_QCX.out
+$BINDIR/stinfosys2autosnow.pl  > $DUMPDIR/station_param_QCX.out
+$BINDIR/stinfosys2QC1-1-112.pl >> $DUMPDIR/station_param_QCX.out
+# $BINDIR/sensor_info2kv.pl > $DUMPDIR/station_param_QCX.out
 $BINDIR/sensor_info_bucket2kv.pl >> $DUMPDIR/station_param_QCX.out
 
 # station_metadata

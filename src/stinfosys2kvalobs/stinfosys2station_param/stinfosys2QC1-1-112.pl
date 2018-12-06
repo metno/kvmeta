@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations
 #
-# $Id: station_info_avg2kvalobs.pl 1 2010-03-16 16:21:15Z terjeer $
+# $Id: stinfosys2QC1-1-112.pl 1 2018-12-07 terjeer $
 #
 # Copyright (C) 2007 met.no
 #
@@ -33,12 +33,12 @@
 # Description: This script prints station_param format files based on information from stinfosys. The select returns heights with metadata from sensor_info where measurement_methodid=217701 and paramid=112.
 # For further information of measurement_methodid and paramid contact stinfosys.
 #
-# Usage: ./sensor_info2kv.pl
+# Usage: ./stinfosys2QC1-1-112.pl
 #
 # Arguments: none
 #
 # Example:
-# $BINDIR/sensor_info2kv.pl > $DUMPDIR/station_param_QCX.out
+# $BINDIR/stinfosys2QC1-1-112.pl > $DUMPDIR/station_param_QCX.out
 
 use strict;
 use DBI;
@@ -83,21 +83,7 @@ if ( my $val = $sth->fetchrow() ) {
 }
 $sth->finish;
 
-$sth = $dbh->prepare("select distinct stationid from obspgm_h where message_formatid=316"); 
-$sth->execute;
-my %is316;
-while ( my @row = $sth->fetchrow() ) {
-    $is316{$row[0]}=1;
-}
-$sth->finish;
 
-$sth = $dbh->prepare("select distinct stationid, message_formatid from obspgm_h where stationid in ( select distinct stationid from obspgm_h where message_formatid=316 and paramid=112) and message_formatid <> 316 order by stationid, message_formatid"); 
-$sth->execute;
-my %statm;
-while ( my @row = $sth->fetchrow() ) {
-    $statm{$row[0]}{$row[1]}=1;
-}
-$sth->finish;
 
 #$sth =
 #  $dbh->prepare(
@@ -130,9 +116,6 @@ while ( my @row = $sth->fetchrow() ) {
     $sthval->execute($stationid,$hlevel,$sensor,$fromtime);        
     if ( my @rowval = $sthval->fetchrow() ) {
 	my $physical_height=$rowval[0];
-	#if( $stationid==13655 ){
-        #        print "Operational is true : $stationid :  $physical_height"; 
-	#}
 	my $description=$rowval[1];
         
         print_station_param( $stationid, $paramid, $hlevel, $sensor,
@@ -183,29 +166,12 @@ $sthval->finish;
 $dbh->disconnect;
 
 
-
-# print_checks($paramid);
-
-# sub print_checks {
-#    my ($paramid) = @_;
-#
-#    my $QCX = "QC1-0";
-#    my $qcx = "QC1-0-autosnow";
-#    print CHECKS
-#      "0~$qcx~$QCX~1~summer_snow~obs;SA;;|meta;SA_R1;;~* * * * *~1500-01-01\n";
-#
-#    $QCX = "QC1-1";
-#    print CHECKS
-# "0~$QCX-$paramid~$QCX~1~RANGE_CHECK~obs;SA;;|meta;SA_max,SA_highest,SA_high,SA_low,SA_lowest,SA_min;;~* * * * *~1500-01-01\n";
-# }
-
-
 sub print_station_param {
     my ( $stationid, $paramid, $level, $sensor, $physical_height, $fromtime, $description ) =
       @_;
 
     # INPUT: Physical height for a sensor with metadata.
-    # SIDE_EFFECT: Print two lines formatted as the station_param format for the checks QC1-1 and QC1-0-autosnow.
+    # SIDE_EFFECT: Print one line formatted as the station_param format for QC1-1-112.
     # RETURN VALUE: none
 
     my $min_clear_factor;
@@ -242,17 +208,4 @@ sub print_station_param {
     print
 "$stationid|$paramid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
 
-    $metadata = "R1\\n2";
-    if( ! exists $is316{$stationid} ){
-	my $qcx = "QC1-0-autosnow";
-	print
-"$stationid|$paramid|$level|$sensor|$fromday|$today|$qcx|$metadata|$desc_metadata|$fromtime\n";
-    }else{
-	foreach my $mf ( keys %{$statm{$stationid}} ){
-	    my $qcx = "QC1-0-autosnow" . "_" . $mf;
-	print
-"$stationid|$paramid|$level|$sensor|$fromday|$today|$qcx|$metadata|$desc_metadata|$fromtime\n";
-	}
-
-    }
 }
