@@ -147,14 +147,14 @@ if( $kvname eq "metno" ){
     
 }else{
 ####### message_formatid <> 0
-   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
+   $sth=$dbh->prepare("select stationid,message_formatid,kvalobsid from message_in where message_formatid <> 0 and totime is NULL and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
    $sth->execute;
    while (my @row = $sth->fetchrow()) {
         $NOT_METNO{$row[0]}{$row[1]}=$row[2];
    }
 
 ####### message_formatid=0
-   $sth=$dbh->prepare("select stationid,kvalobsid from message_in where message_formatid=0 and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
+   $sth=$dbh->prepare("select stationid,kvalobsid from message_in where message_formatid=0 and totime is NULL and kvalobsid=( select kvalobsid from kvalobs where alias='$kvname') and sendtokvalobs is true");
    $sth->execute;
    while (my @row = $sth->fetchrow()) {
         $NOT_METNO_station{$row[0]}=$row[1];
