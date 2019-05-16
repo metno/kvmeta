@@ -72,8 +72,9 @@ do
                   break 
               fi
           else
-              echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
-              exit 1
+	      echo "Database connection problem : $?"
+              # echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
+              # exit 1
           fi
        else
            echo "Noe galt med passordtilordning" | mail -s "kvget_metadata: Noe galt med passordtilordning" $MAILTO
