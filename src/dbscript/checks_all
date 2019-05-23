@@ -52,12 +52,14 @@ if( $argn> 0 ){
     }
 }
 
+
 if( $argn> 1 ){
     my $filedir= $ARGV[1]; #"QC1-2_checks";
     chdir($filedir);
+    print "START $filedir \n";
+}else{
+    print "START \n";
 }
-
-print "START \n";
 
 my $kvpasswd=get_passwd();
 our $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
@@ -185,6 +187,21 @@ sub checks {
 
     close(MYFILE);
 
+    if( ( ! defined $qcx ) || ( $qcx eq "" ) ){
+	print "ERROR qcx empty \n";
+	return;
+    }
+
+    if( ( ! defined $checkname ) || ( $checkname eq "" ) ){
+	print "ERROR checkname empty \n";
+	return;
+    }
+
+    if( ( ! defined $checksignature ) || ( $checksignature eq "" ) ){
+	print "ERROR checksignature empty \n";
+	return;
+    }
+
 
 
     my @med = split /-/,$qcx;
@@ -261,6 +278,8 @@ sub checks {
 
 
     insert_DB( $stationid, $qcx, $medium_qcx, $language, $checkname, $checksignature, $active, $fromtime );
+
+    return;
 }
 
 sub insert_DB{
