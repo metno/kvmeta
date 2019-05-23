@@ -1,19 +1,16 @@
-#!/usr/bin/perl -w
+#! /bin/bash
 
+## Script to update metadata tables in Kvalobs.
 
-use POSIX;
-use strict;
-use dbQC;
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
 
+checks_manual_path=/usr/share/kvalobs/metadata/checks/checks_manual
+echo "checks_manual_path=$checks_manual_path"
 
-my $path= get_checks_manual_path();
-
-my @subd = qw( QC1-2 QC1-6  QC1_rest QC2d );
-
-chdir($path);
-#my $expath=getenv('LIBEXECDIR');
-foreach my $sub (@subd){
-  system("__PKGLIBBINDIR__/checks_all ins $sub");
-  chdir($path);
-}
-
+cd $checks_manual_path
+for sub in QC1-2 QC1-6 QC1_rest QC2d
+do
+   __PKGLIBBINDIR__/checks_all ins $sub
+   cd $checks_manual_path
+done
