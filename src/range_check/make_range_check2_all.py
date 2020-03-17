@@ -9,7 +9,7 @@ from collections import defaultdict
 ## import stinfosys
 from stinfosys import *
 
-import cx_Oracle
+# import cx_Oracle
 
 # Hmm, sannsynligvis så må vi importere fra  
 
@@ -20,8 +20,8 @@ import cx_Oracle
 
 # Connect as user "hr" with password "welcome" to the "orclpdb1" service running on this computer.
 # connection = cx_Oracle.connect("kaxx", "kaxx", "typhoon.met.no/klima11")
-#kaxx/kaxx@hamsin.oslo.dnmi.no:1521/dvh10
-connection = cx_Oracle.connect("kaxx", "kaxx", "hamsin.oslo.dnmi.no/dvh10")
+# kaxx/kaxx@hamsin.oslo.dnmi.no:1521/dvh10
+# connection = cx_Oracle.connect("kaxx", "kaxx", "hamsin.oslo.dnmi.no/dvh10")
 
 
 if( len(sys.argv) < 3 ):
@@ -63,7 +63,7 @@ param_const["178"]=-0.1073
 
 
 c_stationid = conn.cursor()
-c_category = connection.cursor()
+c_category = conn.cursor()
  
 # c_meta = conn.cursor()
 c_amsl = conn.cursor()
@@ -79,11 +79,15 @@ L_TELLER=0 #=1
 l_finnes=0
 for l_stnr, in c_stationid:
     print("*******l_stnr:", l_stnr)
-    l_amsl=amsl_dict[l_stnr]
+    l_amsl=""
+    if l_amsl in amsl_dict:
+        l_amsl=amsl_dict[l_stnr]
+    print("l_stnr=",l_stnr,"type_l_amsl",str(type(l_amsl)))
     if( l_amsl is None or l_amsl=="" ):
         l_amsl=10
+        print("stationid=",stationid,"l_amsl is set to 10")
 
-    c_category.execute("select countyid, kyst_innland from t_grensev_st_cat where stnr=" + str(l_stnr) + " and paramid=" + p_paramid)
+    c_category.execute("select countyid, kyst_innland from range_check_st_cat where stationid=" + str(l_stnr) + " and paramid=" + p_paramid)
     for l_countyid, l_kyst_innland in c_category:
         #c_meta.execute("select distinct amsl from t_range_check_ref where countyid=" + l_countyid + " and kyst_innland='" + l_kyst_innland + "' AND paramid=" + p_paramid)
         #for ref_amsl in c_meta:
@@ -92,7 +96,8 @@ for l_stnr, in c_stationid:
                 print ("i=", i)
                 print ("countyid=", str(l_countyid))
                 print ("kyst_innland =", str(l_kyst_innland))
-                print ("paramid =", str(p_paramid))  
+                print ("paramid =", str(p_paramid))
+                print("*******2 l_stnr:", l_stnr)
                
 ## MIN
                 # Get the stationid to the reference station
@@ -109,6 +114,21 @@ for l_stnr, in c_stationid:
                                              AND M.month = """ + str(i) + """)
                                        AND A.paramid = """ + str(p_paramid) + """
                                        AND A.month = """ + str(i) )
+
+                print("""select A.stnr, A.st_low FROM t_range_check_data A
+                             where A.st_low in (
+                                  select MIN(M.st_low) FROM t_range_check_data M
+                                       WHERE M.stnr in 
+                                             ( select stnr
+                                               from t_range_check_ref
+                                               where countyid=""" + str(l_countyid) +
+                                               """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                               AND param_group =""" + str(p_paramid) + """)
+                                             AND M.paramid = """ + str(p_paramid) + """
+                                             AND M.month = """ + str(i) + """)
+                                       AND A.paramid = """ + str(p_paramid) + """
+                                       AND A.month = """ + str(i) )
+                
 
                 
                 c_min.execute("""select A.stationid, A.st_low FROM range_check_data A
@@ -132,11 +152,12 @@ for l_stnr, in c_stationid:
                 ref_amsl=float(-1)
                 # t_stationid=-1
                 for stationid,st_low in c_min:
-                    print("stationid=",stationid,"st_low=", st_low)
+                    print("stationid=",stationid,"st_low=", st_low, "*******3A0 l_stnr:", l_stnr)
                     #if more than one station is selected that with least amsl difference between l_amsl and r_amsl should be selected
                     r_amsl=amsl_dict[stationid]
                     if( r_amsl is None or r_amsl=="" ):
                         r_amsl=10
+                    print("stationid=",stationid,"type_r_amsl",str(type(r_amsl)),"type_l_amsl",str(type(l_amsl)))
                     diff=abs( r_amsl - l_amsl )
                     if( t_diff < 0 ):
                         t_diff=diff
@@ -148,7 +169,9 @@ for l_stnr, in c_stationid:
                         ref_amsl=r_amsl
 
                 print("t_diff= ",t_diff)
+                print("*******3AA l_stnr:", l_stnr)
                 if( t_diff > 0 ):
+                    print("*******3BB l_stnr:", l_stnr)
                     pconst=str(param_const[p_paramid])
                     print("""update range_check_data set calc_low =""" + str(st_low) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                           + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
@@ -211,7 +234,9 @@ for l_stnr, in c_stationid:
                         ref_amsl=r_amsl
 
                 print("t_diff= ",t_diff)
+                print("*******4 l_stnr:", l_stnr)
                 if( t_diff > 0 ):
+                    print("*******4BB l_stnr:", l_stnr)
                     pconst=str(param_const[p_paramid])
                     print("""update range_check_data set calc_high =""" + str(st_high) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                           + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
@@ -258,6 +283,7 @@ for l_stnr, in c_stationid:
 #######################################################################################################################################################################
 
             else:
+                print("******* else 55 l_stnr:", l_stnr)
                 for i in range(1,13):
                     print ("i=",i)
                     print ("countyid=", str(l_countyid))
