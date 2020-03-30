@@ -328,7 +328,7 @@ c_update= conn.cursor()
 c_update.execute("update range_check_data set calc_highest=calc_high + " + str(p_outer_limit) + " where paramid = " + str(p_paramid) )
 conn.commit()
 
-c_update.execute("update range_check_data set calc_lowest=calc_low + " + str(p_outer_limit) + " where paramid = " + str(p_paramid) )
+c_update.execute("update range_check_data set calc_lowest=calc_low - " + str(p_outer_limit) + " where paramid = " + str(p_paramid) )
 conn.commit()
 
                 
