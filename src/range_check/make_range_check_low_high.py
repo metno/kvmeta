@@ -43,7 +43,7 @@ c_update.execute("update range_check_data set low=calc_low, lowest=calc_lowest w
 conn.commit()
 
 #c)
-c_update.execute("update range_check_data set low=calc_low, lowest=calc_lowest where calc_low > st_low and st_low is NOT NULL and calc_low is NOT NULL")
+c_update.execute("update range_check_data set low=calc_low, lowest=calc_lowest where calc_low < st_low and st_low is NOT NULL and calc_low is NOT NULL")
 conn.commit()
 
 # paramid=81
