@@ -33,7 +33,7 @@ for l_svvst, l_kyst_innland, l_countyid in c_svvst:
         if ( count == 0 ):
             print( "count == 0: l_svvst= " + str(l_svvst) )
             c_insert.execute("""insert into range_check_data select """ + str(l_svvst) + """, month, paramid, amsl, st_low, st_lowest, calc_low, calc_lowest, no_of_years,
-                            st_high, st_highest, calc_high, calc_highest, countyid, hlevel, low, lowest, high, highest, edit_dato, st_group, edited_by, edited_at 
+                            st_high, st_highest, calc_high, calc_highest, countyid, hlevel, low, lowest, high, highest, edit_dato, st_group, 4, edited_at 
                             from range_check_data
                             where stationid=""" + str(l_refst) + """ and paramid=211""")
             conn.commit()

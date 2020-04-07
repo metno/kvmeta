@@ -173,10 +173,10 @@ for l_stnr, in c_stationid:
                 if( t_diff > 0 ):
                     print("*******3BB l_stnr:", l_stnr)
                     pconst=str(param_const[p_paramid])
-                    print("""update range_check_data set calc_low =""" + str(st_low) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
+                    print("""update range_check_data set edited_by=2, calc_low =""" + str(st_low) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                           + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
                     
-                    c_update_min.execute("""update range_check_data set calc_low =""" + str(st_low) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
+                    c_update_min.execute("""update range_check_data set edited_by=2, calc_low =""" + str(st_low) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                                          + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
                     conn.commit()
                 
@@ -238,10 +238,10 @@ for l_stnr, in c_stationid:
                 if( t_diff > 0 ):
                     print("*******4BB l_stnr:", l_stnr)
                     pconst=str(param_const[p_paramid])
-                    print("""update range_check_data set calc_high =""" + str(st_high) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
+                    print("""update range_check_data set edited_by=2, calc_high =""" + str(st_high) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                           + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
                     
-                    c_update_max.execute("""update range_check_data set calc_high =""" + str(st_high) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
+                    c_update_max.execute("""update range_check_data set edited_by=2, calc_high =""" + str(st_high) + """ + ( """ + str(l_amsl) + """ - """ + str(ref_amsl) + """ ) * """ 
                                          + pconst + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
                     conn.commit()
 
@@ -290,7 +290,7 @@ for l_stnr, in c_stationid:
                     print ("kyst_innland =", str(l_kyst_innland))
                     print ("paramid =", str(p_paramid))
                     c_update_min.execute("""update range_check_data d
-                                  set calc_low =
+                                  set edited_by=2, calc_low =
                                      ( select MIN(st_low) 
                                        FROM range_check_data M
                                        WHERE stationid in 
@@ -307,7 +307,7 @@ for l_stnr, in c_stationid:
                     conn.commit()
 
                     c_update_min.execute("""update range_check_data d
-                                  set calc_high =
+                                  set edited_by=2, calc_high =
                                      ( select MAX(st_high)
                                        FROM range_check_data M
                                        WHERE stationid in 
