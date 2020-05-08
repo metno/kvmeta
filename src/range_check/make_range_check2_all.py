@@ -68,7 +68,7 @@ c_category = conn.cursor()
 # c_meta = conn.cursor()
 c_amsl = conn.cursor()
 amsl_dict=defaultdict(dict)
-c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where totime is NULL or totime in ( select MAX(stb.totime) from st_amsl stb where stationid=sta.stationid)")
+c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where totime is NULL or totime in ( select MAX(stb.totime) from st_amsl stb where stb.stationid=sta.stationid)")
 for stationid, amsl in c_amsl:
     amsl_dict[stationid]=amsl
 
@@ -80,12 +80,13 @@ l_finnes=0
 for l_stnr, in c_stationid:
     print("*******l_stnr:", l_stnr)
     l_amsl=""
-    if l_amsl in amsl_dict:
+    if l_stnr in amsl_dict:
         l_amsl=amsl_dict[l_stnr]
+        print("l_stnr=",l_stnr)
     print("l_stnr=",l_stnr,"type_l_amsl",str(type(l_amsl)))
     if( l_amsl is None or l_amsl=="" ):
         l_amsl=10
-        print("stationid=",stationid,"l_amsl is set to 10")
+        print("l_stnr=",l_stnr,"l_amsl is set to 10")
 
     c_category.execute("select countyid, kyst_innland from range_check_st_cat where stationid=" + str(l_stnr) + " and paramid=" + p_paramid)
     for l_countyid, l_kyst_innland in c_category:
@@ -173,6 +174,7 @@ for l_stnr, in c_stationid:
                 if( t_diff > 0 ):
                     print("*******3BB l_stnr:", l_stnr)
                     pconst=param_const[p_paramid]
+                    print( "calc_low = " + str(st_low) + " + ( " +  str(l_amsl) + " - " + str(ref_amsl) + "  ) *  " +  str(pconst) )
                     calc_low ="{:.1f}".format(st_low + ( l_amsl - ref_amsl ) *  pconst)
                     print("calc_low=",calc_low)                   
                     print("""update range_check_data set edited_by=2, calc_low =""" + str(calc_low) + """ where stationid =""" + str(l_stnr) + """ AND month = """ + str(i) +  """ AND paramid = """ + str(p_paramid) )
