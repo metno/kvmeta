@@ -101,10 +101,26 @@ for l_stnr, in c_stationid:
                 print("*******2 l_stnr:", l_stnr)
                
 ## MIN
-                # Get the stationid to the reference station
+                #stationid to the reference station
+                print("""select stationid 
+                         from range_check_ref
+                         where countyid=""" + str(l_countyid) +
+                         """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                         AND param_group =""" + str(p_paramid) )
+                                             
+
+                print("""select stnr
+                         from t_range_check_ref
+                         where countyid=""" + str(l_countyid) +
+                         """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                         AND param_group =""" + str(p_paramid) )
+                                             
+                
+
+                ##MIN
                 print("""select A.stationid, A.st_low FROM range_check_data A
                              where A.st_low in (
-                                  select MIN(M.st_low) FROM range_check_data M
+                                       select MIN(M.st_low) FROM range_check_data M
                                        WHERE M.stationid in 
                                              ( select stationid 
                                                from range_check_ref
@@ -113,12 +129,18 @@ for l_stnr, in c_stationid:
                                                AND param_group =""" + str(p_paramid) + """)
                                              AND M.paramid = """ + str(p_paramid) + """
                                              AND M.month = """ + str(i) + """)
-                                       AND A.paramid = """ + str(p_paramid) + """
-                                       AND A.month = """ + str(i) )
+                                   AND A.stationid in 
+                                           ( select stationid
+                                             from range_check_ref
+                                             where countyid=""" + str(l_countyid) +
+                                             """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                             AND param_group =""" + str(p_paramid) + """)
+                                   AND A.paramid = """ + str(p_paramid) + """
+                                   AND A.month = """ + str(i) )
 
                 print("""select A.stnr, A.st_low FROM t_range_check_data A
                              where A.st_low in (
-                                  select MIN(M.st_low) FROM t_range_check_data M
+                                       select MIN(M.st_low) FROM t_range_check_data M
                                        WHERE M.stnr in 
                                              ( select stnr
                                                from t_range_check_ref
@@ -127,14 +149,20 @@ for l_stnr, in c_stationid:
                                                AND param_group =""" + str(p_paramid) + """)
                                              AND M.paramid = """ + str(p_paramid) + """
                                              AND M.month = """ + str(i) + """)
-                                       AND A.paramid = """ + str(p_paramid) + """
-                                       AND A.month = """ + str(i) )
+                                   AND A.stnr in 
+                                           ( select stnr
+                                             from t_range_check_ref
+                                             where countyid=""" + str(l_countyid) +
+                                             """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                             AND param_group =""" + str(p_paramid) + """) 
+                                   AND A.paramid = """ + str(p_paramid) + """
+                                   AND A.month = """ + str(i) )
                 
 
                 
                 c_min.execute("""select A.stationid, A.st_low FROM range_check_data A
                              where A.st_low in (
-                                  select MIN(M.st_low) FROM range_check_data M
+                                       select MIN(M.st_low) FROM range_check_data M
                                        WHERE M.stationid in 
                                              ( select stationid 
                                                from range_check_ref
@@ -143,8 +171,15 @@ for l_stnr, in c_stationid:
                                                AND param_group =""" + str(p_paramid) + """)
                                              AND M.paramid = """ + str(p_paramid) + """
                                              AND M.month = """ + str(i) + """)
-                                       AND A.paramid = """ + str(p_paramid) + """
-                                       AND A.month = """ + str(i) )
+                                   AND A.stationid in 
+                                           ( select stationid
+                                             from range_check_ref
+                                             where countyid=""" + str(l_countyid) +
+                                             """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                             AND param_group =""" + str(p_paramid) + """)
+                                   AND A.paramid = """ + str(p_paramid) + """
+                                   AND A.month = """ + str(i) )
+                            
                             
                 
                 
@@ -201,8 +236,14 @@ for l_stnr, in c_stationid:
                                                AND param_group =""" + str(p_paramid) + """)
                                              AND M.paramid = """ + str(p_paramid) + """
                                              AND M.month = """ + str(i) + """)
-                                       AND A.paramid = """ + str(p_paramid) + """
-                                       AND A.month = """ + str(i) )
+                                   AND A.stationid in 
+                                           ( select stationid
+                                             from range_check_ref
+                                             where countyid=""" + str(l_countyid) +
+                                             """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                             AND param_group =""" + str(p_paramid) + """)
+                                   AND A.paramid = """ + str(p_paramid) + """
+                                   AND A.month = """ + str(i) )
 
                 
                 c_max.execute("""select A.stationid, A.st_high FROM range_check_data A
@@ -216,8 +257,14 @@ for l_stnr, in c_stationid:
                                                AND param_group =""" + str(p_paramid) + """)
                                              AND M.paramid = """ + str(p_paramid) + """
                                              AND M.month = """ + str(i) + """)
-                                       AND A.paramid = """ + str(p_paramid) + """
-                                       AND A.month = """ + str(i) )
+                                   AND A.stationid in 
+                                           ( select stationid
+                                             from range_check_ref
+                                             where countyid=""" + str(l_countyid) +
+                                             """ AND kyst_innland ='""" +  str(l_kyst_innland) + """'
+                                             AND param_group =""" + str(p_paramid) + """)
+                                   AND A.paramid = """ + str(p_paramid) + """
+                                   AND A.month = """ + str(i) )
                             
                 
                 
