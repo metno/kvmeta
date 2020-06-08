@@ -45,7 +45,7 @@ $HOME/bin/range_check/make_range_check_low_high.py
 
 # make range_check_data for paramid 83 based on 81 multiplied with l_factor
 # $HOME/bin/range_check/make_range_check_83.py l_factor
-$HOME/bin/range_check/make_range_check_83.py 5  >  $HOME/var/log/make_range_check_83.log
+$HOME/bin/range_check/make_range_check_83.py 2  >  $HOME/var/log/make_range_check_83.log
 
 # Make range_check_data for svv data is based on the SVV reference stations
 $HOME/bin/range_check/make_svv_range_check_211.py  >  $HOME/var/log/make_range_check_211_SVV.log

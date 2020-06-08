@@ -68,8 +68,24 @@ c_category = conn.cursor()
 # c_meta = conn.cursor()
 c_amsl = conn.cursor()
 amsl_dict=defaultdict(dict)
-c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where totime is NULL or totime in ( select MAX(stb.totime) from st_amsl stb where stb.stationid=sta.stationid)")
-for stationid, amsl in c_amsl:
+#### c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where totime is NULL or totime in ( select MAX(stb.totime) from st_amsl stb where stb.stationid=sta.stationid)")
+### c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where totime is NULL or totime = ( select MAX(stb.totime) from st_amsl stb where stb.stationid=sta.stationid)")
+#c_amsl.execute("select sta.stationid, sta.amsl from st_amsl sta where sta.fromtime = ( select MAX(stb.fromtime) from st_amsl stb where stb.stationid=sta.stationid)")
+#for stationid, amsl in c_amsl:
+#    amsl_dict[stationid]=amsl
+
+#select sta.stationid,sta.hs,sta.hv,sta.hp  from station sta where sta.ontologyid !=4 and sta.fromtime < now() order by sta.stationid,sta.hs,sta.hv,sta.hp where sta.fromtime = ( select MAX(stb.fromtime) from station stb where stb.stationid=sta.stationid)
+
+c_amsl.execute("select sta.stationid,sta.hs,sta.hv,sta.hp from station sta where sta.ontologyid !=4 and  sta.fromtime = ( select MAX(stb.fromtime) from station stb where stb.stationid=sta.stationid and stb.fromtime < now() ) order by sta.stationid,sta.hs,sta.hv,sta.hp")
+for stationid, hs, hv, hp in c_amsl:
+    amsl=""
+    if( hs is not None and hs != "" ):
+        amsl=hs
+    elif( hp is not None and hp != "" ):
+        amsl=hp
+    elif( hv is not None and hv != "" ):
+        amsl =hv
+        
     amsl_dict[stationid]=amsl
 
       
