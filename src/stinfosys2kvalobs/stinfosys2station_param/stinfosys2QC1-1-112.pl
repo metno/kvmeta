@@ -94,12 +94,12 @@ $sth->finish;
 
 $sth =
   $dbh->prepare("
-select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is true group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
+select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramgroupid=$paramid and si.operational is true group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
 $sth->execute;
 
 my $sthval =
   $dbh->prepare(
-"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is true"
+"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramgroupid=$paramid and si.operational is true"
     ) or die "Can't prep\n";
 # $sth_values->execute;
 
@@ -128,12 +128,12 @@ $sthval->finish;
 ####################
 $sth =
   $dbh->prepare("
-select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is false group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
+select si.stationid, si.hlevel, si.sensor, MAX(si.fromtime) from sensor_info si where si.measurement_methodid in ( $measurement_methodid_list ) and paramgroupid=$paramid and si.operational is false group by si.stationid, si.hlevel, si.sensor") or die "Can't prep\n";
 $sth->execute;
 
 $sthval =
   $dbh->prepare(
-"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramid=$paramid and si.operational is false"
+"select si.physical_height,em.description from equipmentmodel em ,equipment eq, sensor_info si where si.stationid=? and si.hlevel=? and si.sensor=? and si.fromtime=? and eq.modelname=em.modelname and eq.equipmentid=si.equipmentid and si.measurement_methodid in ( $measurement_methodid_list ) and paramgroupid=$paramid and si.operational is false"
     ) or die "Can't prep\n";
 
 

@@ -162,7 +162,7 @@ if( $kvname eq "metno" ){
 }
 
 
-my $base_sql="select stationid,paramid,hlevel,nsensor,message_formatid,priority_message,anytime,array_to_string(hour,'|'),totime,fromtime,edited_by,edited_at from obspgm_h";
+my $base_sql="select stationid,paramid,hlevel,nsensor,message_formatid,priority_message,anytime,array_to_string(hour,'|'),totime,fromtime from obspgm_h";
 
 if( $days_back == -1 ){# fullstendig historisk med alle data 
    $sth=$dbh->prepare("$base_sql") or die "Can't prep\n";

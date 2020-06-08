@@ -11,11 +11,6 @@ set -e  # Exit if a simple shell command fails
 METASRC="http://157.249.168.104/kvalobs/kvmeta.tar.bz2"
 METASRC_UTF8="http://157.249.168.104/kvalobs/kvmeta_UTF8.tar.bz2"
 
-# BINDIR=/usr/bin
-BINDIR=$HOME/bin
-LOGDIR=$HOME/log/insert_update_delete_table
-mkdir -pv $LOGDIR
-
 DATADIR=/var/lib
 METAGET=$DATADIR/kvalobs/metaget
 META_LOCAL_SRC=""
@@ -72,9 +67,8 @@ do
                   break 
               fi
           else
-	      echo "Database connection problem : $?"
-              # echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
-              # exit 1
+              echo "Database connection problem : $?" | mail -s "kvget_metadata: Database connection problem " $MAILTO
+              exit 1
           fi
        else
            echo "Noe galt med passordtilordning" | mail -s "kvget_metadata: Noe galt med passordtilordning" $MAILTO
@@ -157,47 +151,32 @@ fi
 
 echo "Starting metadata update."
 
-echo "Oppdaterer tabellen metadatatype";
-for TABLE in metadatatype
+echo "Sletter tabellene metadatatype og station_metadata"
+$PSQL -a -c "TRUNCATE metadatatype CASCADE"
+
+echo "Oppdaterer tabellene metadatatype station_metadata";
+for TABLE in metadatatype station_metadata
 do
-    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
+
+echo "Sletter tabellen station der static=true";
+$PSQL -a -c "delete from station where static=true"
 
 echo "Oppdaterer tabellen station";
 for TABLE in station
 do
-    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "static=false" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
-    assert_table_not_empty $TABLE
-done
-
-echo "Oppdaterer tabellen checks";
-for TABLE in checks
-do
-    #$PSQL -a -c "truncate table $TABLE"
-    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique "checkname='push6flag' AND active='* * * * *'" > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
-    assert_table_not_empty $TABLE
-done
-
-echo "Oppdaterer tabellene algorithms types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata";
-for TABLE in algorithms types param model qcx_info operator qc2_interpolation_best_neighbors station_metadata
-do
-    #$PSQL -a -c "truncate table $TABLE"
-    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
 
 
-echo "Oppdaterer tabellene station_param obs_pgm";
-for TABLE in station_param obs_pgm
+echo "Oppdaterer tabellene types param obs_pgm model qcx_info operator qc2_interpolation_best_neighbors";
+for TABLE in types param obs_pgm model qcx_info operator qc2_interpolation_best_neighbors
 do
-    #$PSQL -a -c "truncate table $TABLE"
-    #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
-    $BINDIR/insert_update_delete_table_speed.pl $PGHOST 5432 $TABLE $METAGET/$KVMETA/$TABLE.out unique > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log 
+    $PSQL -a -c "truncate table $TABLE"
+    $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
     assert_table_not_empty $TABLE
 done
 

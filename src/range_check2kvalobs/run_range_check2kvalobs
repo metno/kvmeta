@@ -1,0 +1,92 @@
+#! /bin/sh
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+PERL5LIB=/usr/lib/kvalobs-metadata/lib/perl
+BINDIR=/usr/lib/kvalobs-metadata/bin
+
+
+DVH=$HOME
+
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
+if [ -f  $DVH/etc/range_check.conf ]; then
+   . $DVH/etc/range_check.conf
+else
+   echo "Missing file:  $DVH/etc/range_check.conf"
+   exit 1
+fi
+
+if [ -f  $DVH/etc/stinfosys.conf ]; then
+   . $DVH/etc/stinfosys.conf
+else
+   echo "Missing file:  $DVH/etc/stinfosys.conf"
+   exit 1
+fi
+
+
+mkdir -pv $DUMPDIR 
+cd $DUMPDIR
+
+# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK.sql
+# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_PARAM_GROUPS.sql
+
+# sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
+export PGPASSWORD=$PGPASSWD
+psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy ( select stationid,paramid,hlevel,month,highest,high,low,lowest,calc_highest,calc_high,calc_low,calc_lowest from  range_check_data ) to range_check_data.out DELIMITER '|'"
+psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy range_check_param_group to range_check_param_group.out DELIMITER ','"
+unset  PGPASSWORD
+
+
+#$BINDIR/RANGE_CHECK2station_param.pl  $DUMPDIR/RANGE_CHECK.out QC1-1param  $DUMPDIR/RANGE_PARAM_GROUPS.lst
+$HOME/bin/RANGE_CHECK2station_param.pl  $DUMPDIR/range_check_data.out QC1-1param  $DUMPDIR/range_check_param_group.out
+ 
+sort $DUMPDIR/station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.orig.sorted
+
+# Insert_update the table station_param_nonhour_klima
+# This table has the same structure as the table station_param, but lacks the column hour
+LOGDIR=$HOME/var/log/insert_update_delete_table_range_check
+mkdir -pv $LOGDIR
+
+echo "Oppdaterer tabellen station_param_nonhour_range_check";
+TABLE=station_param_nonhour_range_check
+$USRBIN/insert_update_delete_table_speed.pl localhost 5432 $TABLE $DUMPDIR/station_param_QC1-1.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+
+# another postgresl database
+export PGHOST=localhost
+export PGUSER=kvalobs
+export PGPORT=5432
+# echo "assert"
+assert_table_not_empty $TABLE
+# echo "assert funka"
+
+echo "copy $TABLE to $DUMPDIR/station_param_nonhour_range_check.out DELIMITER '|'"
+psql -c "\copy $TABLE to $DUMPDIR/station_param_nonhour_range_check.out DELIMITER '|'"
+  
+sort $DUMPDIR/station_param_nonhour_range_check.out > $DUMPDIR/station_param_QC1-1.out
+
+# exit 0
+
+## COPY TO station_param   
+for FILE in station_param_QC1-1.out
+do       
+    if ! diff -q  $DUMPDIR/$FILE  $METADIR/station_param/station_param_auto/$FILE
+    then
+        if [ -s $DUMPDIR/$FILE ]; then
+	    echo "ulike: ny station_param_QC1-1.out"
+            cp -upv $DUMPDIR/$FILE $METADIR/station_param/station_param_auto/$FILE
+            cp -upv $DUMPDIR/$FILE $METADIR_AUTO/station_param_auto/$FILE
+        else
+            echo "Empty file:  $DUMPDIR/$FILE"
+        fi
+    fi
+done

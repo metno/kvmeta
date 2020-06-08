@@ -49,7 +49,7 @@ use Encode;
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Vi får ikke forbindelse med databasen";
 
-my $sth=$dbh->prepare("select paramid, name, description, unit, hlevel_scale, comment, scalar from param") or die "Can't prep\n";
+my $sth=$dbh->prepare("select paramid, name, description, unit, hlevel_scale, comment, scalar from param where name is not NULL") or die "Can't prep\n";
 $sth->execute;
 
   

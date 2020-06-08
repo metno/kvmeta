@@ -1,0 +1,61 @@
+#! /bin/bash
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+PERL5LIB=/usr/lib/kvalobs-metadata/lib/perl
+BINDIR=/usr/lib/kvalobs-metadata/bin
+
+DVH=$HOME
+
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
+if [ -f  $DVH/etc/klima.conf ]; then
+   . $DVH/etc/klima.conf
+else
+   echo "Missing file:  $DVH/etc/klima.conf"
+   exit 1
+fi
+
+export ORACLE_HOME
+export PATH
+export LD_LIBRARY_PATH
+
+mkdir -pv $DUMPDIR 
+cd $DUMPDIR
+
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_PARAM_GROUPS.sql
+grep -v "^[[:blank:]]*$"  $DUMPDIR/RANGE_PARAM_GROUPS.lst > $DUMPDIR/RANGE_PARAM_GROUPS.lst2
+
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK_REF.sql
+grep -v "^[[:blank:]]*$"  $DUMPDIR/RANGE_CHECK_REF.lst > $DUMPDIR/RANGE_CHECK_REF.lst2
+cp -pv $DUMPDIR/RANGE_CHECK_REF.lst2 $DUMPDIR/range_check_ref.out
+
+# NOT USED IN DVH10 because OF GUI
+# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK_ST_CAT.sql
+# grep -v "^[[:blank:]]*$"  $DUMPDIR/RANGE_CHECK_ST_CAT.lst > $DUMPDIR/RANGE_CHECK_ST_CAT.lst2
+
+# GRENSEV
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/GRENSEV_ST_CAT.sql
+grep -v "^[[:blank:]]*$"  $DUMPDIR/GRENSEV_ST_CAT.lst > $DUMPDIR/GRENSEV_ST_CAT.lst2
+
+#RANGE_CHECK_DATA
+# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK_DATA.sql
+# grep -v "^[[:blank:]]*$"  $DUMPDIR/RANGE_CHECK_DATA.lst > $DUMPDIR/RANGE_CHECK_DATA.lst2
+# sed s/,/./g $DUMPDIR/RANGE_CHECK_DATA.lst2 > $DUMPDIR/RANGE_CHECK_DATA.out2
+
+$HOME/bin/empty2slashN.py  GRENSEV_ST_CAT.lst2 > range_check_st_cat.out
+scp range_check_ref.out range_check_st_cat.out stinfosys@157.249.168.141:~/bin/range_check_from_klima
+
+pwd
+
+
+

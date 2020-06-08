@@ -1,3 +1,13 @@
+kvalobs-metadata (2.10.30-1) unstable; urgency=low
+  * canged run_metadata_instance.in.sh, added table priority
+
+-- Terje Reite <terje.reite@met.no>  Mon, 25 Nov  2019 17:14:00 +0100
+
+kvalobs-metadata (2.10.29-1) unstable; urgency=low
+  * fixes
+
+-- Terje Reite <terje.reite@met.no>  Mon, 1 Jul  2019 15:28:00 +0200
+
 kvalobs-metadata (2.10.28-1) unstable; urgency=low
   * replace tab with blanks in algorithms --> changed algorithm_all
 

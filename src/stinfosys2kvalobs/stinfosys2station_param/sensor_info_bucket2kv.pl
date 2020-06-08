@@ -73,7 +73,7 @@ my $sth;
 
 $sth =
   $dbh->prepare(
-"select stationid, hlevel, sensor, sensor_info.fromtime, equipmentmodel.description from sensor_info, equipment, equipmentmodel where measurement_methodid=$measurement_methodid and sensor_info.paramid=$paramid and sensor_info.equipmentid=equipment.equipmentid and equipment.modelname=equipmentmodel.modelname"
+"select stationid, hlevel, sensor, sensor_info.fromtime, equipmentmodel.description from sensor_info, equipment, equipmentmodel where measurement_methodid=$measurement_methodid and sensor_info.paramgroupid=$paramid and sensor_info.equipmentid=equipment.equipmentid and equipment.modelname=equipmentmodel.modelname"
   ) or die "Can't prep\n";
 $sth->execute;
 

@@ -41,3 +41,32 @@ CREATE TABLE station_param_nonhour_klima (
         fromtime TIMESTAMP NOT NULL,
 	UNIQUE ( stationid, paramid, level, sensor, fromday, today, qcx, fromtime )
 );
+
+CREATE TABLE station_param_nonhour_range_check (
+	stationid INTEGER NOT NULL,
+	paramid   INTEGER NOT NULL,
+	level	  INTEGER DEFAULT 0,	 
+	sensor	  CHAR(1) DEFAULT '0',
+	fromday	  INTEGER NOT NULL,
+	today	  INTEGER NOT NULL,
+        qcx       TEXT NOT NULL,
+	metadata  TEXT DEFAULT NULL,
+        desc_metadata TEXT DEFAULT NULL,
+        fromtime TIMESTAMP NOT NULL,
+	UNIQUE ( stationid, paramid, level, sensor, fromday, today, qcx, fromtime )
+);
+
+CREATE TABLE station_param_dbQC1_1 (
+	stationid INTEGER NOT NULL,
+	paramid   INTEGER NOT NULL,
+	level	  INTEGER DEFAULT 0,	 
+	sensor	  CHAR(1) DEFAULT '0',
+	fromday	  INTEGER NOT NULL,
+	today	  INTEGER NOT NULL,
+	hour      INTEGER DEFAULT -1,
+    qcx       TEXT NOT NULL,
+	metadata  TEXT DEFAULT NULL,
+    desc_metadata TEXT DEFAULT NULL,
+    fromtime TIMESTAMP NOT NULL,
+	UNIQUE ( stationid, paramid, level, sensor, fromday, today, hour, qcx, fromtime )
+);

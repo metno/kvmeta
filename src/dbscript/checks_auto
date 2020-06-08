@@ -66,22 +66,31 @@ while( defined($line=<MYFILE>) ){
 	    my $len = @sline;
 	    
             if( $len==3 ){
-               my $qcx = trim($sline[0]);
+	       print "len==3 \n";
+               my $medium_qcx = trim($sline[0]);
+	       print "medium_qcx=$medium_qcx \n";
                my $checkname = trim($sline[1]);
+	       print "checkname=$checkname \n";
 	       my $check_signature = trim($sline[2]);
+	       print "check_signature=$check_signature \n";
                if( ($checkname ne "") and ($check_signature ne "") ){
-		     push(@qcx_list,$qcx);
-	             $qcx_checks{$qcx} = [$checkname,$check_signature];
+	       	  if( ! exists $qcx_checks{$medium_qcx} ){
+		     push(@qcx_list,$medium_qcx);
+	             $qcx_checks{$medium_qcx} = [$checkname,$check_signature];
+		  }else{
+		      print "ERROR double medium_qcx: $medium_qcx\n";		  
+                  }
+       	     
 	       }
 		 
 	   }elsif(  $len==4 ){
-	       my $qcx = trim($sline[0]);
+	       my $medium_qcx = trim($sline[0]);
 	       my $paramid = trim($sline[1]);
                my $checkname = trim($sline[2]);
 	       my $check_signature = trim($sline[3]);
 	       print "check_signature= $check_signature \n";
 	       if( ($checkname ne "") and ($check_signature ne "") ){
-	             $qcx_param_checks{$paramid} = [$checkname,$check_signature];
+	             $qcx_param_checks{$medium_qcx}{$paramid} = [$checkname,$check_signature];
 	       }
 	       
 	   }
@@ -99,7 +108,7 @@ while( defined($line=<MYFILE>) ){
     my $dbh = DBI->connect('dbi:Pg:dbname=kvalobs;host=localhost;port=5432',"kvalobs",$kvpasswd,{RaiseError => 1}) ||
 	die "Connect failed: $DBI::errstr";
 
-    my $sth = $dbh->prepare('select paramid, name  from param');
+    my $sth = $dbh->prepare('select paramid, name from param');
     $sth->execute;
     my @row=();
     my %param;
@@ -109,12 +118,12 @@ while( defined($line=<MYFILE>) ){
     }
     $sth->finish;
 
-    my $qcx;
+    
     my %qcx_param;
     my @ndef_paramid;
-    foreach $qcx (@qcx_list){
+    foreach my $medium_qcx (@qcx_list){
 	#print $qcx; print "\n";
-	my $sth = $dbh->prepare("select distinct paramid from station_param where qcx like '$qcx%'");
+	my $sth = $dbh->prepare("select distinct paramid from station_param where qcx like '$medium_qcx%'");
 
         $sth->execute;
         my @row=();
@@ -128,7 +137,7 @@ while( defined($line=<MYFILE>) ){
 	       push(@ndef_paramid,$row[0]);
 	   }
         }
-        $qcx_param{$qcx}=\@param_list;
+        $qcx_param{$medium_qcx}=\@param_list;
         $sth->finish;
     }
 
@@ -153,12 +162,13 @@ if( defined($ARGV[1])){
 
 }
 
-      my $outfilename= $ARGV[0].".out";
-      my $checks_outfilename = $checks_path . "/$outfilename";
-      my $checks_outfile = ">" . $checks_path . "/$outfilename";
-      print "checks_outfile= $checks_outfile \n";
-      open(MYFILEOUT,$checks_outfile) or die "Can't open  $checks_outfile: $!\n";
-      select(MYFILEOUT);
+ my $outfilename= $ARGV[0].".out";
+ my $checks_outfilename = $checks_path . "/$outfilename";
+ my $checks_outfile = ">" . $checks_path . "/$outfilename";
+ print "checks_outfile= $checks_outfile \n";
+
+
+ open(MYFILEOUT,$checks_outfile) or die "Can't open  $checks_outfile: $!\n";
 
 
 ################################################################
@@ -170,10 +180,10 @@ if( defined($ARGV[1])){
   my $active = "* * * * *";
 
 
-  foreach $qcx (@qcx_list){
-
-      my @qcx_check = @{$qcx_checks{$qcx}};
-      my @param_list = @{$qcx_param{$qcx}};
+  foreach my $medium_qcx (@qcx_list){
+      print "foreach $medium_qcx \n";
+      my @qcx_check = @{$qcx_checks{$medium_qcx}};
+      my @param_list = @{$qcx_param{$medium_qcx}};
       my $checkname = $qcx_check[0]; 
       my $check_signature = $qcx_check[1];
       my $paramid;
@@ -189,16 +199,16 @@ if( defined($ARGV[1])){
               $checksignature =~ s/$param_template/$name/g;
 
               if($is_qcxsimple){
-                   print "$stationid~$qcx~$qcx~$language~$checkname~$checksignature~$active~$fromtime\n";
+                   print MYFILEOUT "$stationid~$medium_qcx~$medium_qcx~$language~$checkname~$checksignature~$active~$fromtime\n";
 	       }else{
-		   if( defined $qcx_param_checks{$paramid} ){
-		       my @param_check = @{$qcx_param_checks{$paramid}};
+		   if( defined $qcx_param_checks{$medium_qcx}{$paramid} ){
+		       my @param_check = @{$qcx_param_checks{$medium_qcx}{$paramid}};
 		       my $checkname_p = $param_check[0]; 
 		       my $checksignature_p = $param_check[1];
 		       $checksignature_p =~ s/$param_template/$name/g;
-		       print "$stationid~$qcx-$paramid~$qcx~$language~$checkname_p~$checksignature_p~$active~$fromtime\n";
+		       print MYFILEOUT "$stationid~$medium_qcx-$paramid~$medium_qcx~$language~$checkname_p~$checksignature_p~$active~$fromtime\n";
 		   }else{
-		       print "$stationid~$qcx-$paramid~$qcx~$language~$checkname~$checksignature~$active~$fromtime\n";
+		       print MYFILEOUT "$stationid~$medium_qcx-$paramid~$medium_qcx~$language~$checkname~$checksignature~$active~$fromtime\n";
 		   }
 	       }
       }
@@ -206,11 +216,11 @@ if( defined($ARGV[1])){
 
 
 close(MYFILEOUT);
-select(STDOUT);
+## select(STDOUT);
 
 
-foreach $qcx (@qcx_list){
-  print "qcx= $qcx \n";
+foreach my $medium_qcx (@qcx_list){
+  print "medium_qcx= $medium_qcx \n";
 }
 
 
