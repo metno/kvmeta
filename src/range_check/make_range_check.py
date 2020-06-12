@@ -114,8 +114,8 @@ with open(p_outputfilename,'w') as f:
             ### cursor3.execute("""select count(TAN)
             cursor3.execute("""select count(""" + p_paramid_char_min + """)
                                from t_month m 
-                               where stnr=""" + str(l_stnr) + """and to_char ( m.dato,'mm')=""" + str(i) +
-                               """and dato between to_date('1957010100','yyyymmddhh24')
+                               where stnr=""" + str(l_stnr) + """ and to_char ( m.dato,'mm')=""" + str(i) +
+                               """ and dato between to_date('1957010100','yyyymmddhh24')
                                             and to_date('""" + last_time + """','yyyymmddhh24')""")
             
             tuple_l_finnes=cursor3.fetchall()
@@ -128,8 +128,8 @@ with open(p_outputfilename,'w') as f:
                  no_of_years=l_finnes
                  cursor4.execute("""select MIN (""" + str(p_paramid_char_min) + """), MAX(""" + str(p_paramid_char_max) + """)
                                from t_month m 
-                               where stnr=""" + str(l_stnr) + """and to_char ( m.dato,'mm')=""" + str(i) +
-                               """and dato between to_date('1957010100','yyyymmddhh24')
+                               where stnr=""" + str(l_stnr) + """ and to_char ( m.dato,'mm')=""" + str(i) +
+                               """ and dato between to_date('1957010100','yyyymmddhh24')
                                             and to_date('""" + last_time + """','yyyymmddhh24')
                                GROUP BY stnr, TO_CHAR (dato, 'mm' )
                                """)
