@@ -14,7 +14,8 @@ dist_bin_SCRIPTS = kvget-metadata-cron \
                    insert_update_delete_table.pl \
                    insert_update_delete_table_speed.pl \
                    kvget-metadata_insert_update_delete \
-                   kvinstall_metadata 
+                   kvinstall_metadata \
+                   Kvutil.pm
 
 kvget-metadata-cron:	kvget-metadata-cron.in
 	sed s,__KVCONFIG__,$(KVCONFIG), $< \
