@@ -68,7 +68,7 @@ print "START $d \n";
 my $file;
 
 
-    foreach $file (<*station_param*>){
+    foreach $file (<*>){
 	print $file; print "\n";
 	#system("$prog $file $control");
         if( substr($file,-1,1 ) ne '~' ){
