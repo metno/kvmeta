@@ -15,11 +15,10 @@ apt-get install --force-yes -y emacs
 apt-get install --force-yes -y debhelper
 apt-get install --force-yes -y autotools-dev debconf devscripts fakeroot build-essential 
 apt-get install --force-yes -y lintian autoconf automake
-apt-get install --force-yes -y libdbd-pg-perl libdbi-perl libperl5.18 
+apt-get install --force-yes -y libdbd-pg-perl libdbi-perl libperl5.26
 apt-get install --force-yes -y libperl-dev libdate-calc-perl 
 apt-get install --force-yes -y postgresql 
 apt-get install --force-yes -y less bzip2 
-apt-get install --force-yes -y subversion
 
 
 # sudo export LANGUAGE="en_US.UTF-8"
