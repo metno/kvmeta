@@ -26,10 +26,7 @@ apt-get install --force-yes -y less bzip2
 # sudo echo 'LC_ALL="en_US.UTF-8"' >> /etc/default/locale
 # . /etc/default/locale
 
-# sudo -u kvalobs svn co https://svn.met.no/kvoss/kvalobs_metadata/trunk/src/ /metno/kvalobs/src/ || true
-# 
 
-# pg_createcluster --socketdir=/var/run/kvalobs --user=kvalobs 9.3 kvalobs
 
 
 adduser --home /metno/kvalobs --shell /bin/bash kvalobs --disabled-password --quiet --gecos GECOS || true
@@ -41,17 +38,12 @@ sudo -u kvalobs createdb --owner kvalobs SVV || true
 
 sudo -u kvalobs mkdir -p /metno/kvalobs/src 
 
-#sudo -u kvalobs svn co https://svn.met.no/kvoss/kvalobs/trunk/src/kvalobs_database/ /metno/kvalobs/src/kvalobs_database || true
-
 #sudo -u kvalobs psql -f /metno/kvalobs/src/kvalobs_database/kvalobs_schema.sql || true
 #sudo -u kvalobs psql -d METNO -f /metno/kvalobs/src/instance_tables.sql || true  
 #sudo -u kvalobs psql -d PROJ  -f /metno/kvalobs/src/instance_tables.sql || true
 #sudo -u kvalobs psql -d SVV   -f /metno/kvalobs/src/instance_tables.sql || true
 
 #sudo apt-get install --force-yes -y libaio1
-
-# sudo -u kvalobs svn co https://svn.met.no/kvoss_intern/kvmetadata/trunk/share/metadata/   /metno/kvalobs/kvmetadata
-# sudo -u kvalobs svn co https://svn.met.no/kvoss_intern/kvmetadata_auto/   /metno/kvalobs/kvmetadata_auto
 
 sudo mkdir -pv /usr/share/kvalobs/
 sudo chgrp kvalobs /usr/share/kvalobs/
