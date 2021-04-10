@@ -316,7 +316,8 @@ do
      mkdir -p -m700 "$METADIST_INSTANCE/kvmeta_latin1"
      for TABLE in algorithms checks station_param station types param obs_pgm metadatatype station_metadata model qcx_info operator qc2_interpolation_best_neighbors priority
      do
-        iconv -f utf-8 -t latin1  $METADIST_INSTANCE/kvmeta/$TABLE.out >  $METADIST_INSTANCE/kvmeta_latin1/$TABLE.out
+         ## iconv -f utf-8 -t latin1  $METADIST_INSTANCE/kvmeta/$TABLE.out >  $METADIST_INSTANCE/kvmeta_latin1/$TABLE.out
+	 cp -pv $METADIST_INSTANCE/kvmeta/$TABLE.out  $METADIST_INSTANCE/kvmeta_latin1/$TABLE.out
      done
      tar cpjf  $kvmetadist_UTF8 kvmeta
      cp -pv    $kvmetadist_UTF8 kvmeta_${INSTANCE}_UTF8.tar.bz2
