@@ -32,9 +32,9 @@ PGUSER=kvalobs
 #	PGHOST=localhost
 #fi
 
-DUMPDIR="/tmp/$USER/kvalobs/var/log/tabledump"
+DUMPDIR="/tmp/kvalobs/var/log/tabledump"
 rm -rf $DUMPDIR
-mkdir -p -m700 /tmp/$USER/kvalobs/var/log/
+mkdir -p -m700 /tmp/kvalobs/var/log/
 mkdir -m700 $DUMPDIR
 LOGFILE="$DUMPDIR/table_update.log"
 
