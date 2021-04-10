@@ -61,10 +61,10 @@ cat $DUMPDIR/station_info_avg2kvalobs.out $DUMPDIR/hp.out $OPTIONAL_FILES > $DUM
 
 ## CHARSET CONVERSION
 for TABLE in param station message_format
-do
-  iconv -f utf-8 -t latin1  $DUMPDIR/$TABLE.utf-8 > $DUMPDIR/$TABLE.latin1
+do 
   if [ -n "$1" ]; then 
       #echo "latin1"
+      iconv -f utf-8 -t latin1  $DUMPDIR/$TABLE.utf-8 > $DUMPDIR/$TABLE.latin1
       cp -p $DUMPDIR/$TABLE.latin1  $DUMPDIR/$TABLE.out
   else
       #echo "utf-8"
