@@ -1,0 +1,244 @@
+#!/usr/bin/perl -w
+# Kvalobs_Metadata - Free Quality Control Algorithms for Meteorological Observations 
+#
+# $Id$
+#
+# Copyright (C) 2007 met.no
+#
+# Contact information:
+# Norwegian Meteorological Institute
+# Box 43 Blindern
+# 0313 OSLO
+# NORWAY
+# email: kvalobs-dev@met.no
+#
+# This file is part of KVALOBS_METADATA
+# 
+# KVALOBS_METADATA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#
+# KVALOBS_METADATA is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with KVALOBS_METADATA; if not, write to the Free Software Foundation Inc., 
+# 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+
+use strict;
+
+use POSIX;
+use File::Copy;
+use DBI;
+use Cwd qw(cwd);
+
+# use dbQC;
+use trim;
+
+use Encode;
+
+
+my $argn = @ARGV;
+my $control = "ins";
+
+if( $argn > 0 ){
+    # print "HELLO \n";    
+    my $filedir= $ARGV[0];
+    chdir($filedir);
+}
+
+my $dbhost="localhost";
+if( $argn > 1 ){
+    $dbhost=$ARGV[1];
+    # print "dbhost=$dbhost \n"
+}
+
+#exit(0);
+
+print "START \n";
+
+# my $kvpasswd=get_passwd();
+our $dbh = DBI->connect("dbi:Pg:dbname=kvalobs;host=$dbhost;port=5432","kvalobs","",{RaiseError => 1}) ||
+	die "Connect failed: $DBI::errstr";
+
+foreach my $file (<*.pl>){
+    print $file; print "\n";
+    eval { algorithm($file, $control) };
+    if ( $@ ) {                    # EVAL_ERROR
+		print "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
+		warn "\nERROR!!\nERROR:algorithm($file, $control) har feilet\n\nERROR!!\n" ;
+    } else {
+		print "algorithm($file, $control) er OK\n\n";
+    }
+    print "*********************************";print "\n";
+}
+
+$dbh->disconnect;
+
+print "END \n";
+
+#system("perl $prog bad_weatherdescription.pl");
+
+
+# Example of some rows in table algorithms:
+# language        : 1
+# checkname       : windysnowsand_slowwind
+# signature       : obs;X,Y;;|meta;R1,R2,R3,R4;;
+
+sub algorithm {
+ 	my ($fromfile, $control) = @_;
+
+    my $splitter= ":";
+
+    my $remove_from_fromname=3;
+
+    my $tofile = $fromfile;
+    for( my $i = $remove_from_fromname; $i>0; $i-- ){
+		chop($tofile);
+    }
+
+    open(MYFILE,$fromfile) or die "Can't open $fromfile: $!\n";
+
+    my $line;
+    my $counter=0;
+
+    my $language = 1;
+    my $checkname = $tofile;
+    my $signature;
+
+    while( defined($line=<MYFILE>) ){
+		$line = trim($line);
+		#last unless $line;
+
+		if( $counter >= 7)
+		{ last;}
+	
+		if( (length($line) > 0) && ($counter<7) ){
+	    	my $x = substr($line,0,1);
+	    	if($x eq "#"){
+				my $t= substr( $line, 1, length($line) );
+                $t=trim($t);
+				my @words = split /$splitter/,$t;
+				my $len = @words;
+				if($len>1){
+		    		my $r=trim($words[0]);
+		    		if( $r eq "language" ){
+						$language=trim($words[1]);
+						$counter++;
+						print "language=$language  counter= $counter";  print "\n";
+		    		}elsif( $r eq "checkname"){
+						$checkname=trim($words[1]);
+						$counter++;
+						print "checkname=$checkname  counter= $counter";  print "\n";
+		    		}elsif( $r eq "signature"){
+						$signature=trim($words[1]);
+						$counter++;
+						print "signature=$signature  counter= $counter";  print "\n";
+		    		}
+				}
+	    	}
+		}
+    }
+
+
+    my $row= "$language~$checkname~$signature";
+    my $algstr;
+
+    # Read in from $fromfile once more
+    seek(MYFILE,0,0);
+    while( defined($line=<MYFILE>) ){
+		$line =~ s/\s*$//;#Her otfores hoyre trim
+	    chomp($line);
+		# $line =~ s/\\n/\\\\n/g;
+		# $line =~ s/\\t/\\\\t/g;
+		# $line =~ s/\\/\\\\/g; -- We can not have this here now
+		$line =~ s/\\n/ /g; # replace \n in print statements with a blank
+		$algstr .= $line . "\n";
+    }
+
+    close(MYFILE);
+    chomp($algstr);
+    #chop($algstr); #Denne er unødvendig og farlig i og med at den fjerner siste tegn i linjen betingelsesløst.
+    $algstr .= "\n";
+
+    if( defined($row) ){
+		$row .= '~' . $algstr; 
+    }
+
+    insert_DB($language, $checkname, $signature, $algstr);
+}
+
+sub insert_DB{
+	my ( $language, $checkname, $signature, $script ) = @_;
+  	#my @driver_names = DBI->available_drivers;
+ 	#print @driver_names;
+
+  	my $sth = $dbh->prepare("select language from algorithms where checkname=?");
+  	$sth->execute($checkname);
+
+  	my @row=();
+  	my @language_already=();
+
+  	while (@row = $sth->fetchrow_array) {
+    	push(@language_already,$row[0]);
+  	}
+  
+  	$sth->finish;
+
+  	my $len_language=@language_already;
+  	if( $len_language > 0 ){
+   		print "length of language is $len_language\n";
+      	foreach(@language_already){
+	  		if($_ eq $language){ 
+	      		if( $control eq "ins" || $control eq 'R' ){
+		  			print " $checkname: Denne algoritmen blir naa replaced";
+                	my $sth = $dbh->prepare("UPDATE algorithms \
+                                             SET  signature = ?, script = ? \
+                                             WHERE language=? AND checkname=?");
+					
+			# print "script=$script \n";
+			$script=~ s/\t/  /g; # remove tab
+			my $dscript=decode_utf8($script);
+                	$sth->execute($signature,$dscript,$language,$checkname);
+                	$sth->finish;
+                	return;
+				}
+            	else{
+	        		print " $checkname: Dette spraaket er $_ og finnes i fra for; ingen oppdateringer \n";
+	        		return;
+	      		}
+	  		}
+        	else{
+	    		print " $checkname finnes ogsaa for spraak $_ \n";
+	  		}
+     	}
+  	}
+
+  ########################
+
+    #print " $checkname: Denne algoritmen blir naa replaced";
+    #my $sth = $dbh->prepare("UPDATE algorithms \
+    #                        SET  signature = '$signature', script = '$script' \
+    #                        WHERE language like '$language' AND checkname like '$checkname'");
+    #$sth->execute;
+    #$sth->finish;
+
+
+
+	
+        $sth = $dbh->prepare("INSERT INTO algorithms VALUES(?,?,?,?)");
+
+	$script=~ s/\t/  /g; # remove tab
+        my $dscript=decode_utf8($script);
+	# print "script=$script \n";
+  	$sth->execute($language,$checkname,$signature,$dscript);
+  
+  	$sth->finish;
+
+  	return;
+}
