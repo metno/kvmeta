@@ -1,5 +1,5 @@
 AC_PREREQ([2.59])
-AC_INIT([kvalobs-metadata], [2.11.4], [kvoss@met.no])
+AC_INIT([kvalobs-metadata], [2.11.5], [kvoss@met.no])
 AM_INIT_AUTOMAKE
 
 #AC_CONFIG_MACRO_DIR([m4])
