@@ -8,8 +8,10 @@ set -e  # Exit if a simple shell command fails
 
 # METASRC="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta.tar.bz2"
 # METASRC_UTF8="http://repo.met.no/data/metadata/obs/kvalobs/kvmeta_UTF8.tar.bz2"
-METASRC="http://157.249.168.104/kvalobs/kvmeta.tar.bz2"
-METASRC_UTF8="http://157.249.168.104/kvalobs/kvmeta_UTF8.tar.bz2"
+# METASRC="http://157.249.168.104/kvalobs/kvmeta.tar.bz2"
+# METASRC_UTF8="http://157.249.168.104/kvalobs/kvmeta_UTF8.tar.bz2"
+METASRC="http://metakvalobs.met.no/kvalobs/kvmeta.tar.bz2"
+METASRC_UTF8="http://metakvalobs.met.no/kvalobs/kvmeta_UTF8.tar.bz2"
 
 # BINDIR=/usr/bin
 BINDIR=$HOME/bin
