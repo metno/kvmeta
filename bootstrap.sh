@@ -6,19 +6,19 @@
 set -e
 
 # "|| true" makes the command always exit "ok"
-apt-get update || true
-apt-get upgrade --force-yes -y || true
+sudo apt-get update || true
+sudo apt-get upgrade --force-yes -y || true
 
 
-apt-get install --force-yes -y emacs
+sudo apt-get install -y emacs
 
-apt-get install --force-yes -y debhelper
-apt-get install --force-yes -y autotools-dev debconf devscripts fakeroot build-essential 
-apt-get install --force-yes -y lintian autoconf automake
-apt-get install --force-yes -y libdbd-pg-perl libdbi-perl libperl5.26
-apt-get install --force-yes -y libperl-dev libdate-calc-perl 
-apt-get install --force-yes -y postgresql 
-apt-get install --force-yes -y less bzip2 
+sudo apt-get install -y debhelper
+sudo apt-get install -y autotools-dev debconf devscripts fakeroot build-essential 
+sudo apt-get install -y lintian autoconf automake
+sudo apt-get install -y libdbd-pg-perl libdbi-perl libperl5.30
+sudo apt-get install -y libperl-dev libdate-calc-perl 
+sudo apt-get install -y postgresql 
+sudo apt-get install -y less bzip2 
 
 
 # sudo export LANGUAGE="en_US.UTF-8"
@@ -29,7 +29,7 @@ apt-get install --force-yes -y less bzip2
 
 
 
-adduser --home /metno/kvalobs --shell /bin/bash kvalobs --disabled-password --quiet --gecos GECOS || true
+sudo adduser --home /metno/kvalobs --shell /bin/bash kvalobs --disabled-password --quiet --gecos GECOS || true
 sudo -u postgres createuser -sER kvalobs  || true
 sudo -u kvalobs createdb --owner kvalobs kvalobs || true
 sudo -u kvalobs createdb --owner kvalobs METNO || true
