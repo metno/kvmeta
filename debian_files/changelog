@@ -1,3 +1,7 @@
+kvalobs-metadata (2.12.1-4) unstable; urgency=low
+  * FIX
+-- Terje Reite <terje.reite@met.no>  Wed, 28 Apr  2021 14:39 +0200
+
 kvalobs-metadata (2.12.1-3) unstable; urgency=low
   * reduced control file for libkvutil-perl
 -- Terje Reite <terje.reite@met.no>  Tue, 27 Apr  2021 16:35:00 +0200
