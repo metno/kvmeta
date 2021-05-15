@@ -64,11 +64,11 @@ do
               fi
 	  else
 	      echo "Database connection problem : $?"
-	      # echo "Database connection problem : $?" | mail -s "kvget_utesperring: Database connection problem " $MAILTO
+	      # echo "Database connection problem : $?" | mail -s "kvget-utesperring: Database connection problem " $MAILTO
 	      # exit 1
 	  fi
        else
-	   echo "Noe galt med passordtilordning" | mail -s "kvget_utesperring: Noe galt med passordtilordning" $MAILTO
+	   echo "Noe galt med passordtilordning" | mail -s "kvget-utesperring: Noe galt med passordtilordning" $MAILTO
 	   exit 1
        fi
 	  
@@ -76,7 +76,7 @@ done
 
 
 if [ "z$OKDB" != "ztrue" ]; then
-	echo "No database that is not in recovery is found" | mail -s "kvget_utesperring: No database that is not in recovery is found" $MAILTO
+	echo "No database that is not in recovery is found" | mail -s "kvget-utesperring: No database that is not in recovery is found" $MAILTO
         exit 1
 fi
 
@@ -87,7 +87,7 @@ echo "Database OK"
 
 METAGET=/var/lib/kvalobs
 
-KRO="kro"
+KRO="kro.met.no"
 if [ -f $HOME/.kro  ]; then
     KRO=`cat $HOME/.kro`
 fi
@@ -98,31 +98,35 @@ if [ -n "$1" ]; then
    echo "argumentet er $1"
    # tar xvvjf $1
 else
-    DUMPDIR="$METAGET/dumpdir"
-    mkdir -p -m700 $DUMPDIR
-    mkdir -p -m700 "$METAGET/utesperring"
-    #cd "$METAGET/dumpdir"
-    LOGDIR=$HOME/log/utesperring
-    mkdir -p $LOGDIR
+   DUMPDIR="$METAGET/dumpdir"
+   mkdir -p -m700 $DUMPDIR
+   mkdir -p -m700 "$METAGET/utesperring"
+   #cd "$METAGET/dumpdir"
+   LOGDIR=$HOME/log/utesperring
+   mkdir -p $LOGDIR
 
- for FILE in utesperring.sql utesperring_update.sql
- do
-    wget -O - http://$KRO/$FILE > $DUMPDIR/$FILE
-    if ! [ -s $DUMPDIR/$FILE ]; then
-       echo "Filen $DUMPDIR/$FILE er tom" > $LOGDIR/$FILE.log
-       exit 1
-    fi  
+   for FILE in utesperring.sql utesperring_update.sql
+   do
+      echo "wget -O - http://$KRO/$FILE > $DUMPDIR/$FILE"
+      wget -O - http://$KRO/$FILE > $DUMPDIR/$FILE
+      if ! [ -s $DUMPDIR/$FILE ]; then
+         echo "Filen $DUMPDIR/$FILE er tom" > $LOGDIR/$FILE.log
+         exit 1
+      fi  
 
-    echo "$DUMPDIR/$FILE"
-    echo "$METAGET/utesperring/$FILE"
+      echo "$DUMPDIR/$FILE"
+      echo "$METAGET/utesperring/$FILE"
 
-    if ! diff -q  $DUMPDIR/$FILE  $METAGET/utesperring/$FILE
-    then
-       if [ -f $METAGET/utesperring/$FILE  ]; then
+      if [ -f $METAGET/utesperring/$FILE  ]; then
+         if ! diff -q  $DUMPDIR/$FILE  $METAGET/utesperring/$FILE
+         then
             mv -uv $METAGET/utesperring/$FILE $METAGET/utesperring/$FILE.old
-       fi 
-       cp -pv $DUMPDIR/$FILE $METAGET/utesperring/$FILE
-       $PSQL -f $METAGET/utesperring/$FILE
-    fi
-  done
+            cp -pv $DUMPDIR/$FILE $METAGET/utesperring/$FILE
+            # $PSQL -f $METAGET/utesperring/$FILE
+         fi
+      else
+         cp -pv $DUMPDIR/$FILE $METAGET/utesperring/$FILE
+         # $PSQL -f $METAGET/utesperring/$FILE
+      fi
+   done
 fi

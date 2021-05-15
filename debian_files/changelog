@@ -1,3 +1,13 @@
+kvalobs-metadata (2.12.3-1) unstable; urgency=low
+  * kvget-utespering fix
+-- Terje Reite <terje.reite@met.no>  Wed, 14 May  2021 16:43 +0200
+
+kvalobs-metadata (2.12.2-1) unstable; urgency=low
+  * kvget-utespering included in the package kvget-metadata
+  * kvget-metadata fixed utespering and added priority
+  * kvget-metadata_insert_update_delete added priority
+-- Terje Reite <terje.reite@met.no>  Wed, 14 May  2021 10:35 +0200
+
 kvalobs-metadata (2.12.1-4) unstable; urgency=low
   * FIX
 -- Terje Reite <terje.reite@met.no>  Wed, 28 Apr  2021 14:39 +0200

@@ -12,9 +12,7 @@ export PATH
 
 USER=kvalobs
 
-# METALOG="http://157.249.168.104/kvalobs/view_auto.log"
 METALOG="http://metakvalobs.met.no/kvalobs/view_auto.log"
-
 wget -O - $METALOG > $HOME/log/view_auto.log
 MYVAR=`tail -n 1 $HOME/log/view_auto.log`
 if [ $MYVAR = "Fortsett" ]; then
