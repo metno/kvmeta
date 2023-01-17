@@ -42,7 +42,7 @@ cd $DUMPDIR
 
 # sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
 export PGPASSWORD=$PGPASSWD
-psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy ( select stationid,paramid,hlevel,month,highest,high,low,lowest,calc_highest,calc_high,calc_low,calc_lowest from  range_check_data ) to range_check_data.out DELIMITER '|'"
+psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy ( select stationid,paramid,hlevel,month,highest,high,low,lowest,calc_highest,calc_high,calc_low,calc_lowest from range_check_data where highest is not NULL and high is not NULL and low is not NULL and lowest is not NULL ) to range_check_data.out DELIMITER '|'"
 psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy range_check_param_group to range_check_param_group.out DELIMITER ','"
 unset  PGPASSWORD
 
