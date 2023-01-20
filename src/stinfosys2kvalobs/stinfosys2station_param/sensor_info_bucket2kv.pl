@@ -146,7 +146,7 @@ sub print_station_param {
     # my $qcx  = "QC1-1-104";
     my $maxV = $V + 115;
     my $metadata =
-      "max;highest;high;low;lowest;min\\n$maxV;$V;$V;50.0;0.0;-3.0";
+      "max;highest;high;low;lowest;min\\n$maxV;$V;$V;50.0;0.0;0";
     my $QCX = "QC1-1";
     print
 "$stationid|$paramid|$level|$sensor|$fromday|$today|$QCX-$paramid|$metadata|$desc_metadata|$fromtime\n";
