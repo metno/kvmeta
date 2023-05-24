@@ -114,6 +114,13 @@ sub readstfile {
                     print "level=$level  counter= $counter";
                     print "\n";
                 }
+		elsif ( $r eq "sensor" ) {
+                    $is_metadata = 0;
+                    $sensor       = trim( $words[1] );
+                    $counter++;
+		    print "sensor=$sensor  counter= $counter";
+                    print "\n";
+                }
                 elsif ( $r eq "fromday" ) {
                     $is_metadata = 0;
                     $fromday     = trim( $words[1] );
