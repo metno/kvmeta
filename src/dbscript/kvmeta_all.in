@@ -11,7 +11,7 @@ mkdir -pv $HOME/var/log
 
 LIBEXECDIR=__PKGLIBBINDIR__
 $LIBEXECDIR/kvinstall_metadata
-$LIBEXECDIR/run_metadata_instance METNOSVV SVV PROJ > $HOME/var/log/run_metadata_instance.log 2>&1
+$LIBEXECDIR/run_metadata_instance METNOSVV PROJ > $HOME/var/log/run_metadata_instance.log 2>&1
 
 (
 nr=0
