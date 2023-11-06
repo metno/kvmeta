@@ -9,7 +9,7 @@ set -e  # Exit if a simple shell command fails
 DAYS=+10
 #-----------------------------------
 
-DIR=/metno/kvalobs
+DIR=/metno/kvalobs/
 find $DIR -name '*-20*' -type f -mtime $DAYS -exec rm -f {} \;
 
 # echo "cleanup_metno_kvalobs `date +'%Y-%m-%d'`" > $HOME/var/log/cleanup_metno_kvalobs.finished_log
