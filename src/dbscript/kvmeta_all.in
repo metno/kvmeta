@@ -15,7 +15,7 @@ $LIBEXECDIR/run_metadata_instance METNOSVV PROJ > $HOME/var/log/run_metadata_ins
 
 (
 nr=0
-while [ $nr -lt 8 ]
+while [ $nr -lt 6 ]
 do
      # echo "$count"
      # grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l
@@ -25,6 +25,3 @@ done
 
 grep bz2 $HOME/var/log/run_metadata_instance.log
 )
-
-
-
