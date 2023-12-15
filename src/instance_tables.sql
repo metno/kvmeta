@@ -42,6 +42,20 @@ CREATE TABLE obs_pgm (
 	UNIQUE ( stationid, typeid, paramid, level, fromtime )	
 );
 
+CREATE TABLE obs_pgm2  (
+    stationid           INTEGER NOT NULL,
+    paramid             INTEGER NOT NULL,
+    level               INTEGER NOT NULL,
+    typeid              INTEGER NOT NULL,
+    sensor              INTEGER DEFAULT 0,
+    priority_message    BOOLEAN DEFAULT TRUE,
+    anytime             BOOLEAN DEFAULT FALSE,
+    hour                BOOLEAN[24] DEFAULT '{FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE}',
+    fromtime            TIMESTAMP NOT NULL,
+    totime              TIMESTAMP DEFAULT NULL,
+    UNIQUE ( stationid, paramid, level, typeid, sensor, fromtime )
+);
+
 CREATE TABLE station_metadata (
         stationid INTEGER NOT NULL,
         paramid INTEGER DEFAULT NULL,
