@@ -231,8 +231,8 @@ do
 done
 
 
-echo "Oppdaterer tabellene algorithms checks station_param types param obs_pgm obs_pgm2 model qcx_info operator qc2_interpolation_best_neighbors";
-for TABLE in algorithms checks station_param types param obs_pgm obs_pgm2 model qcx_info operator qc2_interpolation_best_neighbors
+echo "Oppdaterer tabellene algorithms checks station_param types param obs_pgm obs_pgm2 model qcx_info operator qc2_interpolation_best_neighbors priority";
+for TABLE in algorithms checks station_param types param obs_pgm obs_pgm2 model qcx_info operator qc2_interpolation_best_neighbors priority
 do
     $PSQL -a -c "truncate table $TABLE"
     $PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
