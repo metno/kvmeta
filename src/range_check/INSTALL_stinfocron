@@ -1,0 +1,6 @@
+#!/bin/bash
+
+mkdir -p $HOME/bin/range_check
+
+cp -upv *.sh   $HOME/bin/range_check
+cp -upv *.py   $HOME/bin/range_check
