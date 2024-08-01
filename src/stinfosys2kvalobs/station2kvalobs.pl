@@ -102,7 +102,7 @@ if( $days_back == -1 ){;
     push(  @where_arr, "( stationid <= $max_stationid or stationid in ( select stationid from network_station where networkid=$Kvalobsintl ) )" );
 #}
 
-    push(  @where_arr, "ontologyid=0" );
+    push(  @where_arr, "( ontologyid=0 or ontologyid=3 )" );
 
 my $where_clause=join(" AND ",@where_arr);
 

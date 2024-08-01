@@ -247,9 +247,9 @@ do
    done
 
    echo "Oppdaterer tabellen obs_pgm for instansen $INSTANCE"
-   #for TABLE in obs_pgm
-   #do
-   TABLE="obs_pgm"
+   for TABLE in obs_pgm obs_pgm2
+   do
+   # TABLE="obs_pgm"
       if [ -n "$INSTANCE" ]; then
          TABLE_INSTANCE=${TABLE}_${INSTANCE}
       else
@@ -273,7 +273,7 @@ do
 
     assert_table_not_empty_instance $INSTANCE $TABLE
     $PSQL -d $INSTANCE -c "\copy $TABLE to $METADIST_INSTANCE/kvmeta/$TABLE.out DELIMITER '|'"
-   #done
+   done
 
    # TABLE="checks"
    # $LIBEXECDIR/table_instance $INSTANCE $TABLE

@@ -36,8 +36,12 @@ mkdir -p  $DUMPDIR
 $BINDIR/station2kvalobs.pl -1 > $DUMPDIR/station.utf-8
 $BINDIR/obs_pgm2kvalobs_new.pl -1 > $DUMPDIR/obs_pgm.out
 $BINDIR/obs_pgm2kvalobs_new.pl -1 METNOSVV > $DUMPDIR/obs_pgm_METNOSVV.out
-$BINDIR/obs_pgm2kvalobs_new.pl -1 SVV > $DUMPDIR/obs_pgm_SVV.out
+# $BINDIR/obs_pgm2kvalobs_new.pl -1 SVV > $DUMPDIR/obs_pgm_SVV.out
 $BINDIR/obs_pgm2kvalobs_new.pl -1 PROJ > $DUMPDIR/obs_pgm_PROJ.out
+$BINDIR/obs_pgm2.pl -1 > $DUMPDIR/obs_pgm2.out
+$BINDIR/obs_pgm2.pl -1 METNOSVV > $DUMPDIR/obs_pgm2_METNOSVV.out
+# $BINDIR/obs_pgm2.pl -1 SVV > $DUMPDIR/obs_pgm2_SVV.out
+$BINDIR/obs_pgm2.pl -1 PROJ > $DUMPDIR/obs_pgm2_PROJ.out
 $BINDIR/param2kvalobs.pl       > $DUMPDIR/param.utf-8
 $BINDIR/message_format_stdump.pl > $DUMPDIR/message_format.utf-8
 
@@ -73,7 +77,7 @@ do
 done
 
 ## COPY TO METADIR    
-for TABLE in param obs_pgm obs_pgm_METNOSVV obs_pgm_SVV obs_pgm_PROJ station station_metadata
+for TABLE in param obs_pgm obs_pgm_METNOSVV obs_pgm_PROJ obs_pgm2 obs_pgm2_METNOSVV obs_pgm2_PROJ station station_metadata
 do  
 	mkdir -p $METADIR/$TABLE
 	
