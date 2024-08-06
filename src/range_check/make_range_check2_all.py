@@ -382,8 +382,8 @@ for l_stnr, in c_stationid:
                                              AND paramid = """ + str(p_paramid) + """
                                              AND month = """ + str(i) + """)
                                    where stationid =""" + str(l_stnr) +
-                                   """AND month = """ + str(i) +                 
-                                   """AND paramid = """ + str(p_paramid) )
+                                   """ AND month = """ + str(i) +                 
+                                   """ AND paramid = """ + str(p_paramid) )
                     conn.commit()
 
                     c_update_min.execute("""update range_check_data d
@@ -399,8 +399,8 @@ for l_stnr, in c_stationid:
                                              AND paramid = """ + str(p_paramid) + """
                                              AND month = """ + str(i) + """)
                                    where stationid =""" + str(l_stnr) +
-                                   """AND month = """ + str(i) +
-                                   """AND paramid = """ + str(p_paramid) )
+                                   """ AND month = """ + str(i) +
+                                   """ AND paramid = """ + str(p_paramid) )
                     conn.commit()
 
 c_update= conn.cursor()

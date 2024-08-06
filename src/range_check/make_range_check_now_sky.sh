@@ -8,9 +8,9 @@ export PYTHONPATH=$HOME/lib/python
 
 mkdir -pv $HOME/share/range_check/
 
-export ORACLE_HOME=/usr/local/lib/oracle/instantclient_21_5/instantclient_21_5
+export ORACLE_HOME=/usr/local/lib/oracle/instantclient_21_14/instantclient_21_14
 export PATH=$ORACLE_HOME:$PATH
-export LD_LIBRARY_PATH=/usr/local/lib/oracle/instantclient_21_5/instantclient_21_5
+export LD_LIBRARY_PATH=/usr/local/lib/oracle/instantclient_21_14/instantclient_21_14
 export TNS_ADMIN=/etc/oracle/client64/network/admin/
 
 echo "start make_range_check.py"
