@@ -47,7 +47,6 @@ if( $len == 0 ){
 
 my $defdump=0;
 my $null="none";
-my $max_stationid=99999;
 my $Kvalobsintl=32;
 
 my %stationf;
@@ -90,7 +89,6 @@ my %time_hash;
 
 my @where_arr;
 
-
 if( $days_back == -1 ){;
 }elsif( $days_back == -2 ){
     push( @where_arr,"totime is NULL" );
@@ -98,11 +96,8 @@ if( $days_back == -1 ){;
     push( @where_arr,"( totime>=( now() - '$days_back days'::INTERVAL )  or totime is NULL)");
 }
 
-#if( $Kvalobs-intl ){
-    push(  @where_arr, "( stationid <= $max_stationid or stationid in ( select stationid from network_station where networkid=$Kvalobsintl ) )" );
-#}
-
-    push(  @where_arr, "( ontologyid=0 or ontologyid=3 )" );
+push(  @where_arr, "( countryid in ( 744, 74, 7106, 578 ) or stationid in ( select stationid from network_station where networkid=$Kvalobsintl ) )" );
+push(  @where_arr, "( ontologyid=0 or ontologyid=3 )" );
 
 my $where_clause=join(" AND ",@where_arr);
 
