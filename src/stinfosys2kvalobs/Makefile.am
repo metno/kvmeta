@@ -12,7 +12,8 @@ dist_bin_SCRIPTS =  \
    message_format_stdump.pl \
    test_wmonr_stinfosys2kvalobs.pl \
    hp.pl \
-   station_info_avg2kvalobs.pl
+   station_info_avg2kvalobs.pl \
+   obs_pgm2.pl
 
 #  obs_pgm2kvalobs.pl    
 #   intodb_stinfosys2kvalobs.pl 
