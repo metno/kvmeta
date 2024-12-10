@@ -28,7 +28,7 @@ do
 done
  
 
-TT=`for tt in $ARG; do find $DIR -type f -name ${tt}.finished_log -mmin +720; done`
+TT=`for tt in $ARG; do find $DIR -type f -name ${tt}.finished_log -mmin +721; done`
 
 if [ -n "$TT" ]; then echo $TT | mail -s "monitoring metakvalobs" $MAILTOLIST; fi
 
