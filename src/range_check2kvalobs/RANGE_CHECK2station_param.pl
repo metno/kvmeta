@@ -53,20 +53,20 @@ my $null='\N';
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$stname;host=$sthost;port=$stport", "$stuser", "$stpasswd",{RaiseError => 1}) or die "Cant't connect";
 
-my %param; 
-my $sth = $dbh->prepare('select paramid, name from param');
-$sth->execute;
-my @row;
-while (@row = $sth->fetchrow_array) {
-    $param{"$row[1]"}=$row[0];
-}
-$sth->finish;
+#my %param; 
+#my $sth = $dbh->prepare('select paramid, name from param');
+#$sth->execute;
+#my @row;
+#while (@row = $sth->fetchrow_array) {
+#    $param{"$row[1]"}=$row[0];
+#}
+#$sth->finish;
 
 
 my %st_maxspeed;
-$sth = $dbh->prepare('select distinct stationid from station where maxspeed > 0');
+my $sth = $dbh->prepare('select distinct stationid from station where maxspeed > 0');
 $sth->execute;
-while (@row = $sth->fetchrow_array) {
+while (my @row = $sth->fetchrow_array) {
     $st_maxspeed{"$row[0]"}=1;
 }
 $sth->finish;
@@ -167,7 +167,7 @@ sub print_station_param{
    my $QCX = "QC1-1";
  
    my $metafile_refarr;
-   if( ! defined $level || $level eq "" ){
+   if( ! defined $level || $level eq "" || $level eq '\N' ){
 	$level=0;
    }
 
@@ -207,8 +207,6 @@ sub print_station_param{
    if( defined $highest && defined $high && defined $lowest && defined $low && $highest ne "" && $high ne "" && $lowest ne "" && $low ne "" ){
       $tt=1;
    }
-
-   #my $paramid=$param{$paraname};
    
    my $desc_metadata = "\\N";          
    my $metadata =  "max;highest;high;low;lowest;min\\n$max;$highest;$high;$low;$lowest;$min";
