@@ -1,3 +1,7 @@
+kvalobs-metadata (2.13.1-1) unstable; urgency=low
+  * Noble
+-- Terje Reite <terje.reite@met.no>  Fri, 15 Nov  2024 16:00:00 +0200
+
 kvalobs-metadata (2.12.3-1) unstable; urgency=low
   * kvget-utespering fix
 -- Terje Reite <terje.reite@met.no>  Wed, 14 May  2021 16:43 +0200

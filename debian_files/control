@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Terje Reite <terje.reite@met.no>
 Build-Depends: debhelper, autotools-dev, debconf,
  devscripts, fakeroot, build-essential, lintian, autoconf,
- automake, libdbd-pg-perl, libdbi-perl, libperl5.30 (>= 5.8.8), 
+ automake, libdbd-pg-perl, libdbi-perl, libperl5.38t64 (>= 5.8.8), 
  libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3), 
  less, bzip2
 Standards-Version: 3.8.3
@@ -14,7 +14,7 @@ Homepage: https://kvalobs.wiki.met.no/doku.php?id=kvalobs
 Package: kvget-metadata
 Architecture: any
 Suggests: kvalobs-metadata
-Depends: libdbd-pg-perl, libdbi-perl, libperl5.30 (>= 5.8.8),
+Depends: libdbd-pg-perl, libdbi-perl, libperl5.38t64 (>= 5.8.8),
   postgresql (>= 8.3), bzip2, wget,
   libclass-singleton-perl, libdatetime-locale-perl, libdatetime-perl,
   libdatetime-set-perl, libdatetime-timezone-perl, libmodule-implementation-perl,
@@ -27,13 +27,13 @@ Description: Metadata to kvalobs
 
 Package: libkvutil-perl
 Architecture: any
-Depends: libperl5.30 (>= 5.8.8), libdatetime-event-sunrise-perl
+Depends: libperl5.38t64 (>= 5.8.8), libdatetime-event-sunrise-perl
 Description: The package contains a module used by perl checks in qabase + libdatetime-event-sunrise-perl.
 
 
 Package: kvalobs-metadata
 Architecture: any
-Depends: libdbd-pg-perl, libdbi-perl, libperl5.30 (>= 5.8.8), 
+Depends: libdbd-pg-perl, libdbi-perl, libperl5.38t64 (>= 5.8.8), 
  libperl-dev, libdate-calc-perl (>= 5.4-5), postgresql (>= 8.3),
  less, bzip2
 Description: Metadata to kvalobs
