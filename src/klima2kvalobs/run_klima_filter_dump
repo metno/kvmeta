@@ -1,0 +1,38 @@
+#! /bin/bash
+
+set -a  # export variables to the environment of subsequent commands
+set -e  # Exit if a simple shell command fails
+#set -x  # for debugging, remove later
+
+PERL5LIB=/usr/lib/kvalobs-metadata/lib/perl
+BINDIR=/usr/lib/kvalobs-metadata/bin
+
+DVH=$HOME
+
+## ** Subroutines **
+assert_table_not_empty() {
+	NUM_ROWS=`psql -t -c "select count(*) from $1"`
+	if [ $NUM_ROWS -eq 0 ]; then
+		echo "ERROR: tabellen $1 er tom."
+		exit 1
+	fi
+}
+
+if [ -f  $DVH/etc/klima.conf ]; then
+   . $DVH/etc/klima.conf
+else
+   echo "Missing file:  $DVH/etc/klima.conf"
+   exit 1
+fi
+
+export ORACLE_HOME
+export PATH
+export LD_LIBRARY_PATH
+
+mkdir -pv $DUMPDIR 
+cd $DUMPDIR
+
+sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/KLIMAFILTER.sql
+grep -v "^[[:blank:]]*$"  $DUMPDIR/KV2KLIMA_PARAM_FILTER.lst > $DUMPDIR/KV2KLIMA_PARAM_FILTER.lst2
+
+pwd
