@@ -10,10 +10,8 @@ export METADIR=$HOME/kvoss_intern/kvmeta
 
 LIBEXECDIR=/usr/lib/kvalobs-metadata/bin
 
-echo '/metno/kvalobs/bin/git_pull:'
-/metno/kvalobs/bin/git_pull
-
-# $LIBEXECDIR/run_klima2kvalobs
+# echo '/metno/kvalobs/bin/git_pull:'
+# /metno/kvalobs/bin/git_pull
 
 mkdir -pv $HOME/var/log
 
@@ -21,5 +19,4 @@ $LIBEXECDIR/kvinstall_metadata
 
 $LIBEXECDIR/run_QC1-1_all
 
-# echo "run_klima2kvalobs_all `date +'%Y-%m-%d'`" > $HOME/var/log/run_klima2kvalobs_all.finished_log
-$HOME/bin/monitor/monitor_log.sh run_klima2kvalobs_all
+$HOME/bin/monitor/monitor_log.sh run_QC1-1_all_cron

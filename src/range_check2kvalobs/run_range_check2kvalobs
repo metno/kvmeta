@@ -37,10 +37,6 @@ fi
 mkdir -pv $DUMPDIR 
 cd $DUMPDIR
 
-# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_CHECK.sql
-# sqlplus -S ${KLUSER}/${KLPASSWD}@//${KLHOST}:1521/${KLDATABASE} < $SQLDIR/RANGE_PARAM_GROUPS.sql
-
-# sed s/,/./g $DUMPDIR/RANGE_CHECK.lst > $DUMPDIR/RANGE_CHECK.out
 export PGPASSWORD=$PGPASSWD
 psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy ( select stationid,paramid,hlevel,month,highest,high,low,lowest,calc_highest,calc_high,calc_low,calc_lowest from range_check_data where highest is not NULL and high is not NULL and low is not NULL and lowest is not NULL ) to range_check_data.out DELIMITER '|'"
 psql -h $PGHOST -p 5432 -U $PGUSER -d $PGNAME  -c "\copy range_check_param_group to range_check_param_group.out DELIMITER ','"
@@ -57,9 +53,11 @@ sort $DUMPDIR/station_param_QC1-1.out > $DUMPDIR/station_param_QC1-1.orig.sorted
 LOGDIR=$HOME/var/log/insert_update_delete_table_range_check
 mkdir -pv $LOGDIR
 
-echo "Oppdaterer tabellen station_param_nonhour_range_check";
+echo "Oppdaterer tabellen station_param_nonhour_range_check"
 TABLE=station_param_nonhour_range_check
 $USRBIN/insert_update_delete_table_speed.pl localhost 5432 $TABLE $DUMPDIR/station_param_QC1-1.out unique nd > $LOGDIR/${TABLE}.log 2> $LOGDIR/${TABLE}.error_log
+
+echo "END::Oppdaterer tabellen station_param_nonhour_range_check"
 
 # another postgresl database
 export PGHOST=localhost
@@ -74,7 +72,7 @@ psql -c "\copy $TABLE to $DUMPDIR/station_param_nonhour_range_check.out DELIMITE
   
 sort $DUMPDIR/station_param_nonhour_range_check.out > $DUMPDIR/station_param_QC1-1.out
 
-# exit 0
+echo "TEST::COPY TO station_param"
 
 ## COPY TO station_param   
 for FILE in station_param_QC1-1.out
