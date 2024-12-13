@@ -11,13 +11,12 @@ mkdir -pv $HOME/var/log
 
 LIBEXECDIR=__PKGLIBBINDIR__
 $LIBEXECDIR/kvinstall_metadata
-$LIBEXECDIR/run_metadata_instance METNOSVV PROJ > $HOME/var/log/run_metadata_instance.log 2>&1
+$LIBEXECDIR/run_metadata_instance METNOSVV > $HOME/var/log/run_metadata_instance.log 2>&1
 
 (
 nr=0
-while [ $nr -lt 6 ]
+while [ $nr -lt 4 ]
 do
-     # echo "$count"
      # grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l
      nr=`grep bz2 $HOME/var/log/run_metadata_instance.log | wc -l`
      sleep 5

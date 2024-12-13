@@ -334,5 +334,9 @@ do
       rm -rf   $METADIST_INSTANCE/kvmeta
    fi  
    date
+   echo "This is the end"
+   exit 0
    )&
 done
+
+exit 0
