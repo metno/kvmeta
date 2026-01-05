@@ -192,8 +192,8 @@ do
 done
 
 
-echo "Oppdaterer tabellene station_param obs_pgm";
-for TABLE in station_param obs_pgm
+echo "Oppdaterer tabellene station_param obs_pgm obs_pgm2";
+for TABLE in station_param obs_pgm obs_pgm2
 do
     #$PSQL -a -c "truncate table $TABLE"
     #$PSQL -c "\copy $TABLE from $METAGET/$KVMETA/$TABLE.out DELIMITER '|'"
